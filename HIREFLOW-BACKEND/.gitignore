@@ -1,0 +1,57 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+
+# Virtual environments
+venv/
+.env/
+.venv/
+ENV/
+env/
+*.venv
+
+# Environment variables and local config
+.env
+.env.*
+!.env.example
+
+# FastAPI / application runtime
+*.log
+*.sqlite3
+*.db
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# IDE / editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Alembic / migration generated state
+alembic/versions/*.pyc
+
+# Local notebooks / temp files
+.ipynb_checkpoints/
+*.tmp
+
+# Node / frontend caches (if ever added later)
+node_modules/
