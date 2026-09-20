@@ -21,17 +21,6 @@ from starlette import status
 candidates_router = APIRouter()
 
 
-@candidates_router.post("", status_code=status.HTTP_201_CREATED)
-def create_candidate(candidate: CandidateCreate, db: Session = Depends(get_db)):
-    try:
-        crud.create_candidate(db, candidate)
-        return {"message": "Candidate created successfully"}
-    except CandidateAlreadyExistsError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Candidate already exists"
-        )
-
-
 @candidates_router.get("", status_code=status.HTTP_200_OK)
 def get_candidates(
     candidate_filters: CandidateFilters = Query(), db: Session = Depends(get_db)

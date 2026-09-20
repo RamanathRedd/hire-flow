@@ -14,27 +14,7 @@ class OldPasswordMismatchError(HireFlowException):
     pass
 
 
-class TokenNotRecognizedError(HireFlowException):
-    pass
-
-
-class InvalidTokenTypeError(HireFlowException):
-    pass
-
-
-class TokenExpiredError(HireFlowException):
-    pass
-
-
-class TokenNotFoundError(HireFlowException):
-    pass
-
-
-class OtherUserSessionError(HireFlowException):
-    pass
-
-
-class UserNotExistsError(HireFlowException):
+class InvalidOrExpiredTokenError(HireFlowException):
     pass
 
 
@@ -92,7 +72,8 @@ class SkippedStageError(HireFlowException):
 
 
 class CandidateAlreadyExistsError(HireFlowException):
-    pass
+    def __init__(self, message: str = "Candidate already exists"):
+        super().__init__(message)
 
 
 class EmailAlreadyExistsError(HireFlowException):
@@ -116,7 +97,8 @@ class LinkedInAlreadyExistsError(HireFlowException):
 
 
 class RecruiterAlreadyExistsError(HireFlowException):
-    pass
+    def __init__(self, message: str = "Recruiter already exists"):
+        super().__init__(message)
 
 
 class ActiveJobExistsError(HireFlowException):

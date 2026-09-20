@@ -1,33 +1,44 @@
-from datetime import datetime, timedelta, timezone
-
-import jwt
 from pydantic import EmailStr
 from sqlalchemy import select
-from domains.auth.model import RefreshToken
 from core.security import (
     create_access_token,
-    create_refresh_token,
-    decode_token,
     hash_password,
-    hash_token,
     verify_password,
 )
 from core.exceptions import (
     InvalidCredentials,
-    InvalidTokenTypeError,
+    InvalidOrExpiredTokenError,
     OldPasswordMismatchError,
-    OtherUserSessionError,
     PasswordMismatchError,
-    TokenExpiredError,
-    TokenNotFoundError,
-    TokenNotRecognizedError,
-    UserNotExistsError,
 )
 from domains.candidates.model import Candidate
+from domains.candidates.schemas import CandidateCreate
+from domains.candidates import crud as candidate_crud
 from domains.recruiters.model import Recruiter
+from domains.recruiters.schemas import RecruiterCreate
+from domains.recruiters import crud as recruiter_crud
 from domains.auth.schemas import PasswordUpdate
 from sqlalchemy.orm import Session
 from core.config import settings
+from core.security import verify_access_token
+from domains.recruiters.crud import get_recruiter_details
+from domains.candidates.crud import get_candidate_details
+
+
+def register(db: Session, role: str, data: dict) -> dict:
+    role = role.strip().lower()
+
+    if role == "admin":
+        recruiter_data = RecruiterCreate.model_validate(data)
+        recruiter_crud.create_recruiter(db, recruiter_data)
+        return {"message": "Recruiter created successfully"}
+
+    if role == "user":
+        candidate_data = CandidateCreate.model_validate(data)
+        candidate_crud.create_candidate(db, candidate_data)
+        return {"message": "Candidate created successfully"}
+
+    raise ValueError("role must be either 'Admin' or 'User'")
 
 
 def login(db: Session, email: EmailStr, password: str) -> dict:
@@ -50,119 +61,37 @@ def login(db: Session, email: EmailStr, password: str) -> dict:
 
     payload = {"sub": str(user.name), "id": user.id, "role": role}
     access_token = create_access_token(payload)
-    refresh_token = create_refresh_token(payload)
-    token_hash = hash_token(refresh_token)
-    # what if same user again login within 2mins?
-    create_refresh_token_record(db, token_hash, user.id, role)
 
     return {
         "access_token": access_token,
-        "refresh_token": refresh_token,
+        "token_type": "bearer",
         "role": role,
         "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     }
 
 
-def create_refresh_token_record(
-    db: Session, token_hash: str, user_id: int, role: str
-) -> None:
-    record = RefreshToken(
-        token_hash=token_hash,
-        user_id=user_id,
-        role=role,
-        expires_at=(
-            datetime.now(timezone.utc)
-            + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
-        ).replace(microsecond=0),
-    )
-    db.add(record)
-    db.commit()
+def get_current_user(db: Session, token: str) -> dict:
+    """Get the currently authenticated user."""
+    payload = verify_access_token(token)
 
+    if payload is None:
+        raise InvalidOrExpiredTokenError
 
-def refresh_token(db: Session, refresh_token: str) -> dict:
+    # Validate user_id is a valid integer (defense against malformed JWT)
     try:
-        payload = decode_token(refresh_token)
-    except jwt.PyJWTError as error:
-        raise error
+        user_id = int(payload["id"])
+    except (TypeError, ValueError):
+        raise InvalidOrExpiredTokenError
 
-    if payload.get("type") != "refresh":
-        raise InvalidTokenTypeError
-
-    token_hash = hash_token(refresh_token)
-    token_data = get_by_hash(db, token_hash)
-
-    if not token_data:
-        raise TokenNotRecognizedError
-
-    if datetime.now(timezone.utc).replace(microsecond=0) > token_data.expires_at:
-        raise TokenExpiredError
-
-    user_id = payload.get("id")
-    role = payload.get("role")
-
-    if role == "Admin":
-        user_exists = db.scalar(select(Recruiter.id).where(Recruiter.id == user_id))
+    if payload["role"] == "Admin":
+        user = get_recruiter_details(db, user_id)
     else:
-        user_exists = db.scalar(select(Candidate.id).where(Candidate.id == user_id))
-
-    if not user_exists:
-        # Prevent rotation and force logout by cleaning up or raising an error
-        raise UserNotExistsError
-
-    access_token = create_access_token(payload)
-    refresh_token = create_refresh_token(payload)
-    token_hash = hash_token(refresh_token)
-    db.delete(token_data)
-    db.commit()
-    create_refresh_token_record(db, token_hash, token_data.user_id, role)
-
-    return {
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-        "role": role,
-        "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-    }
-
-
-def logout(db: Session, refresh_token: str, current_user: dict) -> None:
-    token_hash = hash_token(refresh_token)
-    token_data = get_by_hash(db, token_hash)
-
-    if not token_data:
-        raise TokenNotFoundError
-
-    if (
-        token_data.user_id != current_user["id"]
-        or token_data.role != current_user["role"]
-    ):
-        raise OtherUserSessionError
-
-    db.delete(token_data)
-    db.commit()
-
-
-def get_by_hash(db: Session, token_hash: str) -> RefreshToken:
-    return db.query(RefreshToken).filter(RefreshToken.token_hash == token_hash).first()
-
-
-def read_me(db: Session, role: str, id: int) -> dict:
-    if role == "Admin":
-        user = db.scalar(select(Recruiter).where(Recruiter.id == id))
-    else:
-        user = db.scalar(select(Candidate).where(Candidate.id == id))
+        user = get_candidate_details(db, user_id)
 
     if not user:
-        raise UserNotExistsError
+        raise InvalidCredentials
 
-    return {
-        "id": user.id,
-        "role": role,
-        "email": user.email,
-        "name": user.name,
-        "department": user.department if role == "Admin" else None,
-        "skills": user.skills if role == "Admin" else [],
-        "experience_years": user.experience_years if role == "Admin" else None,
-    }
+    return user
 
 
 def update_password(

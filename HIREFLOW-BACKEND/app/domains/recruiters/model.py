@@ -15,7 +15,7 @@ class Recruiter(Base):
     email: Mapped[str] = mapped_column(String(254), unique=True)
     phone: Mapped[str] = mapped_column(String(15), unique=True)
     department: Mapped[str] = mapped_column(String(100))
-    password: Mapped[str] = mapped_column(String(60))
+    password: Mapped[str] = mapped_column(String(100))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc).replace(microsecond=0),

@@ -10,7 +10,7 @@ class Candidate(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String(100))
-    password: Mapped[str] = mapped_column(String(60))
+    password: Mapped[str] = mapped_column(String(100))
     email: Mapped[str] = mapped_column(String(150), unique=True)
     phone: Mapped[str] = mapped_column(String(15), unique=True)
     resume_url: Mapped[str] = mapped_column(String(500))

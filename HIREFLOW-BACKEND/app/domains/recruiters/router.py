@@ -21,17 +21,6 @@ from starlette import status
 recruiters_router = APIRouter()
 
 
-@recruiters_router.post("", status_code=status.HTTP_201_CREATED)
-def create_recruiter(recruiter: RecruiterCreate, db: Session = Depends(get_db)):
-    try:
-        crud.create_recruiter(db, recruiter)
-        return {"message": "Recruiter created successfully"}
-    except RecruiterAlreadyExistsError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Recruiter already exists"
-        )
-
-
 @recruiters_router.get(
     "", status_code=status.HTTP_200_OK, response_model=RecruiterListResponse
 )
