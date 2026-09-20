@@ -16,9 +16,8 @@ class Interview(Base):
     round_number: Mapped[int]
     round_type: Mapped[ROUND_TYPE] = mapped_column(String(20))
     scheduled_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    interviewer_name: Mapped[str] = mapped_column(String(100))
-    interviewer_id: Mapped[int | None] = mapped_column(
-        ForeignKey("recruiters.id", ondelete="SET NULL"), nullable=True, default=None
+    interviewer_id: Mapped[int] = mapped_column(
+        ForeignKey("recruiters.id", ondelete="CASCADE")
     )
     status: Mapped[INTERVIEW_STATUS] = mapped_column(String(15), default="Scheduled")
     feedback: Mapped[str | None] = mapped_column(Text, nullable=True, default=None)

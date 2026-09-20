@@ -13,6 +13,7 @@ from core.exceptions import (
     JobNotOpenError,
     RecruiterNotExistsError,
     SkippedStageError,
+    UnauthorizedError,
 )
 from domains.application_stage_history.model import StageHistory
 from domains.applications.model import Application
@@ -36,7 +37,12 @@ def _serialize_model(instance) -> dict:
     }
 
 
-def create_application(db: Session, application: ApplicationCreate) -> None:
+def create_application(
+    db: Session, application: ApplicationCreate, current_user: dict
+) -> None:
+    if current_user["role"] != "User":
+        raise UnauthorizedError
+
     job_exists = db.scalar(select(Job).where(Job.id == application.job_id))
 
     if not job_exists:
@@ -46,7 +52,7 @@ def create_application(db: Session, application: ApplicationCreate) -> None:
         raise JobNotOpenError
 
     candidate_exists = db.scalar(
-        select(Candidate).where(Candidate.id == application.candidate_id)
+        select(Candidate).where(Candidate.id == current_user["id"])
     )
 
     if not candidate_exists:
@@ -54,14 +60,16 @@ def create_application(db: Session, application: ApplicationCreate) -> None:
 
     query = select(Application).where(
         Application.job_id == application.job_id,
-        Application.candidate_id == application.candidate_id,
+        Application.candidate_id == current_user["id"],
     )
     application_exist = db.scalar(query)
 
     if application_exist:
         raise ApplicationAlreadyExistsError
 
-    db_application = Application(**application.model_dump())
+    db_application = Application(
+        **application.model_dump(), candidate_id=current_user["id"]
+    )
 
     db.add(db_application)
     db.flush()
@@ -78,25 +86,30 @@ def create_application(db: Session, application: ApplicationCreate) -> None:
 
 
 def get_applications(
-    db: Session, application_filters: ApplicationFilters
+    db: Session, application_filters: ApplicationFilters, current_user: dict
 ) -> list[Application]:
+    if current_user["role"] != "User":
+        raise UnauthorizedError
+
     query = select(Application)
 
     if application_filters.job_id:
         query = query.where(Application.job_id == application_filters.job_id)
 
-    if application_filters.candidate_id:
-        query = query.where(
-            Application.candidate_id == application_filters.candidate_id
-        )
-
     if application_filters.stage:
         query = query.where(Application.stage == application_filters.stage)
+
+    query = query.where(Application.candidate_id == current_user["id"])
 
     return db.scalars(query).all()
 
 
-def get_application_details(db: Session, application_id: int) -> dict | None:
+def get_application_details(
+    db: Session, application_id: int, current_user: dict
+) -> dict | None:
+    if current_user["role"] != "User":
+        raise UnauthorizedError
+
     application = db.scalar(select(Application).where(Application.id == application_id))
 
     if not application:
@@ -155,10 +168,13 @@ def get_application_details(db: Session, application_id: int) -> dict | None:
 
 
 def update_application_stage(
-    db: Session, application_id: int, update_stage: UpdateStage
+    db: Session, application_id: int, update_stage: UpdateStage, current_user: dict
 ) -> None:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
     recruiter_exist = db.scalar(
-        select(Recruiter).where(Recruiter.id == update_stage.recruiter_id)
+        select(Recruiter).where(Recruiter.id == current_user["id"])
     )
 
     if not recruiter_exist:
@@ -196,7 +212,7 @@ def update_application_stage(
         application_id=application_id,
         from_stage=previous_stage,
         to_stage=update_stage.new_stage,
-        changed_by=update_stage.recruiter_id,
+        changed_by=current_user["id"],
         notes=update_stage.notes or None,
     )
 
@@ -213,10 +229,16 @@ def update_application_stage(
 
 
 def reject_application(
-    db: Session, application_id: int, update_stage: RejectApplication
+    db: Session,
+    application_id: int,
+    update_stage: RejectApplication,
+    current_user: dict,
 ) -> None:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
     recruiter_exists = db.scalar(
-        select(Recruiter).where(Recruiter.id == update_stage.recruiter_id)
+        select(Recruiter).where(Recruiter.id == current_user["id"])
     )
 
     if not recruiter_exists:
@@ -244,7 +266,7 @@ def reject_application(
         application_id=application_id,
         from_stage=previous_stage,
         to_stage="Rejected",
-        changed_by=update_stage.recruiter_id,
+        changed_by=current_user["id"],
         notes=update_stage.notes or None,
     )
 
@@ -252,7 +274,12 @@ def reject_application(
     db.commit()
 
 
-def get_application_timeline(db: Session, application_id: int) -> dict | None:
+def get_application_timeline(
+    db: Session, application_id: int, current_user: dict
+) -> dict | None:
+    if current_user["role"] != "User":
+        raise UnauthorizedError
+
     application = db.scalar(
         select(Application)
         .options(joinedload(Application.candidate), joinedload(Application.job))

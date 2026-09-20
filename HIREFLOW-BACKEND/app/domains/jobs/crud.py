@@ -4,6 +4,7 @@ from core.exceptions import (
     JobNotExistsError,
     RecruiterNotExistsError,
     SameStatusError,
+    UnauthorizedError,
 )
 from domains.applications.model import Application
 from domains.candidates.model import Candidate
@@ -14,15 +15,23 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
 
-def create_job(db: Session, job_data: JobCreate) -> None:
-    recruiter_exists = get_recruiter_details(db, job_data.created_by)
+def create_job(db: Session, job_data: JobCreate, current_user: dict) -> None:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
+    recruiter_exists = get_recruiter_details(db, current_user["id"])
+
     if not recruiter_exists:
         raise RecruiterNotExistsError
-    db.add(Job(**job_data.model_dump()))
+
+    db.add(Job(**job_data.model_dump(), created_by=current_user["id"]))
     db.commit()
 
 
-def get_jobs(db: Session, job_filters: JobFilters) -> list[Job]:
+def get_jobs(db: Session, job_filters: JobFilters, current_user: dict) -> list[Job]:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
     query = select(Job).options(joinedload(Job.recruiter))
 
     if job_filters.department:
@@ -37,7 +46,10 @@ def get_jobs(db: Session, job_filters: JobFilters) -> list[Job]:
     return db.scalars(query).all()
 
 
-def get_job_by_id(db: Session, job_id: int) -> dict | None:
+def get_job_by_id(db: Session, job_id: int, current_user: dict) -> dict | None:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
     query = select(Job).where(Job.id == job_id)
     response = db.scalar(query)
 
@@ -58,7 +70,12 @@ def get_job_by_id(db: Session, job_id: int) -> dict | None:
     return response
 
 
-def update_job(db: Session, job_id: int, job_data: JobUpdate) -> None:
+def update_job(
+    db: Session, job_id: int, job_data: JobUpdate, current_user: dict
+) -> None:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
     query = select(Job).where(Job.id == job_id)
     job = db.scalar(query)
 
@@ -66,12 +83,17 @@ def update_job(db: Session, job_id: int, job_data: JobUpdate) -> None:
         raise JobNotExistsError
 
     payload = job_data.model_dump(exclude_unset=True)
+
     for key, value in payload.items():
         setattr(job, key, value)
+
     db.commit()
 
 
-def delete_job(db: Session, job_id: int) -> None:
+def delete_job(db: Session, job_id: int, current_user: dict) -> None:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
     query = select(Job).where(Job.id == job_id)
     job = db.scalar(query)
 
@@ -89,7 +111,12 @@ def delete_job(db: Session, job_id: int) -> None:
     db.commit()
 
 
-def update_job_status(db: Session, job_id: int, new_status: STATUS) -> None:
+def update_job_status(
+    db: Session, job_id: int, new_status: STATUS, current_user: dict
+) -> None:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
     query = select(Job).where(Job.id == job_id)
     job = db.scalar(query)
 
@@ -103,7 +130,10 @@ def update_job_status(db: Session, job_id: int, new_status: STATUS) -> None:
     db.commit()
 
 
-def get_job_applications(db: Session, job_id: int) -> dict | None:
+def get_job_applications(db: Session, job_id: int, current_user: dict) -> dict | None:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
     target_job = db.scalar(select(Job).where(Job.id == job_id))
 
     if not target_job:

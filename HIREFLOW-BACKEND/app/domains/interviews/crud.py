@@ -11,6 +11,7 @@ from core.exceptions import (
     InterviewDetailsNotExistsError,
     RecruiterNotExistsError,
     RejectedApplicationError,
+    UnauthorizedError,
     UnscreenedApplicationError,
 )
 from domains.applications.model import Application
@@ -29,7 +30,12 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 
-def create_interview(db: Session, interview_details: InterviewCreate) -> None:
+def create_interview(
+    db: Session, interview_details: InterviewCreate, current_user: dict
+) -> None:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
     parsed_date = interview_details.scheduled_at.astimezone(timezone.utc).replace(
         microsecond=0
     )
@@ -61,16 +67,24 @@ def create_interview(db: Session, interview_details: InterviewCreate) -> None:
     if duplicate_round:
         raise DuplicateRoundError
 
-    if (interview_details.interviewer_id is not None) and not db.scalar(
-        select(Recruiter.id).where(Recruiter.id == interview_details.interviewer_id)
-    ):
-        raise RecruiterNotExistsError
-
-    db.add(Interview(**{**interview_details.model_dump(), "scheduled_at": parsed_date}))
+    db.add(
+        Interview(
+            **{
+                **interview_details.model_dump(),
+                "scheduled_at": parsed_date,
+                "interviewer_id": current_user["id"],
+            }
+        )
+    )
     db.commit()
 
 
-def get_interviews(db: Session, interview_filters: InterviewFilters) -> list:
+def get_interviews(
+    db: Session, interview_filters: InterviewFilters, current_user: dict
+) -> list:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
     query = (
         select(
             Interview,
@@ -120,7 +134,10 @@ def get_interviews(db: Session, interview_filters: InterviewFilters) -> list:
     return response
 
 
-def list_upcoming_interviews(db: Session) -> dict:
+def list_upcoming_interviews(db: Session, current_user: dict) -> dict:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
     now = datetime.now(timezone.utc).replace(microsecond=0)
     seven_days_later = now + timedelta(days=7)
     query = (
@@ -167,7 +184,12 @@ def list_upcoming_interviews(db: Session) -> dict:
     return response
 
 
-def get_interview_details(db: Session, interview_id: int) -> dict | None:
+def get_interview_details(
+    db: Session, interview_id: int, current_user: dict
+) -> dict | None:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
     interview = db.scalar(select(Interview).where(Interview.id == interview_id))
 
     if not interview:
@@ -212,8 +234,14 @@ def get_interview_details(db: Session, interview_id: int) -> dict | None:
 
 
 def update_interview(
-    db: Session, interview_id: int, interview_update: UpdateInterview
+    db: Session,
+    interview_id: int,
+    interview_update: UpdateInterview,
+    current_user: dict,
 ) -> None:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
     interview = db.scalar(select(Interview).where(Interview.id == interview_id))
 
     if not interview:
@@ -225,11 +253,7 @@ def update_interview(
     if interview.status == "Cancelled":
         raise InterviewAlreadyCancelledError
 
-    if (interview_update.interviewer_id is not None) and not (
-        db.scalar(
-            select(Recruiter.id).where(Recruiter.id == interview_update.interviewer_id)
-        )
-    ):
+    if db.scalar(select(Recruiter.id).where(Recruiter.id == current_user["id"])):
         raise RecruiterNotExistsError
 
     if interview_update.scheduled_at is not None:
@@ -244,17 +268,21 @@ def update_interview(
     for key, value in update_data.items():
         setattr(interview, key, value)
 
+    interview.interviewer_id = current_user["id"]
+
     db.commit()
 
 
 def cancel_interview(
-    db: Session, interview_id: int, cancellation_data: CancelInterview
+    db: Session,
+    interview_id: int,
+    cancellation_data: CancelInterview,
+    current_user: dict,
 ):
-    if (cancellation_data.interviewer_id is not None) and not (
-        db.scalar(
-            select(Recruiter.id).where(Recruiter.id == cancellation_data.interviewer_id)
-        )
-    ):
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
+    if not (db.scalar(select(Recruiter.id).where(Recruiter.id == current_user["id"]))):
         raise RecruiterNotExistsError
 
     interview = db.scalar(select(Interview).where(Interview.id == interview_id))
@@ -272,21 +300,21 @@ def cancel_interview(
     for key, value in update_data.items():
         setattr(interview, key, value)
 
+    interview.interviewer_id = current_user["id"]
     interview.status = "Cancelled"
     db.commit()
 
 
 def submit_interview_feedback(
-    db: Session, interview_id: int, submit_feedback: SubmitFeedback
+    db: Session, interview_id: int, submit_feedback: SubmitFeedback, current_user: dict
 ) -> None:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
     if not submit_feedback.feedback.strip():
         raise FeedbackEmptyError
 
-    if (submit_feedback.interviewer_id is not None) and not (
-        db.scalar(
-            select(Recruiter.id).where(Recruiter.id == submit_feedback.interviewer_id)
-        )
-    ):
+    if not (db.scalar(select(Recruiter.id).where(Recruiter.id == current_user["id"]))):
         raise RecruiterNotExistsError
 
     interview = db.scalar(select(Interview).where(Interview.id == interview_id))
@@ -304,5 +332,6 @@ def submit_interview_feedback(
     for key, value in update_data.items():
         setattr(interview, key, value)
 
+    interview.interviewer_id = current_user["id"]
     interview.status = "Completed"
     db.commit()

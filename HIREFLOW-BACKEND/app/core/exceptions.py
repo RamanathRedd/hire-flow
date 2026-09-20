@@ -109,6 +109,10 @@ class UnscreenedApplicationError(HireFlowException):
     pass
 
 
+class UnauthorizedError(HireFlowException):
+    pass
+
+
 class RejectedApplicationError(HireFlowException):
     pass
 

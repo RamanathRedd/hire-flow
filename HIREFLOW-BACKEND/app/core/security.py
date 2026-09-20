@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 from core.config import settings
 from fastapi.security import OAuth2PasswordBearer
 from pwdlib import PasswordHash
+from domains.recruiters.model import Recruiter
 
 password_hash = PasswordHash.recommended()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
@@ -65,6 +66,9 @@ def get_authenticated_user(
         return None
 
     return {"id": user_id, "role": role}
+
+
+CurrentUser = Annotated[dict, Depends(get_authenticated_user)]
 
 
 # Overlooked Negative Cases & Edge Scenarios
