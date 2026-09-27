@@ -36,13 +36,17 @@ def register(db: Session, isAdmin: bool, data: dict) -> dict:
         return {"message": "Candidate created successfully"}
 
 
-def login(db: Session, email: EmailStr, password: str) -> dict:
-    query = select(Recruiter).where(Recruiter.email == email)
-    user = db.scalar(query)
-
-    role = "Admin"
-
-    if not user:
+def login(
+    db: Session,
+    isAdmin: bool,
+    email: EmailStr,
+    password: str,
+) -> dict:
+    if isAdmin:
+        query = select(Recruiter).where(Recruiter.email == email)
+        user = db.scalar(query)
+        role = "Admin"
+    else:
         query = select(Candidate).where(Candidate.email == email)
         user = db.scalar(query)
 

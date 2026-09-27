@@ -14,9 +14,16 @@ from domains.recruiters import model as recruiter_model  # noqa: F401
 from domains.recruiters.router import recruiters_router
 from domains.auth.router import auth_router
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title=settings.APP_TITLE)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 init_db()
 

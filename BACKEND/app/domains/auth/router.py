@@ -33,10 +33,12 @@ def register(isAdmin: bool, data: dict, db: Session = Depends(get_db)):
 
 @auth_router.post("/login", status_code=status.HTTP_200_OK)
 def login(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+    isAdmin: bool,
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
 ):
     try:
-        response = service.login(db, form_data.username, form_data.password)
+        response = service.login(db, isAdmin, form_data.username, form_data.password)
         return response
     except InvalidCredentials:
         raise HTTPException(
