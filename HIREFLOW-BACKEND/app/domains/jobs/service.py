@@ -10,7 +10,7 @@ from domains.applications.model import Application
 from domains.candidates.model import Candidate
 from domains.jobs.model import Job
 from domains.jobs.schemas import JobCreate, JobFilters, JobUpdate
-from domains.recruiters.crud import get_recruiter_details
+from domains.recruiters.service import get_recruiter_details
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 

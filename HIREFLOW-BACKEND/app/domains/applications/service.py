@@ -51,11 +51,7 @@ def create_application(
     if job_exists.status != "Open":
         raise JobNotOpenError
 
-    candidate_exists = db.scalar(
-        select(Candidate).where(Candidate.id == current_user["id"])
-    )
-
-    if not candidate_exists:
+    if not (db.scalar(select(Candidate).where(Candidate.id == current_user["id"]))):
         raise CandidateNotExistsError
 
     query = select(Application).where(
@@ -92,14 +88,13 @@ def get_applications(
         raise UnauthorizedError
 
     query = select(Application)
+    query = query.where(Application.candidate_id == current_user["id"])
 
     if application_filters.job_id:
         query = query.where(Application.job_id == application_filters.job_id)
 
     if application_filters.stage:
         query = query.where(Application.stage == application_filters.stage)
-
-    query = query.where(Application.candidate_id == current_user["id"])
 
     return db.scalars(query).all()
 
@@ -237,11 +232,7 @@ def reject_application(
     if current_user["role"] != "Admin":
         raise UnauthorizedError
 
-    recruiter_exists = db.scalar(
-        select(Recruiter).where(Recruiter.id == current_user["id"])
-    )
-
-    if not recruiter_exists:
+    if not (db.scalar(select(Recruiter).where(Recruiter.id == current_user["id"]))):
         raise RecruiterNotExistsError
 
     application = db.scalar(select(Application).where(Application.id == application_id))

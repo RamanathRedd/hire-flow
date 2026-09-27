@@ -13,32 +13,27 @@ from core.exceptions import (
 )
 from domains.candidates.model import Candidate
 from domains.candidates.schemas import CandidateCreate
-from domains.candidates import crud as candidate_crud
+from domains.candidates import service as candidate_service
 from domains.recruiters.model import Recruiter
 from domains.recruiters.schemas import RecruiterCreate
-from domains.recruiters import crud as recruiter_crud
+from domains.recruiters import service as recruiter_service
 from domains.auth.schemas import PasswordUpdate
 from sqlalchemy.orm import Session
 from core.config import settings
 from core.security import verify_access_token
-from domains.recruiters.crud import get_recruiter_details
-from domains.candidates.crud import get_candidate_details
+from domains.recruiters.service import get_recruiter_details
+from domains.candidates.service import get_candidate_details
 
 
-def register(db: Session, role: str, data: dict) -> dict:
-    role = role.strip().lower()
-
-    if role == "admin":
+def register(db: Session, isAdmin: bool, data: dict) -> dict:
+    if isAdmin:
         recruiter_data = RecruiterCreate.model_validate(data)
-        recruiter_crud.create_recruiter(db, recruiter_data)
+        recruiter_service.create_recruiter(db, recruiter_data)
         return {"message": "Recruiter created successfully"}
-
-    if role == "user":
+    else:
         candidate_data = CandidateCreate.model_validate(data)
-        candidate_crud.create_candidate(db, candidate_data)
+        candidate_service.create_candidate(db, candidate_data)
         return {"message": "Candidate created successfully"}
-
-    raise ValueError("role must be either 'Admin' or 'User'")
 
 
 def login(db: Session, email: EmailStr, password: str) -> dict:

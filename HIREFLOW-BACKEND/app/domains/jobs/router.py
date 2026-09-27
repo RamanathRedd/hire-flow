@@ -7,7 +7,7 @@ from core.exceptions import (
     SameStatusError,
     UnauthorizedError,
 )
-from domains.jobs import crud
+from domains.jobs import service
 from domains.jobs.schemas import JobCreate, JobFilters, JobUpdate
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
@@ -30,7 +30,7 @@ def create_job(
     job: JobCreate, current_user: CurrentUser, db: Session = Depends(get_db)
 ):
     try:
-        crud.create_job(db, job, current_user)
+        service.create_job(db, job, current_user)
         return {"message": "Job created successfully"}
     except UnauthorizedError:
         raise HTTPException(
@@ -50,7 +50,7 @@ def get_jobs(
     db: Session = Depends(get_db),
 ):
     try:
-        filtered_jobs = crud.get_jobs(db, job_filters, current_user)
+        filtered_jobs = service.get_jobs(db, job_filters, current_user)
 
         filtered_jobs = [_serialize_job(job) for job in filtered_jobs]
 
@@ -67,7 +67,7 @@ def get_job_by_id(
     job_id: int, current_user: CurrentUser, db: Session = Depends(get_db)
 ):
     try:
-        response = crud.get_job_by_id(db, job_id, current_user)
+        response = service.get_job_by_id(db, job_id, current_user)
         return {"data": response}
     except UnauthorizedError:
         raise HTTPException(
@@ -88,7 +88,7 @@ def update_job(
     db: Session = Depends(get_db),
 ):
     try:
-        crud.update_job(db, job_id, job_data, current_user)
+        service.update_job(db, job_id, job_data, current_user)
         return {"message": "Job updated successfully"}
     except UnauthorizedError:
         raise HTTPException(
@@ -104,7 +104,7 @@ def update_job(
 @jobs_router.delete("/{job_id}", status_code=status.HTTP_200_OK)
 def delete_job(job_id: int, current_user: CurrentUser, db: Session = Depends(get_db)):
     try:
-        crud.delete_job(db, job_id, current_user)
+        service.delete_job(db, job_id, current_user)
         return {"message": "Job deleted successfully"}
     except UnauthorizedError:
         raise HTTPException(
@@ -130,7 +130,7 @@ def update_job_status(
     db: Session = Depends(get_db),
 ):
     try:
-        crud.update_job_status(db, job_id, new_status)
+        service.update_job_status(db, job_id, new_status)
         return {"message": "Job status updated successfully"}
     except UnauthorizedError:
         raise HTTPException(
@@ -153,7 +153,7 @@ def get_job_applications(
     job_id: int, current_user: CurrentUser, db: Session = Depends(get_db)
 ):
     try:
-        response = crud.get_job_applications(db, job_id)
+        response = service.get_job_applications(db, job_id)
         return {"data": response}
     except UnauthorizedError:
         raise HTTPException(

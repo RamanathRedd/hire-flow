@@ -13,7 +13,7 @@ from core.exceptions import (
     UnauthorizedError,
     UnscreenedApplicationError,
 )
-from domains.interviews import crud
+from domains.interviews import service
 from domains.interviews.schemas import (
     CancelInterview,
     InterviewCreate,
@@ -36,7 +36,7 @@ def create_interview(
     db: Session = Depends(get_db),
 ):
     try:
-        crud.create_interview(db, interview_details, current_user)
+        service.create_interview(db, interview_details, current_user)
         return {"message": "created successfully"}
     except UnauthorizedError:
         raise HTTPException(
@@ -78,7 +78,7 @@ def get_interviews(
     db: Session = Depends(get_db),
 ):
     try:
-        response = crud.get_interviews(db, interview_filters, current_user)
+        response = service.get_interviews(db, interview_filters, current_user)
         return {"data": response}
     except UnauthorizedError:
         raise HTTPException(
@@ -90,7 +90,7 @@ def get_interviews(
 @interviews_router.get("/upcoming", status_code=status.HTTP_200_OK)
 def list_upcoming_interviews(current_user: CurrentUser, db: Session = Depends(get_db)):
     try:
-        response = crud.list_upcoming_interviews(db, current_user)
+        response = service.list_upcoming_interviews(db, current_user)
         return {"data": response}
     except UnauthorizedError:
         raise HTTPException(
@@ -104,7 +104,7 @@ def get_interview_details(
     interview_id: int, current_user: CurrentUser, db: Session = Depends(get_db)
 ):
     try:
-        response = crud.get_interview_details(db, interview_id, current_user)
+        response = service.get_interview_details(db, interview_id, current_user)
         return {"data": response}
     except UnauthorizedError:
         raise HTTPException(
@@ -125,7 +125,7 @@ def update_interview(
     db: Session = Depends(get_db),
 ):
     try:
-        crud.update_interview(db, interview_id, interview_update, current_user)
+        service.update_interview(db, interview_id, interview_update, current_user)
         return {"message": "updated successfully"}
     except UnauthorizedError:
         raise HTTPException(
@@ -162,7 +162,7 @@ def cancel_interview(
     db: Session = Depends(get_db),
 ):
     try:
-        crud.cancel_interview(db, interview_id, cancellation_data, current_user)
+        service.cancel_interview(db, interview_id, cancellation_data, current_user)
         return {"message": "Interview cancelled successfully"}
     except UnauthorizedError:
         raise HTTPException(
@@ -197,7 +197,9 @@ def submit_interview_feedback(
     db: Session = Depends(get_db),
 ):
     try:
-        crud.submit_interview_feedback(db, interview_id, submit_feedback, current_user)
+        service.submit_interview_feedback(
+            db, interview_id, submit_feedback, current_user
+        )
         return {"message": "Feedback submitted successfully"}
     except UnauthorizedError:
         raise HTTPException(

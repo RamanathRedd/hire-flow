@@ -10,7 +10,7 @@ from core.exceptions import (
     PasswordMismatchError,
     RecruiterAlreadyExistsError,
 )
-from domains.auth import crud
+from domains.auth import service
 from core.database import get_db
 from domains.auth.schemas import PasswordUpdate
 from sqlalchemy.orm import Session
@@ -21,11 +21,9 @@ auth_router = APIRouter()
 
 
 @auth_router.post("/register", status_code=status.HTTP_201_CREATED)
-def register(role: str, data: dict, db: Session = Depends(get_db)):
+def register(isAdmin: bool, data: dict, db: Session = Depends(get_db)):
     try:
-        return crud.register(db, role, data)
-    except ValueError as error:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
+        return service.register(db, isAdmin, data)
     except (
         RecruiterAlreadyExistsError,
         CandidateAlreadyExistsError,
@@ -38,7 +36,7 @@ def login(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
     try:
-        response = crud.login(db, form_data.username, form_data.password)
+        response = service.login(db, form_data.username, form_data.password)
         return response
     except InvalidCredentials:
         raise HTTPException(
@@ -52,7 +50,7 @@ async def get_current_user(
     db: Session = Depends(get_db),
 ):
     try:
-        response = crud.get_current_user(db, token)
+        response = service.get_current_user(db, token)
         return response
     except InvalidOrExpiredTokenError:
         raise HTTPException(
@@ -73,7 +71,7 @@ def update_password(
     db: Session = Depends(get_db),
 ):
     try:
-        crud.update_password(
+        service.update_password(
             db, current_user["role"], current_user["id"], new_password_data
         )
         return {"message": "Password updated successfully"}

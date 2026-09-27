@@ -13,7 +13,7 @@ from core.exceptions import (
     SkippedStageError,
     UnauthorizedError,
 )
-from domains.applications import crud
+from domains.applications import service
 from domains.applications.schemas import (
     ApplicationCreate,
     ApplicationFilters,
@@ -35,7 +35,7 @@ def create_application(
     db: Session = Depends(get_db),
 ):
     try:
-        crud.create_application(db, application, current_user)
+        service.create_application(db, application, current_user)
         return {"message": "Application created successfully"}
     except UnauthorizedError:
         raise HTTPException(
@@ -69,7 +69,7 @@ def get_applications(
     db: Session = Depends(get_db),
 ):
     try:
-        response = crud.get_applications(db, application_filters, current_user)
+        response = service.get_applications(db, application_filters, current_user)
         return {"data": response}
     except UnauthorizedError:
         raise HTTPException(
@@ -83,7 +83,7 @@ def get_application_details(
     application_id: int, current_user: CurrentUser, db: Session = Depends(get_db)
 ):
     try:
-        response = crud.get_application_details(db, application_id, current_user)
+        response = service.get_application_details(db, application_id, current_user)
         return {"data": response}
     except UnauthorizedError:
         raise HTTPException(
@@ -109,7 +109,7 @@ def update_application_stage(
             detail="Use the /applications/{application_id}/reject endpoint to reject an application",
         )
     try:
-        crud.update_application_stage(db, application_id, update_stage, current_user)
+        service.update_application_stage(db, application_id, update_stage, current_user)
         return {"message": "Updated Successfully"}
     except UnauthorizedError:
         raise HTTPException(
@@ -159,7 +159,7 @@ def reject_application(
     db: Session = Depends(get_db),
 ):
     try:
-        crud.reject_application(db, application_id, update_stage, current_user)
+        service.reject_application(db, application_id, update_stage, current_user)
         return {"message": "Application rejected successfully"}
     except UnauthorizedError:
         raise HTTPException(
@@ -191,7 +191,7 @@ def get_application_timeline(
     application_id: int, current_user: CurrentUser, db: Session = Depends(get_db)
 ):
     try:
-        response = crud.get_application_timeline(db, application_id, current_user)
+        response = service.get_application_timeline(db, application_id, current_user)
         return {"data": response}
     except UnauthorizedError:
         raise HTTPException(

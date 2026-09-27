@@ -22,7 +22,7 @@ class StageHistory(Base):
         default=lambda: datetime.now(timezone.utc).replace(microsecond=0),
     )
     changed_by: Mapped[int | None] = mapped_column(
-        ForeignKey("recruiters.id", ondelete="SET NULL"), nullable=True, default=None
+        ForeignKey("recruiters.id", ondelete="CASCADE"), nullable=True, default=None
     )
     notes: Mapped[str | None] = mapped_column(Text, nullable=True, default=None)
 

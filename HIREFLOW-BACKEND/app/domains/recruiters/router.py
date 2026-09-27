@@ -3,13 +3,11 @@ from core.exceptions import (
     ActiveJobExistsError,
     EmailAlreadyExistsError,
     PhoneAlreadyExistsError,
-    RecruiterAlreadyExistsError,
     RecruiterNotExistsError,
 )
 from domains.jobs.model import Job
-from domains.recruiters import crud
+from domains.recruiters import service
 from domains.recruiters.schemas import (
-    RecruiterCreate,
     RecruiterListResponse,
     RecruiterUpdate,
 )
@@ -28,7 +26,7 @@ def get_recruiters(
     department: str | None = Query(default=None, min_length=3, max_length=100),
     db: Session = Depends(get_db),
 ):
-    response = crud.get_recruiters(db, department)
+    response = service.get_recruiters(db, department)
     return {"data": response}
 
 
@@ -37,7 +35,7 @@ def get_recruiters(
     status_code=status.HTTP_200_OK,
 )
 def get_recruiter_details(recruiter_id: int, db: Session = Depends(get_db)):
-    response = crud.get_recruiter_details(db, recruiter_id)
+    response = service.get_recruiter_details(db, recruiter_id)
 
     if not response:
         raise HTTPException(
@@ -86,7 +84,7 @@ def update_recruiter(
     db: Session = Depends(get_db),
 ):
     try:
-        crud.update_recruiter(db, recruiter_id, update_recruiter)
+        service.update_recruiter(db, recruiter_id, update_recruiter)
         return {"message": "Recruiter profile updated successfully"}
     except RecruiterNotExistsError:
         raise HTTPException(
@@ -108,7 +106,7 @@ def update_recruiter(
 @recruiters_router.delete("/{recruiter_id}", status_code=status.HTTP_200_OK)
 def delete_recruiter(recruiter_id: int, db: Session = Depends(get_db)):
     try:
-        crud.delete_recruiter(db, recruiter_id)
+        service.delete_recruiter(db, recruiter_id)
         return {"message": "Recruiter Deleted Successfully"}
     except ActiveJobExistsError:
         raise HTTPException(

@@ -253,7 +253,7 @@ def update_interview(
     if interview.status == "Cancelled":
         raise InterviewAlreadyCancelledError
 
-    if db.scalar(select(Recruiter.id).where(Recruiter.id == current_user["id"])):
+    if not (db.scalar(select(Recruiter.id).where(Recruiter.id == current_user["id"]))):
         raise RecruiterNotExistsError
 
     if interview_update.scheduled_at is not None:
