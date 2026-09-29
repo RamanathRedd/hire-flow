@@ -37,7 +37,7 @@ const LoginPage = () => {
 
       sessionStorage.setItem("access_token", result.access_token);
       sessionStorage.setItem("role", result.role);
-      navigate(isAdmin ? "/dashboard" : "/my-applications");
+      navigate(isAdmin ? "/jobs" : "/browseJobs");
     } catch (error) {
       setErrorMessage(
         error instanceof TypeError
@@ -83,7 +83,9 @@ const LoginPage = () => {
           </div>
 
           <div className="auth-field">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">
+              Email<span className="required-field"> *</span>
+            </label>
             <input
               id="email"
               type="email"
@@ -95,7 +97,9 @@ const LoginPage = () => {
             />
           </div>
           <div className="auth-field">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">
+              Password<span className="required-field"> *</span>
+            </label>
             <input
               id="password"
               type="password"

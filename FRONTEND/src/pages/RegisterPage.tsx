@@ -89,7 +89,9 @@ const RegisterPage = () => {
           </div>
           <div className="register-fields">
             <div className="auth-field">
-              <label htmlFor="name">Full name</label>
+              <label htmlFor="name">
+                Full name<span className="required-field"> *</span>
+              </label>
               <input
                 id="name"
                 type="text"
@@ -101,7 +103,9 @@ const RegisterPage = () => {
               />
             </div>
             <div className="auth-field">
-              <label htmlFor="register-email">Email</label>
+              <label htmlFor="register-email">
+                Email<span className="required-field"> *</span>
+              </label>
               <input
                 id="register-email"
                 type="email"
@@ -113,7 +117,9 @@ const RegisterPage = () => {
               />
             </div>
             <div className="auth-field">
-              <label htmlFor="phone">Phone</label>
+              <label htmlFor="phone">
+                Phone<span className="required-field"> *</span>
+              </label>
               <input
                 id="phone"
                 type="tel"
@@ -125,7 +131,9 @@ const RegisterPage = () => {
               />
             </div>
             <div className="auth-field">
-              <label htmlFor="department">Department</label>
+              <label htmlFor="department">
+                Department<span className="required-field"> *</span>
+              </label>
               <input
                 id="department"
                 type="text"
@@ -137,7 +145,9 @@ const RegisterPage = () => {
               />
             </div>
             <div className="auth-field">
-              <label htmlFor="register-password">Password</label>
+              <label htmlFor="register-password">
+                Password<span className="required-field"> *</span>
+              </label>
               <input
                 id="register-password"
                 type="password"
@@ -149,7 +159,9 @@ const RegisterPage = () => {
               />
             </div>
             <div className="auth-field">
-              <label htmlFor="confirm-password">Confirm password</label>
+              <label htmlFor="confirm-password">
+                Confirm password<span className="required-field"> *</span>
+              </label>
               <input
                 id="confirm-password"
                 type="password"
