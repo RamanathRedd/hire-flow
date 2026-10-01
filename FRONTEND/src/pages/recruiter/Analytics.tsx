@@ -3,7 +3,7 @@ import Navbar from "../../components/layout/Navbar";
 const Analytics = () => {
   return (
     <>
-      <Navbar left="Overall funnel" right="" classString="" />
+      <Navbar leftTitle="Overall funnel" rightText="" classString="" />
       <h1>Analytics</h1>
     </>
   );

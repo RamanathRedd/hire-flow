@@ -1,5 +1,7 @@
+import { useState } from "react";
 import Navbar from "../../components/layout/Navbar";
 import ProfileForm from "../../components/profile/ProfileForm";
+import Modal from "../../components/ui/Modal";
 
 const inputFieldDetails = [
   {
@@ -7,7 +9,6 @@ const inputFieldDetails = [
     placeHolder: "Ramanath Reddy",
     name: "Full name",
     key: "fullName",
-    readonly: true,
     required: true,
   },
   {
@@ -15,7 +16,6 @@ const inputFieldDetails = [
     placeHolder: "ram@example.com",
     name: "Email",
     key: "email",
-    readonly: true,
     required: true,
   },
   {
@@ -23,7 +23,6 @@ const inputFieldDetails = [
     placeHolder: "9391233969",
     name: "Phone",
     key: "phone",
-    readonly: true,
     required: true,
   },
   {
@@ -31,7 +30,6 @@ const inputFieldDetails = [
     placeHolder: "3.10",
     name: "Experience (in years)",
     key: "experience",
-    readonly: true,
     required: true,
   },
   {
@@ -39,7 +37,6 @@ const inputFieldDetails = [
     placeHolder: "Software Engineer",
     name: "Current title",
     key: "currentTitle",
-    readonly: true,
     required: true,
   },
   {
@@ -47,7 +44,6 @@ const inputFieldDetails = [
     placeHolder: "TCS",
     name: "Current company",
     key: "currentCompany",
-    readonly: true,
     required: true,
   },
   {
@@ -55,7 +51,6 @@ const inputFieldDetails = [
     placeHolder: "",
     name: "Skills",
     key: "skills",
-    readonly: true,
     required: false,
   },
   {
@@ -63,7 +58,6 @@ const inputFieldDetails = [
     placeHolder: "drive.google.com/ram-resume",
     name: "Resume",
     key: "resume",
-    readonly: true,
     required: false,
   },
   {
@@ -71,7 +65,6 @@ const inputFieldDetails = [
     placeHolder: "linkedin.com/in/ram",
     name: "LinkedIn",
     key: "linkedIn",
-    readonly: true,
     required: false,
   },
 ];
@@ -89,7 +82,30 @@ interface UserDetails {
 }
 
 const Profile = () => {
-  const button = { text: "Edit profile", isEdit: true };
+  const [isEditable, setIsEditable] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const onCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  const onConfirm = () => {
+    setIsModalOpen(false);
+    setIsEditable(false);
+  };
+
+  const onClickEditButton = () => {
+    if (isEditable) {
+      setIsModalOpen(true);
+      return;
+    }
+    setIsEditable((prev) => !prev);
+  };
+  const rightText = {
+    text: "Edit profile",
+    isEditable: isEditable,
+    onClickEditButton: onClickEditButton,
+  };
   const userData: UserDetails = {
     fullName: "Ramanath Reddy",
     email: "ram@example.com",
@@ -105,11 +121,36 @@ const Profile = () => {
   return (
     <>
       <Navbar
-        left="My profile"
-        right={button}
+        leftTitle="My profile"
+        rightText={rightText}
         classString="nav-action-candidate-button"
       />
-      <ProfileForm inputFields={inputFieldDetails} userData={userData} />
+      <ProfileForm
+        inputFields={inputFieldDetails}
+        userData={userData}
+        isEditable={isEditable}
+      />
+      {isModalOpen && (
+        <Modal
+          onConfirm={onConfirm}
+          onCancel={onCancel}
+          title="Save profile changes?"
+          message="Your updated profile information will be saved."
+          cancelText="Cancel"
+          confirmText="Save changes"
+          confirmClassString="candidate-profile"
+          icon={
+            <path
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+              color="#0e9f8f"
+            />
+          }
+        />
+      )}
     </>
   );
 };

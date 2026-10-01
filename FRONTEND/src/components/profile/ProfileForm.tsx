@@ -5,7 +5,6 @@ interface inputField {
   placeHolder: string;
   name: string;
   key: string;
-  readonly: boolean;
   required: boolean;
 }
 
@@ -26,10 +25,11 @@ interface UserDetails {
 interface ProfileFormProps {
   inputFields: inputField[];
   userData: UserDetails;
+  isEditable: boolean;
 }
 
 const ProfileForm = (props: ProfileFormProps) => {
-  const { inputFields, userData } = props;
+  const { inputFields, userData, isEditable } = props;
   const [draftUserDetails, setDraftUserDetails] =
     useState<UserDetails>(userData);
 
@@ -78,7 +78,7 @@ const ProfileForm = (props: ProfileFormProps) => {
               placeholder={inputField.placeHolder}
               value={draftUserDetails[inputField.key as keyof UserDetails]}
               onChange={onFieldChange}
-              readOnly={inputField.readonly}
+              readOnly={inputField.type != "email" ? !isEditable : true}
               required={inputField.required}
             />
           </div>

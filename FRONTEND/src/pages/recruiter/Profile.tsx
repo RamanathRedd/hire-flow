@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Navbar from "../../components/layout/Navbar";
 import ProfileForm from "../../components/profile/ProfileForm";
+import Modal from "../../components/ui/Modal";
 
 const inputFieldDetails = [
   {
@@ -8,7 +9,6 @@ const inputFieldDetails = [
     placeHolder: "Ramanath Reddy",
     name: "Full name",
     key: "fullName",
-    readonly: true,
     required: true,
   },
   {
@@ -16,7 +16,6 @@ const inputFieldDetails = [
     placeHolder: "ram@example.com",
     name: "Work email",
     key: "email",
-    readonly: true,
     required: true,
   },
   {
@@ -24,7 +23,6 @@ const inputFieldDetails = [
     placeHolder: "9391233969",
     name: "Phone",
     key: "phone",
-    readonly: true,
     required: true,
   },
   {
@@ -32,7 +30,6 @@ const inputFieldDetails = [
     placeHolder: "Engineering",
     name: "Department",
     key: "department",
-    readonly: true,
     required: true,
   },
   {
@@ -40,7 +37,6 @@ const inputFieldDetails = [
     placeHolder: "••••••••••",
     name: "Password",
     key: "password",
-    readonly: true,
     required: true,
   },
 ];
@@ -54,19 +50,33 @@ interface UserDetails {
 }
 
 const Profile = () => {
-  const onButtonChange = () => {
-    console.log("sample");
-    if (button.text === "Edit profile") setButton({ ...button, text: "Save" });
+  const [isEditable, setIsEditable] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const onClickEditButton = () => {
+    if (isEditable) {
+      setIsModalOpen(true);
+      return;
+    }
+
+    setIsEditable(true);
   };
-  const [button, setButton] = useState<{
-    text: string;
-    isEdit: boolean;
-    buttonChange: Function;
-  }>({
+
+  const onConfirm = () => {
+    setIsEditable(false);
+    setIsModalOpen(false);
+  };
+
+  const onCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  const rightText = {
     text: "Edit profile",
-    isEdit: true,
-    buttonChange: onButtonChange,
-  });
+    isEditable: isEditable,
+    onClickEditButton: onClickEditButton,
+  };
+
   const userData: UserDetails = {
     fullName: "Ramanath Reddy",
     email: "ram@example.com",
@@ -74,16 +84,45 @@ const Profile = () => {
     department: "Engineering",
     password: "Ram@1432",
   };
-  // const [buttonText, setButtonText] = useState<string>("Edit profile");
+
+  // useEffect(() => {
+  //   setIsEditable(false);
+  //   setIsModalOpen(false);
+  // });
 
   return (
     <>
       <Navbar
-        left="My profile"
-        right={button}
+        leftTitle="My profile"
+        rightText={rightText}
         classString="nav-action-button"
       />
-      <ProfileForm inputFields={inputFieldDetails} userData={userData} />
+      <ProfileForm
+        inputFields={inputFieldDetails}
+        userData={userData}
+        isEditable={isEditable}
+      />
+      {isModalOpen && (
+        <Modal
+          title="Save profile changes?"
+          message="Your updated profile information will be saved."
+          cancelText="Cancel"
+          confirmText="Save changes"
+          confirmClassString="recruiter-profile"
+          icon={
+            <path
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+              color="#8ea0ff"
+            />
+          }
+          onConfirm={onConfirm}
+          onCancel={onCancel}
+        />
+      )}
     </>
   );
 };
