@@ -277,11 +277,11 @@ body {
 	background: #5a73f6;
 }
 
-.candidate-profile{
+.candidate-profile,.candidate-account{
 	background: #0e9f8f;
 }
 
-.candidate-profile:hover {
+.candidate-profile:hover,.candidate-account:hover {
 	background: #31867c;
 }
 
@@ -415,6 +415,46 @@ body {
 	margin-bottom: 18px;
 }
 
+.filter-toolbar {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(130px, 180px));
+	gap: 12px;
+	width: fit-content;
+	padding: 0;
+	margin: 0 0 4px 42px;
+}
+
+.interview-toolbar,.browser-job-toolbar{
+	margin: 0 0 12px 30px;
+}
+
+.filter-select {
+	width: 100%;
+	height: 38px;
+	padding: 0 32px 0 14px;
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	border-radius: 8px;
+	background: rgba(18, 22, 29, 0.82);
+	color: #e9edf5;
+	font-size: 0.96rem;
+	font-weight: 500;
+	cursor: pointer;
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	background-image: linear-gradient(45deg, transparent 50%, #c6ccd7 50%), linear-gradient(135deg, #c6ccd7 50%, transparent 50%);
+	background-position: calc(100% - 16px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px);
+	background-size: 5px 5px, 5px 5px;
+	background-repeat: no-repeat;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+.filter-select:focus {
+	outline: none;
+	border-color: rgba(141, 158, 255, 0.64);
+	box-shadow: 0 0 0 3px rgba(110, 126, 255, 0.12);
+}
+
 .filter-button {
 	padding: 10px 14px;
 	border: 1px solid #313b45;
@@ -433,17 +473,22 @@ body {
 
 .jobs-table th,
 .jobs-table td {
-	padding: 12px 8px;
-	border-bottom: 1px solid #242d38;
+	padding: 14px 10px 13px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 	text-align: left;
 	font-size: 1rem;
 }
 
+.interviews-table th:first-child,
+.interviews-table td:first-child {
+	padding-left: 34px;
+}
+
 .jobs-table th {
-	color: #aab4c1;
-	font-size: 0.82rem;
+	color: #c2c9d4;
+	font-size: 0.8rem;
 	font-weight: 600;
-	letter-spacing: 0.02em;
+	letter-spacing: 0.01em;
 	text-transform: none;
 }
 
@@ -627,11 +672,12 @@ body {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	min-width: 46px;
-	padding: 3px 9px;
+	min-width: 48px;
+	padding: 4px 10px;
 	border-radius: 6px;
 	font-size: 12px;
 	font-weight: 600;
+	line-height: 1.2;
 }
 
 .status-badge.Open , .status-badge.Scheduled {
@@ -728,14 +774,14 @@ input {
 	margin-bottom: 18px;
 }
 
-.register-heading a {
+/* .register-heading a {
 	color: #4261ee;
 	text-decoration: none;
 }
 
 .register-heading a:hover {
 	text-decoration: underline;
-}
+} */
 
 .role-switch {
 	display: grid;
@@ -760,6 +806,20 @@ input {
 	color: #4261ee;
 }
 
+.role-option.is-active.candidate {
+	border-color: #0e9f8f;
+	background: #0e9f8f;
+	color: #fff;
+}
+
+.candidate-profile,.candidate-account{
+	background: #0e9f8f;
+}
+
+.candidate-profile:hover,.candidate-account:hover {
+	background: #31867c;
+}
+
 .auth-field {
 	display: flex;
 	flex-direction: column;
@@ -775,6 +835,15 @@ input {
 
 .register-fields .auth-field {
 	margin-bottom: 12px;
+}
+
+.register-fields .skills-field {
+	grid-column: 1 / -1;
+}
+
+.register-fields .skills-field .skill-input-row,
+.register-fields .skills-field .profile-form-skill-list {
+	width: 100%;
 }
 
 .auth-field label {
@@ -810,14 +879,17 @@ input {
 	margin-top: 0;
 	border: 0;
 	border-radius: 8px;
-	background: #354ed5;
 	color: #fff;
 	cursor: pointer;
 	font-size: 14px;
 	font-weight: 600;
 }
 
-.auth-submit:hover {
+.recruiter-account{
+	background: #354ed5;
+}
+
+.recruiter-account:hover {
 	background: #4059e3;
 }
 
@@ -848,13 +920,18 @@ input {
 	text-align: center;
 }
 
-.auth-footer a {
+.recruiter-link {
 	color: #4261ee;
 	text-decoration: none;
 }
 
-.auth-footer a:hover {
+.recruiter-link:hover,.candidate-link:hover {
 	text-decoration: underline;
+}
+
+.candidate-link {
+	color: #0e9f8f;
+	text-decoration: none;
 }
 
 @media (max-width: 640px) {

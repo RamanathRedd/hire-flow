@@ -72,7 +72,9 @@ const LoginPage = () => {
               Recruiter
             </button>
             <button
-              className={!isAdmin ? "role-option is-active" : "role-option"}
+              className={
+                !isAdmin ? "role-option is-active candidate" : "role-option"
+              }
               type="button"
               onClick={onRoleChange}
               name="candidate"
@@ -110,7 +112,11 @@ const LoginPage = () => {
               required
             />
           </div>
-          <button className="auth-submit" type="submit" disabled={isSubmitting}>
+          <button
+            className={`auth-submit ${isAdmin ? `recruiter-account` : `candidate-account`}`}
+            type="submit"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? "Signing in..." : "Sign in"}
           </button>
           {errorMessage && (
@@ -119,7 +125,13 @@ const LoginPage = () => {
             </p>
           )}
           <p className="auth-footer">
-            Don't have an account? <Link to="/register">Create an Account</Link>
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className={`${isAdmin ? "recruiter-link" : "candidate-link"}`}
+            >
+              Create an Account
+            </Link>
           </p>
         </form>
       </section>

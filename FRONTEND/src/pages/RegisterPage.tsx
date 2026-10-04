@@ -12,12 +12,32 @@ const RegisterPage = () => {
   const [email, setEmail] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [department, setDepartment] = useState<string>("");
+  const [resumeUrl, setResumeUrl] = useState<string>("");
+  const [linkedinUrl, setLinkedinUrl] = useState<string>("");
+  const [experienceYears, setExperienceYears] = useState<number>(0);
+  const [currentTitle, setCurrentTitle] = useState<string>("");
+  const [companyName, setCompanyName] = useState<string>("");
+  const [skill, setSkill] = useState<string>("");
+  const [skills, setSkills] = useState<string[]>([]);
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [isAdmin, setIsAdmin] = useState<boolean>(true);
 
   const onRoleChange = (e: MouseEvent<HTMLButtonElement>) => {
     setIsAdmin(e.currentTarget.name === "recruiter");
+    setName("");
+    setEmail("");
+    setPhone("");
+    setDepartment("");
+    setResumeUrl("");
+    setLinkedinUrl("");
+    setExperienceYears(0);
+    setCurrentTitle("");
+    setCompanyName("");
+    setSkill("");
+    setSkills([]);
+    setPassword("");
+    setConfirmPassword("");
   };
 
   const onNameChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -36,6 +56,41 @@ const RegisterPage = () => {
     setDepartment(e.target.value);
   };
 
+  const onResumeUrlChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setResumeUrl(e.target.value);
+  };
+
+  const onLinkedinUrlChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setLinkedinUrl(e.target.value);
+  };
+
+  const onExperienceYearsChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setExperienceYears(Number(e.target.value));
+  };
+
+  const onCurrentTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setCurrentTitle(e.target.value);
+  };
+
+  const onCompanyNameChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setCompanyName(e.target.value);
+  };
+
+  const onSkillChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSkill(e.target.value);
+  };
+
+  const addSkill = () => {
+    const trimmedSkill = skill.trim();
+
+    if (!trimmedSkill || skills.includes(trimmedSkill)) {
+      return;
+    }
+
+    setSkills((currentSkills) => [...currentSkills, trimmedSkill]);
+    setSkill("");
+  };
+
   const onPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   };
@@ -51,6 +106,13 @@ const RegisterPage = () => {
     setEmail("");
     setPhone("");
     setDepartment("");
+    setResumeUrl("");
+    setLinkedinUrl("");
+    setExperienceYears(0);
+    setCurrentTitle("");
+    setCompanyName("");
+    setSkill("");
+    setSkills([]);
     setPassword("");
     setConfirmPassword("");
     setIsAdmin(true);
@@ -64,7 +126,13 @@ const RegisterPage = () => {
           <header className="auth-heading register-heading">
             <h1 id="register-title">Create your account</h1>
             <p>
-              Already have one? <Link to="/">Sign in instead</Link>
+              Already have one?{" "}
+              <Link
+                to="/"
+                className={`${isAdmin ? "recruiter-link" : "candidate-link"}`}
+              >
+                Sign in instead
+              </Link>
             </p>
           </header>
           <div className="role-switch" aria-label="Choose account type">
@@ -78,7 +146,9 @@ const RegisterPage = () => {
               Recruiter
             </button>
             <button
-              className={!isAdmin ? "role-option is-active" : "role-option"}
+              className={
+                !isAdmin ? "role-option is-active candidate" : "role-option"
+              }
               type="button"
               onClick={onRoleChange}
               name="candidate"
@@ -130,20 +200,125 @@ const RegisterPage = () => {
                 required
               />
             </div>
-            <div className="auth-field">
-              <label htmlFor="department">
-                Department<span className="required-field"> *</span>
-              </label>
-              <input
-                id="department"
-                type="text"
-                name="department"
-                value={department}
-                onChange={onDepartmentChange}
-                placeholder="Engineering"
-                required
-              />
-            </div>
+            {isAdmin && (
+              <div className="auth-field">
+                <label htmlFor="department">
+                  Department<span className="required-field"> *</span>
+                </label>
+                <input
+                  id="department"
+                  type="text"
+                  name="department"
+                  value={department}
+                  onChange={onDepartmentChange}
+                  placeholder="Engineering"
+                  required
+                />
+              </div>
+            )}
+            {!isAdmin && (
+              <>
+                <div className="auth-field">
+                  <label htmlFor="resumeUrl">
+                    Resume Url<span className="required-field"> *</span>
+                  </label>
+                  <input
+                    id="resumeUrl"
+                    type="text"
+                    name="resumeUrl"
+                    value={resumeUrl}
+                    onChange={onResumeUrlChange}
+                    placeholder="drive.google.com/ram-resume"
+                    required
+                  />
+                </div>
+                <div className="auth-field">
+                  <label htmlFor="linkedinUrl">Linkedin Url</label>
+                  <input
+                    id="linkedinUrl"
+                    type="text"
+                    name="linkedinUrl"
+                    value={linkedinUrl}
+                    onChange={onLinkedinUrlChange}
+                    placeholder="linkedin.com/in/ram"
+                  />
+                </div>
+                <div className="auth-field">
+                  <label htmlFor="experienceYears">
+                    Experience Years<span className="required-field"> *</span>
+                  </label>
+                  <input
+                    id="experienceYears"
+                    type="number"
+                    name="experienceYears"
+                    value={experienceYears}
+                    onChange={onExperienceYearsChange}
+                    required
+                  />
+                </div>
+                <div className="auth-field">
+                  <label htmlFor="currentTitle">
+                    Current Title<span className="required-field"> *</span>
+                  </label>
+                  <input
+                    id="currentTitle"
+                    type="text"
+                    name="currentTitle"
+                    value={currentTitle}
+                    onChange={onCurrentTitleChange}
+                    placeholder="Software Engineer"
+                    required
+                  />
+                </div>
+                <div className="auth-field">
+                  <label htmlFor="companyName">
+                    Company Name<span className="required-field"> *</span>
+                  </label>
+                  <input
+                    id="companyName"
+                    type="text"
+                    name="companyName"
+                    value={companyName}
+                    onChange={onCompanyNameChange}
+                    placeholder="TCS"
+                    required
+                  />
+                </div>
+                <div className="auth-field skills-field">
+                  <label htmlFor="skill">
+                    Skills<span className="required-field"> *</span>
+                  </label>
+                  <div className="skill-input-row">
+                    <input
+                      id="skill"
+                      type="text"
+                      name="skill"
+                      value={skill}
+                      onChange={onSkillChange}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          event.preventDefault();
+                          addSkill();
+                        }
+                      }}
+                      placeholder="React, Python, SQL"
+                    />
+                  </div>
+                  {skills.length > 0 && (
+                    <div className="profile-form-skill-list ">
+                      {skills.map((skill, index) => (
+                        <span
+                          key={`${skill}-${index}`}
+                          className="profile-form-skill"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
             <div className="auth-field">
               <label htmlFor="register-password">
                 Password<span className="required-field"> *</span>
@@ -173,7 +348,10 @@ const RegisterPage = () => {
               />
             </div>
           </div>
-          <button className="auth-submit" type="submit">
+          <button
+            className={`auth-submit ${isAdmin ? `recruiter-account` : `candidate-account`}`}
+            type="submit"
+          >
             Create account
           </button>
         </form>

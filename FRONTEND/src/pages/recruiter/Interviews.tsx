@@ -1,7 +1,6 @@
 import Navbar from "../../components/layout/Navbar";
 
 const Interviews = () => {
-  const rightText = "Next 7 days: 4";
   const interviews = [
     {
       id: 1,
@@ -44,6 +43,11 @@ const Interviews = () => {
       status: "Scheduled",
     },
   ];
+  const jobs = [
+    { id: 1, name: "Backend Engineer" },
+    { id: 2, name: "Product Designer" },
+  ];
+  const rightText = "Next 7 days: " + interviews.length;
 
   return (
     <>
@@ -52,7 +56,34 @@ const Interviews = () => {
         rightText={rightText}
         classString="nav-meta"
       />
-      <table className="jobs-table">
+      <div className="filter-toolbar interview-toolbar">
+        <select className="filter-select" defaultValue="">
+          <option value="" disabled hidden>
+            Status
+          </option>
+          <option value="Draft">Draft</option>
+          <option value="Open">Open</option>
+          <option value="Closed">Closed</option>
+          <option value="On_hold">On_hold</option>
+        </select>
+        <select className="filter-select" defaultValue="">
+          <option value="" disabled hidden>
+            Round Type
+          </option>
+          <option value="Technical">Technical</option>
+          <option value="HR">HR</option>
+          <option value="System Design">System Design</option>
+          <option value="Assignment">Assignment</option>
+        </select>
+        <select className="filter-select" defaultValue="">
+          <option value="" disabled hidden>
+            Job
+          </option>
+          {jobs &&
+            jobs.map((job) => <option value={job.name}>{job.name}</option>)}
+        </select>
+      </div>
+      <table className="jobs-table interviews-table">
         <thead>
           <tr>
             <th scope="col">

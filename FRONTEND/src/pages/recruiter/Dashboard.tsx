@@ -31,6 +31,15 @@ const Dashboard = () => {
       openings: "0 / 2",
     },
   ];
+  const departments = [
+    { id: 1, name: "Engineering" },
+    { id: 2, name: "Design" },
+  ];
+  const locations = [
+    { id: 1, name: "Hyderabad" },
+    { id: 2, name: "Remote" },
+    { id: 3, name: "Bengaluru" },
+  ];
   return (
     <section>
       <Navbar
@@ -38,6 +47,35 @@ const Dashboard = () => {
         rightText={button}
         classString="nav-action-button"
       />
+      <div className="filter-toolbar">
+        <select className="filter-select" defaultValue="">
+          <option value="" disabled hidden>
+            Department
+          </option>
+          {departments &&
+            departments.map((department) => (
+              <option value={department.name}>{department.name}</option>
+            ))}
+        </select>
+        <select className="filter-select" defaultValue="">
+          <option value="" disabled hidden>
+            Status
+          </option>
+          <option value="Draft">Draft</option>
+          <option value="Open">Open</option>
+          <option value="Closed">Closed</option>
+          <option value="On_hold">On_hold</option>
+        </select>
+        <select className="filter-select" defaultValue="">
+          <option value="" disabled hidden>
+            Location
+          </option>
+          {locations &&
+            locations.map((location) => (
+              <option value={location.name}>{location.name}</option>
+            ))}
+        </select>
+      </div>
       <div className="content-panel">
         <table className="jobs-table">
           <thead>
