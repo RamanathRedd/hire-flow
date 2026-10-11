@@ -6,6 +6,7 @@ from domains.applications import model as application_model  # noqa: F401
 from domains.applications.router import applications_router
 from domains.candidates import model as candidate_model  # noqa: F401
 from domains.candidates.router import candidates_router
+from domains.reference_data.router import reference_data_router
 from domains.interviews import model as interview_model  # noqa: F401
 from domains.interviews.router import interviews_router
 from domains.jobs import model as job_model  # noqa: F401
@@ -30,6 +31,9 @@ init_db()
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(jobs_router, prefix="/jobs", tags=["jobs"])
 app.include_router(candidates_router, prefix="/candidates", tags=["candidates"])
+app.include_router(
+    reference_data_router, prefix="/reference_data", tags=["reference_data"]
+)
 app.include_router(applications_router, prefix="/applications", tags=["applications"])
 app.include_router(recruiters_router, prefix="/recruiters", tags=["recruiters"])
 app.include_router(interviews_router, prefix="/interviews", tags=["interviews"])

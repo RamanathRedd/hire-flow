@@ -16,3 +16,17 @@ ROUND_TYPE = Literal["Technical", "HR", "System_Design", "Assignment"]
 STATUS = Literal["Draft", "Open", "Closed", "On-hold"]
 JOB_TYPE = Literal["Full-time", "Contract"]
 ROLE = Literal["Admin", "User"]
+DEPARTMENTS = (
+    "Engineering",
+    "Product",
+    "Design",
+    "Data & Analytics",
+    "IT",
+    "Marketing",
+    "Sales",
+    "Human Resources",
+    "Finance",
+    "Operations",
+    "Customer Support",
+    "Legal",
+)
