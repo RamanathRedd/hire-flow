@@ -47,6 +47,7 @@ const Interviews = () => {
     { id: 1, name: "Backend Engineer" },
     { id: 2, name: "Product Designer" },
   ];
+
   const rightText = "Next 7 days: " + interviews.length;
 
   return (
@@ -61,10 +62,10 @@ const Interviews = () => {
           <option value="" disabled hidden>
             Status
           </option>
-          <option value="Draft">Draft</option>
-          <option value="Open">Open</option>
-          <option value="Closed">Closed</option>
-          <option value="On_hold">On_hold</option>
+          <option value="Scheduled">Scheduled</option>
+          <option value="Completed">Completed</option>
+          <option value="Cancelled">Cancelled</option>
+          <option value="Rescheduled">Rescheduled</option>
         </select>
         <select className="filter-select" defaultValue="">
           <option value="" disabled hidden>
@@ -72,7 +73,7 @@ const Interviews = () => {
           </option>
           <option value="Technical">Technical</option>
           <option value="HR">HR</option>
-          <option value="System Design">System Design</option>
+          <option value="System_Design">System Design</option>
           <option value="Assignment">Assignment</option>
         </select>
         <select className="filter-select" defaultValue="">

@@ -3,9 +3,11 @@ import Navbar from "../../components/layout/Navbar";
 import { useDeleteJob, useGetJobs } from "../../hooks/useJobs";
 import type { Job } from "../../types/job";
 import { useDepartments, useStatus } from "../../hooks/useReferenceData";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Dashboard = () => {
   const button = { text: "+ New job", navigation: "/jobForm" };
+  const queryClient = useQueryClient();
   const { data: jobs = [] } = useGetJobs({
     department: null,
     status: null,
@@ -34,7 +36,11 @@ const Dashboard = () => {
 
   const deleteJob = () => {
     deleteJobMutation.mutate(Number(openJobMenuId), {
-      onSuccess: () => {},
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["jobs"],
+        });
+      },
     });
     setOpenJobMenuId(null);
   };
