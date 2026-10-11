@@ -6,5 +6,5 @@ reference_data_router = APIRouter()
 
 
 @reference_data_router.get("/departments", status_code=status.HTTP_200_OK)
-def get_departments() -> dict[str, list[str]]:
-    return {"data": list(DEPARTMENTS)}
+def get_departments() -> dict:
+    return {"data": DEPARTMENTS}
