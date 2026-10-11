@@ -7,6 +7,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import AuthBrandPanel from "../components/auth/AuthBrandPanel";
 import { useRegister } from "../hooks/useAuth";
+import { useDepartments } from "../hooks/useReferenceData";
 
 const RegisterPage = () => {
   const [name, setName] = useState<string>("");
@@ -43,7 +44,13 @@ const RegisterPage = () => {
     setPhone(e.target.value);
   };
 
-  const onDepartmentChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const {
+    data: departments = [],
+    isPending: departmentsLoading,
+    isError: departmentsError,
+  } = useDepartments();
+
+  const onDepartmentChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setDepartment(e.target.value);
   };
 
@@ -222,15 +229,33 @@ const RegisterPage = () => {
                 <label htmlFor="department">
                   Department<span className="required-field"> *</span>
                 </label>
-                <input
+                <select
                   id="department"
-                  type="text"
                   name="department"
                   value={department}
                   onChange={onDepartmentChange}
-                  placeholder="Engineering"
                   required
-                />
+                  disabled={departmentsLoading || departmentsError}
+                  aria-describedby={
+                    departmentsError ? "department-load-error" : undefined
+                  }
+                >
+                  <option value="" disabled hidden>
+                    {departmentsLoading
+                      ? "Loading departments..."
+                      : "Select department"}
+                  </option>
+                  {departments.map((department) => (
+                    <option key={department.id} value={department.name}>
+                      {department.name}
+                    </option>
+                  ))}
+                </select>
+                {departmentsError && (
+                  <span id="department-load-error" role="alert">
+                    Failed to load departments. Please try again.
+                  </span>
+                )}
               </div>
             )}
             {!isAdmin && (
