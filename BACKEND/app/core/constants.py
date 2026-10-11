@@ -13,13 +13,7 @@ STAGES = (
 STAGE_LITERAL = Literal[STAGES]
 INTERVIEW_STATUS = Literal["Scheduled", "Completed", "Cancelled", "Rescheduled"]
 ROUND_TYPE = Literal["Technical", "HR", "System_Design", "Assignment"]
-
-
-STATUS_LITERAL = Literal["Draft", "Open", "Closed", "On-hold"]
-STATUS = [
-    {"id": id, "name": name}
-    for id, name in enumerate(get_args(STATUS_LITERAL), start=1)
-]
+STATUS = Literal["Draft", "Open", "Closed", "On-hold"]
 JOB_TYPE = Literal["Full-time", "Contract"]
 ROLE = Literal["Admin", "User"]
 DEPARTMENTS = [

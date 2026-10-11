@@ -1,38 +1,39 @@
 import Navbar from "../../components/layout/Navbar";
+import { useGetJobs } from "../../hooks/useJobs";
+import { useDepartments } from "../../hooks/useReferenceData";
+import type { Job } from "../../types/job";
 
 const BrowseJobs = () => {
-  const jobs = [
-    {
-      id: 1,
-      title: "Backend Engineer",
-      department: "Engineering",
-      location: "Hyderabad",
-      type: "Full time",
-    },
-    {
-      id: 2,
-      title: "Product Designer",
-      department: "Design",
-      location: "Remote",
-      type: "Full time",
-    },
-  ];
-  const departments = [
-    { id: 1, name: "Engineering" },
-    { id: 2, name: "Design" },
-  ];
+  const { data: jobs = [] } = useGetJobs({
+    department: null,
+    status: null,
+    location: null,
+  });
+
+  const {
+    data: departments,
+    isPending: departmentsLoading,
+    isError: departmentsError,
+  } = useDepartments();
+
   const locations = [
     { id: 1, name: "Hyderabad" },
     { id: 2, name: "Remote" },
     { id: 3, name: "Bengaluru" },
   ];
-  const applyJob = () => {};
+  const applyJob = (id: number) => {
+    console.log(id);
+  };
   return (
     <>
       <Navbar leftTitle="Open roles" rightText="" classString="" />
 
       <div className="filter-toolbar browser-job-toolbar">
-        <select className="filter-select" defaultValue="">
+        <select
+          className="filter-select"
+          defaultValue=""
+          disabled={departmentsLoading || departmentsError}
+        >
           <option value="" disabled hidden>
             Department
           </option>
@@ -41,6 +42,11 @@ const BrowseJobs = () => {
               <option value={department.name}>{department.name}</option>
             ))}
         </select>
+        {departmentsError && (
+          <span id="department-load-error" role="alert">
+            Failed to load departments. Please try again.
+          </span>
+        )}
         <select className="filter-select" defaultValue="">
           <option value="" disabled hidden>
             Location
@@ -73,18 +79,18 @@ const BrowseJobs = () => {
           </tr>
         </thead>
         <tbody>
-          {jobs.length > 0
-            ? jobs.map((job) => (
+          {jobs
+            ? jobs.map((job: Job) => (
                 <tr key={job.id}>
                   <td>{job.title}</td>
                   <td>{job.department}</td>
                   <td>{job.location}</td>
-                  <td>{job.type}</td>
+                  <td>{job.job_type}</td>
                   <td>
                     <button
                       className="apply-button"
                       type="button"
-                      onClick={applyJob}
+                      onClick={() => applyJob(job.id)}
                     >
                       Apply
                     </button>

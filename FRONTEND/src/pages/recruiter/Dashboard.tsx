@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import Navbar from "../../components/layout/Navbar";
 import { useDeleteJob, useGetJobs } from "../../hooks/useJobs";
 import type { Job } from "../../types/job";
-import { useDepartments, useStatus } from "../../hooks/useReferenceData";
+import { useDepartments } from "../../hooks/useReferenceData";
 import { useQueryClient } from "@tanstack/react-query";
+import Modal from "../../components/ui/Modal";
 
 const Dashboard = () => {
   const button = { text: "+ New job", navigation: "/jobForm" };
   const queryClient = useQueryClient();
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
   const { data: jobs = [] } = useGetJobs({
     department: null,
     status: null,
@@ -15,34 +18,30 @@ const Dashboard = () => {
   });
 
   const deleteJobMutation = useDeleteJob();
-  const [openJobMenuId, setOpenJobMenuId] = useState<Job["id"] | null>(null);
+  const [openJobMenu, setOpenJobMenu] = useState<{
+    id: number;
+    title: string;
+  } | null>(null);
 
   useEffect(() => {
-    if (openJobMenuId === null) return;
+    if (openJobMenu === null) return;
 
     const closeMenuOnOutsideClick = (event: MouseEvent) => {
       if (
         event.target instanceof Element &&
         !event.target.closest(".job-actions-cell")
       ) {
-        setOpenJobMenuId(null);
+        setOpenJobMenu(null);
       }
     };
 
     document.addEventListener("mousedown", closeMenuOnOutsideClick);
     return () =>
       document.removeEventListener("mousedown", closeMenuOnOutsideClick);
-  }, [openJobMenuId]);
+  }, [openJobMenu]);
 
   const deleteJob = () => {
-    deleteJobMutation.mutate(Number(openJobMenuId), {
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["jobs"],
-        });
-      },
-    });
-    setOpenJobMenuId(null);
+    setIsModalOpen(true);
   };
 
   const {
@@ -51,11 +50,29 @@ const Dashboard = () => {
     isError: departmentsError,
   } = useDepartments();
 
-  const {
-    data: status,
-    isPending: statusLoading,
-    isError: statusError,
-  } = useStatus();
+  const status = [
+    { id: 1, name: "Draft" },
+    { id: 2, name: "Open" },
+    { id: 3, name: "Closed" },
+    { id: 4, name: "On-hold" },
+  ];
+
+  const onConfirm = () => {
+    deleteJobMutation.mutate(Number(openJobMenu?.id), {
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["jobs"],
+        });
+        setIsModalOpen(false);
+        setOpenJobMenu(null);
+      },
+    });
+  };
+
+  const onCancel = () => {
+    setIsModalOpen(false);
+    setOpenJobMenu(null);
+  };
 
   const locations = [
     { id: 1, name: "Hyderabad" },
@@ -63,147 +80,162 @@ const Dashboard = () => {
     { id: 3, name: "Bengaluru" },
   ];
   return (
-    <section>
-      <Navbar
-        leftTitle="Jobs"
-        rightText={button}
-        classString="nav-action-button"
-      />
-      <div className="filter-toolbar">
-        <select
-          className="filter-select"
-          defaultValue=""
-          disabled={departmentsLoading || departmentsError}
-        >
-          <option value="" disabled hidden>
-            Department
-          </option>
-          {departments &&
-            departments.map((department) => (
-              <option value={department.name}>{department.name}</option>
-            ))}
-        </select>
-        {departmentsError && (
-          <span id="department-load-error" role="alert">
-            Failed to load departments. Please try again.
-          </span>
-        )}
-        <select
-          className="filter-select"
-          defaultValue=""
-          disabled={statusLoading || statusError}
-        >
-          <option value="" disabled hidden>
-            Status
-          </option>
-          {status &&
-            status.map((item) => (
+    <>
+      <section>
+        <Navbar
+          leftTitle="Jobs"
+          rightText={button}
+          classString="nav-action-button"
+        />
+        <div className="filter-toolbar">
+          <select
+            className="filter-select"
+            defaultValue=""
+            disabled={departmentsLoading || departmentsError}
+          >
+            <option value="" disabled hidden>
+              Department
+            </option>
+            {departments &&
+              departments.map((department) => (
+                <option value={department.name}>{department.name}</option>
+              ))}
+          </select>
+          {departmentsError && (
+            <span id="department-load-error" role="alert">
+              Failed to load departments. Please try again.
+            </span>
+          )}
+          <select className="filter-select" defaultValue="">
+            <option value="" disabled hidden>
+              Status
+            </option>
+            {status.map((item) => (
               <option key={item.id} value={item.name}>
                 {item.name}
               </option>
             ))}
-        </select>
-        {statusError && (
-          <span id="status-load-error" role="alert">
-            Failed to load status. Please try again.
-          </span>
-        )}
-        <select className="filter-select" defaultValue="">
-          <option value="" disabled hidden>
-            Location
-          </option>
-          {locations &&
-            locations.map((location) => (
-              <option key={location.id} value={location.name}>
-                {location.name}
-              </option>
-            ))}
-        </select>
-      </div>
-      <div className="content-panel">
-        <table className="jobs-table">
-          <thead>
-            <tr>
-              <th scope="col">
-                <button
-                  className="table-sort-button"
-                  type="button"
-                  // onClick={"sortDirection"}
-                >
-                  Title{" "}
-                  <span aria-hidden="true">
-                    {"ascending" === "ascending" ? "↑" : "↓"}
-                  </span>
-                </button>
-              </th>
-              <th scope="col">Department</th>
-              <th scope="col">Location</th>
-              <th scope="col">Status</th>
-              <th scope="col">Applicants</th>
-              <th scope="col">Openings</th>
-            </tr>
-          </thead>
-          <tbody>
-            {jobs ? (
-              jobs.map((job: Job) => (
-                <tr key={job.id}>
-                  <td>{job.title}</td>
-                  <td>{job.department}</td>
-                  <td>{job.location}</td>
-                  <td>
-                    <span className={`status-badge ${job.status}`}>
-                      {job.status}
-                    </span>
-                  </td>
-                  <td>{job.applicant_count}</td>
-                  <td>{job.openings_count - job.filled_count}</td>
-                  <td className="job-actions-cell">
-                    <button
-                      className="job-actions-trigger"
-                      type="button"
-                      aria-label={`Actions for ${job.title}`}
-                      aria-haspopup="menu"
-                      aria-expanded={openJobMenuId === job.id}
-                      onClick={() =>
-                        setOpenJobMenuId((currentId) =>
-                          currentId === job.id ? null : job.id,
-                        )
-                      }
-                    >
-                      <span aria-hidden="true">⋮</span>
-                    </button>
-                    {openJobMenuId === job.id && (
-                      <div className="job-actions-menu" role="menu">
-                        <button
-                          className="job-actions-menu-item"
-                          type="button"
-                          role="menuitem"
-                          onClick={() => setOpenJobMenuId(null)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="job-actions-menu-item job-actions-delete"
-                          type="button"
-                          role="menuitem"
-                          onClick={deleteJob}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))
-            ) : (
+          </select>
+          <select className="filter-select" defaultValue="">
+            <option value="" disabled hidden>
+              Location
+            </option>
+            {locations &&
+              locations.map((location) => (
+                <option key={location.id} value={location.name}>
+                  {location.name}
+                </option>
+              ))}
+          </select>
+        </div>
+        <div className="content-panel">
+          <table className="jobs-table">
+            <thead>
               <tr>
-                <td colSpan={6}>No jobs found</td>
+                <th scope="col">
+                  <button
+                    className="table-sort-button"
+                    type="button"
+                    // onClick={"sortDirection"}
+                  >
+                    Title{" "}
+                    <span aria-hidden="true">
+                      {"ascending" === "ascending" ? "↑" : "↓"}
+                    </span>
+                  </button>
+                </th>
+                <th scope="col">Department</th>
+                <th scope="col">Location</th>
+                <th scope="col">Status</th>
+                <th scope="col">Applicants</th>
+                <th scope="col">Openings</th>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </section>
+            </thead>
+            <tbody>
+              {jobs ? (
+                jobs.map((job: Job) => (
+                  <tr key={job.id}>
+                    <td>{job.title}</td>
+                    <td>{job.department}</td>
+                    <td>{job.location}</td>
+                    <td>
+                      <span className={`status-badge ${job.status}`}>
+                        {job.status}
+                      </span>
+                    </td>
+                    <td>{job.applicant_count}</td>
+                    <td>{job.openings_count - job.filled_count}</td>
+                    <td className="job-actions-cell">
+                      <button
+                        className="job-actions-trigger"
+                        type="button"
+                        aria-label={`Actions for ${job.title}`}
+                        aria-haspopup="menu"
+                        aria-expanded={openJobMenu?.id === job.id}
+                        onClick={() =>
+                          setOpenJobMenu((currentJob) =>
+                            currentJob?.id === job.id
+                              ? null
+                              : { id: job.id, title: job.title },
+                          )
+                        }
+                      >
+                        <span aria-hidden="true">⋮</span>
+                      </button>
+                      {openJobMenu && openJobMenu.id === job.id && (
+                        <div className="job-actions-menu" role="menu">
+                          <button
+                            className="job-actions-menu-item"
+                            type="button"
+                            role="menuitem"
+                            onClick={() => setOpenJobMenu(null)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="job-actions-menu-item job-actions-delete"
+                            type="button"
+                            role="menuitem"
+                            onClick={deleteJob}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6}>No jobs found</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      {isModalOpen && (
+        <Modal
+          title="Delete this job posting?"
+          message={`This will permanently delete "${openJobMenu?.title}"`}
+          cancelText="Cancel"
+          confirmText="Delete Job"
+          confirmClassString="job-delete"
+          icon={
+            <path
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m-6 5v6m4-6v6"
+              color="#b91c1c"
+            />
+          }
+          onConfirm={onConfirm}
+          onCancel={onCancel}
+        />
+      )}
+    </>
   );
 };
 

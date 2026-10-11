@@ -13,6 +13,7 @@ export interface Job {
   applicant_count: number;
   openings_count: number;
   filled_count: number;
+  job_type: string;
 }
 
 export interface JobCreate {

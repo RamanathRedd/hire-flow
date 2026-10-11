@@ -142,6 +142,10 @@ body {
 	color: #8a919d;
 }
 
+.profile-form-input[readonly] {
+	cursor: not-allowed;
+}
+
 .profile-form-input:focus {
 	border-color: rgba(84, 112, 255, 0.55);
 	box-shadow: 0 0 0 3px rgba(84, 112, 255, 0.12);
@@ -275,6 +279,15 @@ body {
 
 .recruiter-profile:hover {
 	background: #5a73f6;
+}
+
+.job-delete{
+	background: #dc2626;
+	box-shadow: 0 6px 16px rgba(220, 38, 38, 0.24);
+}
+
+.job-delete:hover {
+	background: #b91c1c;
 }
 
 .candidate-profile,.candidate-account{

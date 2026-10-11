@@ -1,4 +1,4 @@
-from core.constants import STAGES, STATUS_LITERAL
+from core.constants import STAGES, STATUS
 from core.exceptions import (
     ActiveApplicationsExistsError,
     JobNotExistsError,
@@ -29,7 +29,8 @@ def create_job(db: Session, job_data: JobCreate, current_user: dict) -> None:
 
 
 def get_jobs(db: Session, job_filters: JobFilters, current_user: dict) -> list[Job]:
-    if current_user["role"] != "Admin":
+    if not current_user["role"]:
+        print("came")
         raise UnauthorizedError
 
     query = select(Job)
@@ -47,7 +48,7 @@ def get_jobs(db: Session, job_filters: JobFilters, current_user: dict) -> list[J
 
 
 def get_job_by_id(db: Session, job_id: int, current_user: dict) -> dict | None:
-    if current_user["role"] != "Admin":
+    if not current_user["role"]:
         raise UnauthorizedError
 
     query = select(Job).where(Job.id == job_id)
@@ -112,7 +113,7 @@ def delete_job(db: Session, job_id: int, current_user: dict) -> None:
 
 
 def update_job_status(
-    db: Session, job_id: int, new_status: STATUS_LITERAL, current_user: dict
+    db: Session, job_id: int, new_status: STATUS, current_user: dict
 ) -> None:
     if current_user["role"] != "Admin":
         raise UnauthorizedError
