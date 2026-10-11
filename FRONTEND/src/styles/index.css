@@ -686,6 +686,7 @@ body {
 }
 
 .job-form-field input,
+.job-form-field select,
 .job-form-field textarea {
 	width: 100%;
 	min-width: 0;
@@ -697,6 +698,11 @@ body {
 }
 
 .job-form-field input {
+	height: 38px;
+	padding: 0 11px;
+}
+
+.job-form-field select {
 	height: 38px;
 	padding: 0 11px;
 }

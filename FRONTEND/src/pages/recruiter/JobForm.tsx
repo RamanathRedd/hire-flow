@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCreateJob } from "../../hooks/useJobs";
+import { useDepartments } from "../../hooks/useReferenceData";
 
 const JobForm = () => {
   const [jobTitle, setJobTitle] = useState<string>("");
@@ -17,7 +18,7 @@ const JobForm = () => {
     setJobTitle(e.target.value);
   };
 
-  const onDepartmentChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const onDepartmentChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setDepartment(e.target.value);
   };
 
@@ -25,7 +26,7 @@ const JobForm = () => {
     setLocation(e.target.value);
   };
 
-  const onJobTypeChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const onJobTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setJobType(e.target.value);
   };
 
@@ -40,6 +41,12 @@ const JobForm = () => {
   const onRequirementsChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setRequirements(e.target.value);
   };
+
+  const {
+    data: departments,
+    isPending: departmentsLoading,
+    isError: departmentsError,
+  } = useDepartments();
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -106,15 +113,29 @@ const JobForm = () => {
             <label htmlFor="job-department">
               Department<span className="required-field"> *</span>
             </label>
-            <input
+            <select
               id="job-department"
-              type="text"
               name="department"
               value={department}
               onChange={onDepartmentChange}
-              placeholder="Engineering"
+              disabled={departmentsLoading || departmentsError}
               required
-            />
+            >
+              <option value="" disabled hidden>
+                Select Department
+              </option>
+              {departments &&
+                departments.map((department) => (
+                  <option key={department.id} value={department.name}>
+                    {department.name}
+                  </option>
+                ))}
+            </select>
+            {departmentsError && (
+              <span id="department-load-error" role="alert">
+                Failed to load departments. Please try again.
+              </span>
+            )}
           </div>
           <div className="job-form-field">
             <label htmlFor="job-location">
@@ -134,15 +155,19 @@ const JobForm = () => {
             <label htmlFor="job-type">
               Job type<span className="required-field"> *</span>
             </label>
-            <input
+            <select
               id="job-type"
-              type="text"
               name="jobType"
               value={jobType}
               onChange={onJobTypeChange}
-              placeholder="Full time"
               required
-            />
+            >
+              <option value="" disabled hidden>
+                Select JobType
+              </option>
+              <option value="Full-time">Full-time</option>
+              <option value="Contract">Contract</option>
+            </select>
           </div>
           <div className="job-form-field">
             <label htmlFor="job-openings">
