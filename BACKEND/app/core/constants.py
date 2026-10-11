@@ -16,6 +16,26 @@ ROUND_TYPE = Literal["Technical", "HR", "System_Design", "Assignment"]
 STATUS = Literal["Draft", "Open", "Closed", "On-hold"]
 JOB_TYPE = Literal["Full-time", "Contract"]
 ROLE = Literal["Admin", "User"]
+LOCATIONS_LITERAL = Literal[
+    "Hyderabad",
+    "Bengaluru",
+    "Chennai",
+    "Mumbai",
+    "Pune",
+    "Delhi",
+    "Gurugram",
+    "Noida",
+    "Kolkata",
+    "Ahmedabad",
+    "Jaipur",
+    "Kochi",
+    "Remote",
+    "Hybrid",
+]
+LOCATIONS = [
+    {"id": id, "name": name}
+    for id, name in enumerate(get_args(LOCATIONS_LITERAL), start=1)
+]
 DEPARTMENTS = [
     {"id": 1, "name": "Engineering"},
     {"id": 2, "name": "Product"},

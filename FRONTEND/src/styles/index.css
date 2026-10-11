@@ -282,12 +282,11 @@ body {
 }
 
 .job-delete{
-	background: #dc2626;
-	box-shadow: 0 6px 16px rgba(220, 38, 38, 0.24);
+	background: #4b67f5;
 }
 
 .job-delete:hover {
-	background: #b91c1c;
+	background: #5a73f6;
 }
 
 .candidate-profile,.candidate-account{
@@ -434,7 +433,7 @@ body {
 
 .filter-toolbar {
 	display: grid;
-	grid-template-columns: repeat(3, minmax(130px, 180px));
+	grid-template-columns: repeat(3, minmax(130px, 155px));
 	gap: 12px;
 	width: fit-content;
 	padding: 0;

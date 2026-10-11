@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Navbar from "../../components/layout/Navbar";
 import { useDeleteJob, useGetJobs } from "../../hooks/useJobs";
 import type { Job } from "../../types/job";
-import { useDepartments } from "../../hooks/useReferenceData";
+import { useDepartments, useLocations } from "../../hooks/useReferenceData";
 import { useQueryClient } from "@tanstack/react-query";
 import Modal from "../../components/ui/Modal";
 
@@ -74,7 +74,13 @@ const Dashboard = () => {
     setOpenJobMenu(null);
   };
 
-  const locations = [
+  const {
+    data: locations,
+    isPending: locationsLoading,
+    isError: locationsError,
+  } = useLocations();
+
+  [
     { id: 1, name: "Hyderabad" },
     { id: 2, name: "Remote" },
     { id: 3, name: "Bengaluru" },
@@ -116,17 +122,26 @@ const Dashboard = () => {
               </option>
             ))}
           </select>
-          <select className="filter-select" defaultValue="">
+          <select
+            className="filter-select"
+            defaultValue=""
+            disabled={locationsLoading || locationsError}
+          >
             <option value="" disabled hidden>
               Location
             </option>
             {locations &&
-              locations.map((location) => (
+              locations.map((location: { id: number; name: string }) => (
                 <option key={location.id} value={location.name}>
                   {location.name}
                 </option>
               ))}
           </select>
+          {locationsError && (
+            <span id="location-load-error" role="alert">
+              Failed to load locations. Please try again.
+            </span>
+          )}
         </div>
         <div className="content-panel">
           <table className="jobs-table">

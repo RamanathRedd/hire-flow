@@ -42,7 +42,7 @@ def get_jobs(db: Session, job_filters: JobFilters, current_user: dict) -> list[J
         query = query.where(Job.status == job_filters.status)
 
     if job_filters.location:
-        query = query.where(Job.location.ilike(f"%{job_filters.location}%"))
+        query = query.where(Job.location == job_filters.location)
 
     return db.scalars(query).all()
 

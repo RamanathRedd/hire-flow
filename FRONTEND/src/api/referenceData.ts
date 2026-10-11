@@ -10,3 +10,12 @@ export const getDepartments = async (): Promise<
   );
   return response.data;
 };
+
+export const getLocations = async (): Promise<
+  { id: number; name: string }[]
+> => {
+  const response = await axios.get<{ id: number; name: string }[]>(
+    `${API_BASE_URL}/reference_data/locations`,
+  );
+  return response.data;
+};
