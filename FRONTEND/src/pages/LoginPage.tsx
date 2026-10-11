@@ -27,6 +27,11 @@ const LoginPage = () => {
     setIsAdmin(e.currentTarget.name === "recruiter");
   };
 
+  const resetForm = () => {
+    setEmail("");
+    setPassword("");
+  };
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     loginMutation.mutate(
@@ -35,6 +40,7 @@ const LoginPage = () => {
         onSuccess: (result) => {
           sessionStorage.setItem("access_token", result.access_token);
           sessionStorage.setItem("role", result.role);
+          resetForm();
           navigate(isAdmin ? "/jobs" : "/browseJobs");
         },
       },
