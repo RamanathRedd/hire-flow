@@ -1,10 +1,11 @@
 from typing import Annotated
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 import jwt
 from datetime import datetime, timedelta, timezone
 from core.config import settings
 from fastapi.security import OAuth2PasswordBearer
 from pwdlib import PasswordHash
+from starlette import status
 
 password_hash = PasswordHash.recommended()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
@@ -56,7 +57,10 @@ def get_authenticated_user(
 ):
     payload = verify_access_token(token)
     if payload is None:
-        return None
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired access token",
+        )
 
     try:
         user_id = int(payload["id"])

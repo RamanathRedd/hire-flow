@@ -6,15 +6,15 @@ import {
 } from "react";
 import AuthBrandPanel from "../components/auth/AuthBrandPanel";
 import { Link, useNavigate } from "react-router-dom";
-import { login } from "../api/auth";
+import { useLogin } from "../hooks/useAuth";
 
 const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isAdmin, setIsAdmin] = useState<boolean>(true);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
   const navigate = useNavigate();
+  const loginMutation = useLogin();
+
   const onEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
   };
@@ -27,28 +27,18 @@ const LoginPage = () => {
     setIsAdmin(e.currentTarget.name === "recruiter");
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErrorMessage("");
-    setIsSubmitting(true);
-
-    try {
-      const result = await login(email, password, isAdmin);
-
-      sessionStorage.setItem("access_token", result.access_token);
-      sessionStorage.setItem("role", result.role);
-      navigate(isAdmin ? "/jobs" : "/browseJobs");
-    } catch (error) {
-      setErrorMessage(
-        error instanceof TypeError
-          ? "Unable to connect to the server. Check that the backend is running and try again."
-          : error instanceof Error
-            ? error.message
-            : "Sign in failed. Please try again.",
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
+    loginMutation.mutate(
+      { email, password, isAdmin },
+      {
+        onSuccess: (result) => {
+          sessionStorage.setItem("access_token", result.access_token);
+          sessionStorage.setItem("role", result.role);
+          navigate(isAdmin ? "/jobs" : "/browseJobs");
+        },
+      },
+    );
   };
 
   return (
@@ -115,13 +105,13 @@ const LoginPage = () => {
           <button
             className={`auth-submit ${isAdmin ? `recruiter-account` : `candidate-account`}`}
             type="submit"
-            disabled={isSubmitting}
+            disabled={loginMutation.isPending}
           >
-            {isSubmitting ? "Signing in..." : "Sign in"}
+            {loginMutation.isPending ? "Signing in..." : "Sign in"}
           </button>
-          {errorMessage && (
+          {loginMutation.isError && (
             <p className="auth-message is-error" role="alert">
-              {errorMessage}
+              {loginMutation.error.message}
             </p>
           )}
           <p className="auth-footer">

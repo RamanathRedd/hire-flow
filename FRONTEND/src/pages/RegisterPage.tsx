@@ -4,8 +4,9 @@ import {
   type FormEvent,
   type MouseEvent,
 } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AuthBrandPanel from "../components/auth/AuthBrandPanel";
+import { useRegister } from "../hooks/useAuth";
 
 const RegisterPage = () => {
   const [name, setName] = useState<string>("");
@@ -22,22 +23,12 @@ const RegisterPage = () => {
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [isAdmin, setIsAdmin] = useState<boolean>(true);
+  const registerMutation = useRegister();
+  const navigate = useNavigate();
 
   const onRoleChange = (e: MouseEvent<HTMLButtonElement>) => {
     setIsAdmin(e.currentTarget.name === "recruiter");
-    setName("");
-    setEmail("");
-    setPhone("");
-    setDepartment("");
-    setResumeUrl("");
-    setLinkedinUrl("");
-    setExperienceYears(0);
-    setCurrentTitle("");
-    setCompanyName("");
-    setSkill("");
-    setSkills([]);
-    setPassword("");
-    setConfirmPassword("");
+    resetForm();
   };
 
   const onNameChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -81,7 +72,7 @@ const RegisterPage = () => {
   };
 
   const addSkill = () => {
-    const trimmedSkill = skill.trim();
+    const trimmedSkill = skill.trim().toLowerCase();
 
     if (!trimmedSkill || skills.includes(trimmedSkill)) {
       return;
@@ -99,9 +90,7 @@ const RegisterPage = () => {
     setConfirmPassword(e.target.value);
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("submitted", e);
+  const resetForm = () => {
     setName("");
     setEmail("");
     setPhone("");
@@ -115,7 +104,33 @@ const RegisterPage = () => {
     setSkills([]);
     setPassword("");
     setConfirmPassword("");
-    setIsAdmin(true);
+  };
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    registerMutation.mutate(
+      {
+        email,
+        password,
+        isAdmin,
+        name,
+        phone,
+        department,
+        resume_url: resumeUrl,
+        linkedin_url: linkedinUrl,
+        experience_years: experienceYears,
+        skills,
+        current_title: currentTitle,
+        current_company: companyName,
+      },
+      {
+        onSuccess: () => {
+          navigate("/");
+          resetForm();
+          setIsAdmin(true);
+        },
+      },
+    );
   };
 
   return (
@@ -185,6 +200,7 @@ const RegisterPage = () => {
                 placeholder="ram@example.com"
                 required
               />
+              <span></span>
             </div>
             <div className="auth-field">
               <label htmlFor="phone">
@@ -197,6 +213,7 @@ const RegisterPage = () => {
                 value={phone}
                 onChange={onPhoneChange}
                 placeholder="9391233969"
+                inputMode="numeric"
                 required
               />
             </div>
@@ -295,14 +312,17 @@ const RegisterPage = () => {
                       name="skill"
                       value={skill}
                       onChange={onSkillChange}
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter") {
-                          event.preventDefault();
-                          addSkill();
-                        }
-                      }}
                       placeholder="React, Python, SQL"
                     />
+
+                    <button
+                      type="button"
+                      className="add-skill-button"
+                      onClick={addSkill}
+                      disabled={!skill.trim() || skills.includes(skill.trim())}
+                    >
+                      Add Skill
+                    </button>
                   </div>
                   {skills.length > 0 && (
                     <div className="profile-form-skill-list ">
@@ -312,6 +332,18 @@ const RegisterPage = () => {
                           className="profile-form-skill"
                         >
                           {skill}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setSkills((current) =>
+                                current.filter((value) => value !== skill),
+                              )
+                            }
+                            style={{ cursor: "pointer" }}
+                            aria-label={`Remove ${skill}`}
+                          >
+                            ×
+                          </button>
                         </span>
                       ))}
                     </div>
@@ -351,9 +383,17 @@ const RegisterPage = () => {
           <button
             className={`auth-submit ${isAdmin ? `recruiter-account` : `candidate-account`}`}
             type="submit"
+            disabled={registerMutation.isPending}
           >
-            Create account
+            {registerMutation.isPending
+              ? "Creating account..."
+              : "Create account"}
           </button>
+          {registerMutation.isError && (
+            <p className="auth-message is-error" role="alert">
+              {registerMutation.error.message}
+            </p>
+          )}
         </form>
       </section>
     </main>

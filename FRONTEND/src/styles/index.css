@@ -285,6 +285,10 @@ body {
 	background: #31867c;
 }
 
+.candidate-profile:hover,.candidate-account:disabled {
+	background: #0e9f8f;
+}
+
 @keyframes modal-enter {
 	from {
 		opacity: 0;
@@ -436,6 +440,7 @@ body {
 	border-radius: 8px;
 	background: rgba(18, 22, 29, 0.82);
 	color: #e9edf5;
+	color-scheme: dark;
 	font-size: 0.96rem;
 	font-weight: 500;
 	cursor: pointer;
@@ -447,6 +452,11 @@ body {
 	background-size: 5px 5px, 5px 5px;
 	background-repeat: no-repeat;
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+.filter-select option {
+	background-color: #12161d;
+	color: #e9edf5;
 }
 
 .filter-select:focus {
@@ -490,6 +500,75 @@ body {
 	font-weight: 600;
 	letter-spacing: 0.01em;
 	text-transform: none;
+}
+
+.job-actions-cell {
+	position: relative;
+	width: 1%;
+	white-space: nowrap;
+}
+
+.job-actions-trigger {
+	display: inline-flex;
+	width: 34px;
+	height: 34px;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	border: 1px solid transparent;
+	border-radius: 8px;
+	background: transparent;
+	color: #c2c9d4;
+	font-size: 1.4rem;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.job-actions-trigger:hover,
+.job-actions-trigger[aria-expanded="true"] {
+	border-color: rgba(255, 255, 255, 0.12);
+	background: rgba(255, 255, 255, 0.06);
+	color: #f4f7fb;
+}
+
+.job-actions-trigger:focus-visible,
+.job-actions-menu-item:focus-visible {
+	outline: 2px solid #6f87ff;
+	outline-offset: 2px;
+}
+
+.job-actions-menu {
+	position: absolute;
+	top: calc(100% - 8px);
+	right: 10px;
+	z-index: 10;
+	display: flex;
+	min-width: 130px;
+	flex-direction: column;
+	padding: 5px;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 9px;
+	background: #1b222c;
+	box-shadow: 0 10px 28px rgba(0, 0, 0, 0.38);
+}
+
+.job-actions-menu-item {
+	padding: 9px 11px;
+	border: 0;
+	border-radius: 6px;
+	background: transparent;
+	color: #e7e9ee;
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.job-actions-menu-item:hover {
+	background: rgba(255, 255, 255, 0.07);
+}
+
+.job-actions-menu-item.job-actions-delete {
+	color: #ff8585;
 }
 
 .table-sort-button {
@@ -841,15 +920,34 @@ input {
 	grid-column: 1 / -1;
 }
 
-.register-fields .skills-field .skill-input-row,
+/* .register-fields .skills-field .skill-input-row, */
 .register-fields .skills-field .profile-form-skill-list {
 	width: 100%;
+}
+
+.skill-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.skill-input-row input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
 }
 
 .auth-field label {
 	color: #a4aab5;
 	font-size: 13px;
 	line-height: 1.2;
+}
+
+.error-message {
+	color: #ff8d96;
+	font-size: 12px;
+	line-height: 1.3;
 }
 
 .auth-field input {
@@ -893,9 +991,39 @@ input {
 	background: #4059e3;
 }
 
+.recruiter-account:disabled{
+	background: #354ed5;
+}
+
 .auth-submit:disabled {
 	opacity: 0.7;
-	cursor: wait;
+	cursor: not-allowed;
+}
+
+.add-skill-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  padding: 0 16px;
+  border: 1px solid #0e9f8f;
+  border-radius: 8px;
+  background: #0e9f8f;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.add-skill-button:hover:not(:disabled) {
+  background: #31867c;
+}
+
+.add-skill-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .auth-message {
