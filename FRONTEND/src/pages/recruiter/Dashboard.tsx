@@ -1,36 +1,43 @@
+import { useEffect, useState } from "react";
 import Navbar from "../../components/layout/Navbar";
+import { useDeleteJob, useGetJobs } from "../../hooks/useJobs";
+import type { Job } from "../../types/job";
 
 const Dashboard = () => {
   const button = { text: "+ New job", navigation: "/jobForm" };
-  const jobs = [
-    {
-      id: 1,
-      title: "Backend Engineer",
-      department: "Engineering",
-      location: "Hyderabad",
-      status: "Open",
-      applicants: 18,
-      openings: "2 / 3",
-    },
-    {
-      id: 2,
-      title: "Product Designer",
-      department: "Design",
-      location: "Remote",
-      status: "Open",
-      applicants: 9,
-      openings: "0 / 1",
-    },
-    {
-      id: 3,
-      title: "QA Analyst",
-      department: "Engineering",
-      location: "Bengaluru",
-      status: "Draft",
-      applicants: 0,
-      openings: "0 / 2",
-    },
-  ];
+  const { data: jobs = [] } = useGetJobs({
+    department: null,
+    status: null,
+    location: null,
+  });
+
+  const deleteJobMutation = useDeleteJob();
+  const [openJobMenuId, setOpenJobMenuId] = useState<Job["id"] | null>(null);
+
+  useEffect(() => {
+    if (openJobMenuId === null) return;
+
+    const closeMenuOnOutsideClick = (event: MouseEvent) => {
+      if (
+        event.target instanceof Element &&
+        !event.target.closest(".job-actions-cell")
+      ) {
+        setOpenJobMenuId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", closeMenuOnOutsideClick);
+    return () =>
+      document.removeEventListener("mousedown", closeMenuOnOutsideClick);
+  }, [openJobMenuId]);
+
+  const deleteJob = () => {
+    deleteJobMutation.mutate(Number(openJobMenuId), {
+      onSuccess: () => {},
+    });
+    setOpenJobMenuId(null);
+  };
+
   const departments = [
     { id: 1, name: "Engineering" },
     { id: 2, name: "Design" },
@@ -100,8 +107,8 @@ const Dashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {jobs.length > 0 ? (
-              jobs.map((job) => (
+            {jobs ? (
+              jobs.map((job: Job) => (
                 <tr key={job.id}>
                   <td>{job.title}</td>
                   <td>{job.department}</td>
@@ -111,8 +118,44 @@ const Dashboard = () => {
                       {job.status}
                     </span>
                   </td>
-                  <td>{job.applicants}</td>
-                  <td>{job.openings}</td>
+                  <td>{job.applicant_count}</td>
+                  <td>{job.openings_count - job.filled_count}</td>
+                  <td className="job-actions-cell">
+                    <button
+                      className="job-actions-trigger"
+                      type="button"
+                      aria-label={`Actions for ${job.title}`}
+                      aria-haspopup="menu"
+                      aria-expanded={openJobMenuId === job.id}
+                      onClick={() =>
+                        setOpenJobMenuId((currentId) =>
+                          currentId === job.id ? null : job.id,
+                        )
+                      }
+                    >
+                      <span aria-hidden="true">⋮</span>
+                    </button>
+                    {openJobMenuId === job.id && (
+                      <div className="job-actions-menu" role="menu">
+                        <button
+                          className="job-actions-menu-item"
+                          type="button"
+                          role="menuitem"
+                          onClick={() => setOpenJobMenuId(null)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="job-actions-menu-item job-actions-delete"
+                          type="button"
+                          role="menuitem"
+                          onClick={deleteJob}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </td>
                 </tr>
               ))
             ) : (

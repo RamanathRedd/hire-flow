@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import { useCreateJob } from "../../hooks/useJobs";
 
 const JobForm = () => {
   const [jobTitle, setJobTitle] = useState<string>("");
@@ -8,7 +9,9 @@ const JobForm = () => {
   const [jobType, setJobType] = useState<string>("");
   const [openings, setOpenings] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+  const [requirements, setRequirements] = useState<string>("");
   const navigate = useNavigate();
+  const createJobMutation = useCreateJob();
 
   const onJobTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setJobTitle(e.target.value);
@@ -34,9 +37,35 @@ const JobForm = () => {
     setDescription(e.target.value);
   };
 
+  const onRequirementsChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setRequirements(e.target.value);
+  };
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(e.target);
+    const submitter = (e.nativeEvent as SubmitEvent).submitter;
+    const status =
+      submitter instanceof HTMLButtonElement && submitter.value === "draft"
+        ? "Draft"
+        : "Open";
+
+    createJobMutation.mutate(
+      {
+        title: jobTitle,
+        department,
+        location,
+        job_type: jobType,
+        description,
+        status: status,
+        openings_count: Number(openings),
+        requirements,
+      },
+      {
+        onSuccess: () => {
+          navigate("/jobs");
+        },
+      },
+    );
   };
 
   return (
@@ -131,6 +160,20 @@ const JobForm = () => {
             />
           </div>
           <div className="job-form-field job-form-field-wide">
+            <label htmlFor="job-requirements">
+              Requirements<span className="required-field"> *</span>
+            </label>
+            <textarea
+              id="job-requirements"
+              name="requirements"
+              value={requirements}
+              onChange={onRequirementsChange}
+              rows={3}
+              placeholder="Describe the requirements for this role"
+              required
+            />
+          </div>
+          <div className="job-form-field job-form-field-wide">
             <label htmlFor="job-description">
               Description<span className="required-field"> *</span>
             </label>
@@ -147,10 +190,20 @@ const JobForm = () => {
         </div>
 
         <footer className="job-form-actions">
-          <button className="job-form-draft" type="submit">
+          <button
+            className="job-form-draft"
+            type="submit"
+            name="action"
+            value="draft"
+          >
             Save as draft
           </button>
-          <button className="job-form-submit" type="submit">
+          <button
+            className="job-form-submit"
+            type="submit"
+            name="action"
+            value="create"
+          >
             Create job
           </button>
         </footer>
