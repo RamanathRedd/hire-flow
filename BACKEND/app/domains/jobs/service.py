@@ -12,7 +12,7 @@ from domains.jobs.model import Job
 from domains.jobs.schemas import JobCreate, JobFilters, JobUpdate
 from domains.recruiters.service import get_recruiter_details
 from sqlalchemy import select
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 
 
 def create_job(db: Session, job_data: JobCreate, current_user: dict) -> None:
@@ -32,7 +32,7 @@ def get_jobs(db: Session, job_filters: JobFilters, current_user: dict) -> list[J
     if current_user["role"] != "Admin":
         raise UnauthorizedError
 
-    query = select(Job).options(joinedload(Job.recruiter))
+    query = select(Job)
 
     if job_filters.department:
         query = query.where(Job.department == job_filters.department)

@@ -10,8 +10,8 @@ class JobCreate(BaseModel):
     description: str = Field(min_length=5, max_length=500)
     requirements: str = Field(min_length=5, max_length=1000)
     status: STATUS = Field(default="Draft")
-    openings_count: int = Field(gt=0)  # no.of openings
-    filled_count: int = Field(default=0)  # no.of peoples selected
+    openings_count: int = Field(gt=0)
+    filled_count: int = Field(default=0)
 
 
 class JobFilters(BaseModel):

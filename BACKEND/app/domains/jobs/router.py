@@ -22,6 +22,7 @@ def _serialize_job(job) -> dict:
         column.name: getattr(job, column.name) for column in job.__table__.columns
     }
     payload["recruiter_name"] = job.recruiter.name if job.recruiter else None
+    payload["applicant_count"] = len(job.applications)
     return payload
 
 
@@ -54,7 +55,7 @@ def get_jobs(
 
         filtered_jobs = [_serialize_job(job) for job in filtered_jobs]
 
-        return {"data": filtered_jobs}
+        return filtered_jobs
     except UnauthorizedError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
