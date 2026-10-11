@@ -236,9 +236,6 @@ const RegisterPage = () => {
                   onChange={onDepartmentChange}
                   required
                   disabled={departmentsLoading || departmentsError}
-                  aria-describedby={
-                    departmentsError ? "department-load-error" : undefined
-                  }
                 >
                   <option value="" disabled hidden>
                     {departmentsLoading

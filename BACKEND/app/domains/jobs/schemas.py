@@ -1,4 +1,4 @@
-from core.constants import JOB_TYPE, STATUS
+from core.constants import JOB_TYPE, STATUS_LITERAL
 from pydantic import BaseModel, Field
 
 
@@ -9,14 +9,14 @@ class JobCreate(BaseModel):
     job_type: JOB_TYPE
     description: str = Field(min_length=5, max_length=500)
     requirements: str = Field(min_length=5, max_length=1000)
-    status: STATUS = Field(default="Draft")
+    status: STATUS_LITERAL = Field(default="Draft")
     openings_count: int = Field(gt=0)
     filled_count: int = Field(default=0)
 
 
 class JobFilters(BaseModel):
     department: str | None = Field(default=None, min_length=3, max_length=50)
-    status: STATUS | None = None
+    status: STATUS_LITERAL | None = None
     location: str | None = Field(default=None, min_length=3, max_length=50)
 
 

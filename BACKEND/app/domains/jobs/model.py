@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import List
 
-from core.constants import JOB_TYPE, STATUS
+from core.constants import JOB_TYPE, STATUS_LITERAL
 from core.database import Base
 from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -17,7 +17,7 @@ class Job(Base):
     job_type: Mapped[JOB_TYPE] = mapped_column(String(15))
     description: Mapped[str] = mapped_column(String(500))
     requirements: Mapped[str] = mapped_column(String(1000))
-    status: Mapped[STATUS] = mapped_column(String(10), default="Draft")
+    status: Mapped[STATUS_LITERAL] = mapped_column(String(10), default="Draft")
     created_by: Mapped[int] = mapped_column(
         ForeignKey("recruiters.id", ondelete="CASCADE")
     )

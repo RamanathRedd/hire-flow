@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Navbar from "../../components/layout/Navbar";
 import { useDeleteJob, useGetJobs } from "../../hooks/useJobs";
 import type { Job } from "../../types/job";
+import { useDepartments, useStatus } from "../../hooks/useReferenceData";
 
 const Dashboard = () => {
   const button = { text: "+ New job", navigation: "/jobForm" };
@@ -38,10 +39,18 @@ const Dashboard = () => {
     setOpenJobMenuId(null);
   };
 
-  const departments = [
-    { id: 1, name: "Engineering" },
-    { id: 2, name: "Design" },
-  ];
+  const {
+    data: departments,
+    isPending: departmentsLoading,
+    isError: departmentsError,
+  } = useDepartments();
+
+  const {
+    data: status,
+    isPending: statusLoading,
+    isError: statusError,
+  } = useStatus();
+
   const locations = [
     { id: 1, name: "Hyderabad" },
     { id: 2, name: "Remote" },
@@ -55,7 +64,11 @@ const Dashboard = () => {
         classString="nav-action-button"
       />
       <div className="filter-toolbar">
-        <select className="filter-select" defaultValue="">
+        <select
+          className="filter-select"
+          defaultValue=""
+          disabled={departmentsLoading || departmentsError}
+        >
           <option value="" disabled hidden>
             Department
           </option>
@@ -64,22 +77,40 @@ const Dashboard = () => {
               <option value={department.name}>{department.name}</option>
             ))}
         </select>
-        <select className="filter-select" defaultValue="">
+        {departmentsError && (
+          <span id="department-load-error" role="alert">
+            Failed to load departments. Please try again.
+          </span>
+        )}
+        <select
+          className="filter-select"
+          defaultValue=""
+          disabled={statusLoading || statusError}
+        >
           <option value="" disabled hidden>
             Status
           </option>
-          <option value="Draft">Draft</option>
-          <option value="Open">Open</option>
-          <option value="Closed">Closed</option>
-          <option value="On_hold">On_hold</option>
+          {status &&
+            status.map((item) => (
+              <option key={item.id} value={item.name}>
+                {item.name}
+              </option>
+            ))}
         </select>
+        {statusError && (
+          <span id="status-load-error" role="alert">
+            Failed to load status. Please try again.
+          </span>
+        )}
         <select className="filter-select" defaultValue="">
           <option value="" disabled hidden>
             Location
           </option>
           {locations &&
             locations.map((location) => (
-              <option value={location.name}>{location.name}</option>
+              <option key={location.id} value={location.name}>
+                {location.name}
+              </option>
             ))}
         </select>
       </div>

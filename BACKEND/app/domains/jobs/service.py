@@ -1,4 +1,4 @@
-from core.constants import STAGES, STATUS
+from core.constants import STAGES, STATUS_LITERAL
 from core.exceptions import (
     ActiveApplicationsExistsError,
     JobNotExistsError,
@@ -112,7 +112,7 @@ def delete_job(db: Session, job_id: int, current_user: dict) -> None:
 
 
 def update_job_status(
-    db: Session, job_id: int, new_status: STATUS, current_user: dict
+    db: Session, job_id: int, new_status: STATUS_LITERAL, current_user: dict
 ) -> None:
     if current_user["role"] != "Admin":
         raise UnauthorizedError

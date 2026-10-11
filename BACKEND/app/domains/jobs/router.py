@@ -1,4 +1,4 @@
-from core.constants import STATUS
+from core.constants import STATUS_LITERAL
 from core.database import get_db
 from core.exceptions import (
     ActiveApplicationsExistsError,
@@ -126,7 +126,7 @@ def delete_job(job_id: int, current_user: CurrentUser, db: Session = Depends(get
 @jobs_router.patch("/{job_id}/status", status_code=status.HTTP_200_OK)
 def update_job_status(
     job_id: int,
-    new_status: STATUS,
+    new_status: STATUS_LITERAL,
     current_user: CurrentUser,
     db: Session = Depends(get_db),
 ):
