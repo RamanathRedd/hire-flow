@@ -85,11 +85,6 @@ const Profile = () => {
     password: "Ram@1432",
   };
 
-  // useEffect(() => {
-  //   setIsEditable(false);
-  //   setIsModalOpen(false);
-  // });
-
   return (
     <>
       <Navbar

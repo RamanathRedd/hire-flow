@@ -9,7 +9,12 @@ export const useCreateJob = () =>
 
 export const useGetJobs = (jobFilters: JobFilter) =>
   useQuery({
-    queryKey: ["jobs"],
+    queryKey: [
+      "jobs",
+      jobFilters.department ?? "",
+      jobFilters.status ?? "",
+      jobFilters.location ?? "",
+    ],
     queryFn: () => getJobs(jobFilters),
   });
 

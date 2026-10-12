@@ -11,7 +11,7 @@ from domains.candidates.model import Candidate
 from domains.jobs.model import Job
 from domains.jobs.schemas import JobCreate, JobFilters, JobUpdate
 from domains.recruiters.service import get_recruiter_details
-from sqlalchemy import select
+from sqlalchemy import not_, select
 from sqlalchemy.orm import Session
 
 
@@ -30,10 +30,19 @@ def create_job(db: Session, job_data: JobCreate, current_user: dict) -> None:
 
 def get_jobs(db: Session, job_filters: JobFilters, current_user: dict) -> list[Job]:
     if not current_user["role"]:
-        print("came")
         raise UnauthorizedError
 
     query = select(Job)
+
+    if current_user["role"] == "User":
+        query = query.where(
+            Job.status == "Open",
+            not_(
+                Job.applications.any(
+                    Application.candidate_id == current_user["id"]
+                )
+            ),
+        )
 
     if job_filters.department:
         query = query.where(Job.department == job_filters.department)

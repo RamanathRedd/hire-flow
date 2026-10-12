@@ -10,11 +10,16 @@ const Dashboard = () => {
   const button = { text: "+ New job", navigation: "/jobForm" };
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedDepartment, setSelectedDepartment] = useState<string | null>(
+    null,
+  );
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
 
   const { data: jobs = [] } = useGetJobs({
-    department: null,
-    status: null,
-    location: null,
+    department: selectedDepartment,
+    status: selectedStatus,
+    location: selectedLocation,
   });
 
   const deleteJobMutation = useDeleteJob();
@@ -80,11 +85,12 @@ const Dashboard = () => {
     isError: locationsError,
   } = useLocations();
 
-  [
-    { id: 1, name: "Hyderabad" },
-    { id: 2, name: "Remote" },
-    { id: 3, name: "Bengaluru" },
-  ];
+  const clearFilters = () => {
+    setSelectedDepartment(null);
+    setSelectedLocation(null);
+    setSelectedStatus(null);
+  };
+
   return (
     <>
       <section>
@@ -96,15 +102,18 @@ const Dashboard = () => {
         <div className="filter-toolbar">
           <select
             className="filter-select"
-            defaultValue=""
+            value={selectedDepartment ?? "department-placeholder"}
+            onChange={(event) => setSelectedDepartment(event.target.value)}
             disabled={departmentsLoading || departmentsError}
           >
-            <option value="" disabled hidden>
+            <option value="department-placeholder" disabled hidden>
               Department
             </option>
             {departments &&
               departments.map((department) => (
-                <option value={department.name}>{department.name}</option>
+                <option key={department.id} value={department.name}>
+                  {department.name}
+                </option>
               ))}
           </select>
           {departmentsError && (
@@ -112,8 +121,12 @@ const Dashboard = () => {
               Failed to load departments. Please try again.
             </span>
           )}
-          <select className="filter-select" defaultValue="">
-            <option value="" disabled hidden>
+          <select
+            className="filter-select"
+            value={selectedStatus ?? "status-placeholder"}
+            onChange={(event) => setSelectedStatus(event.target.value)}
+          >
+            <option value="status-placeholder" disabled hidden>
               Status
             </option>
             {status.map((item) => (
@@ -124,10 +137,11 @@ const Dashboard = () => {
           </select>
           <select
             className="filter-select"
-            defaultValue=""
+            value={selectedLocation ?? "location-placeholder"}
+            onChange={(event) => setSelectedLocation(event.target.value)}
             disabled={locationsLoading || locationsError}
           >
-            <option value="" disabled hidden>
+            <option value="location-placeholder" disabled hidden>
               Location
             </option>
             {locations &&
@@ -142,6 +156,13 @@ const Dashboard = () => {
               Failed to load locations. Please try again.
             </span>
           )}
+          <button
+            type="button"
+            className="filter-button"
+            onClick={clearFilters}
+          >
+            Clear Filters
+          </button>
         </div>
         <div className="content-panel">
           <table className="jobs-table">
@@ -167,7 +188,7 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {jobs ? (
+              {jobs.length > 0 ? (
                 jobs.map((job: Job) => (
                   <tr key={job.id}>
                     <td>{job.title}</td>

@@ -1,6 +1,14 @@
+import { useState } from "react";
 import Navbar from "../../components/layout/Navbar";
+import { useGetJobs } from "../../hooks/useJobs";
 
 const Interviews = () => {
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const [selectedRoundType, setSelectedRoundType] = useState<string | null>(
+    null,
+  );
+  const [selectedJob, setSelectedJob] = useState<string | null>(null);
+
   const interviews = [
     {
       id: 1,
@@ -43,10 +51,20 @@ const Interviews = () => {
       status: "Scheduled",
     },
   ];
-  const jobs = [
-    { id: 1, name: "Backend Engineer" },
-    { id: 2, name: "Product Designer" },
-  ];
+  const {
+    data: jobs = [],
+    isPending: jobsLoading,
+    isError: jobsError,
+  } = useGetJobs({
+    department: null,
+    status: null,
+    location: null,
+  });
+  const clearFilters = () => {
+    setSelectedStatus(null);
+    setSelectedRoundType(null);
+    setSelectedJob(null);
+  };
 
   const rightText = "Next 7 days: " + interviews.length;
 
@@ -58,8 +76,12 @@ const Interviews = () => {
         classString="nav-meta"
       />
       <div className="filter-toolbar interview-toolbar">
-        <select className="filter-select" defaultValue="">
-          <option value="" disabled hidden>
+        <select
+          className="filter-select"
+          value={selectedStatus ?? "status-placeholder"}
+          onChange={(event) => setSelectedStatus(event.target.value)}
+        >
+          <option value="status-placeholder" disabled hidden>
             Status
           </option>
           <option value="Scheduled">Scheduled</option>
@@ -67,8 +89,12 @@ const Interviews = () => {
           <option value="Cancelled">Cancelled</option>
           <option value="Rescheduled">Rescheduled</option>
         </select>
-        <select className="filter-select" defaultValue="">
-          <option value="" disabled hidden>
+        <select
+          className="filter-select"
+          value={selectedRoundType ?? "round-type-placeholder"}
+          onChange={(event) => setSelectedRoundType(event.target.value)}
+        >
+          <option value="round-type-placeholder" disabled hidden>
             Round Type
           </option>
           <option value="Technical">Technical</option>
@@ -76,13 +102,28 @@ const Interviews = () => {
           <option value="System_Design">System Design</option>
           <option value="Assignment">Assignment</option>
         </select>
-        <select className="filter-select" defaultValue="">
-          <option value="" disabled hidden>
+        <select
+          className="filter-select"
+          value={selectedJob ?? "job-placeholder"}
+          onChange={(event) => setSelectedJob(event.target.value)}
+          disabled={jobsLoading || jobsError}
+        >
+          <option value="job-placeholder" disabled hidden>
             Job
           </option>
           {jobs &&
-            jobs.map((job) => <option value={job.name}>{job.name}</option>)}
+            jobs.map((job: { id: number; title: string }) => (
+              <option value={job.title}>{job.title}</option>
+            ))}
         </select>
+        {jobsError && (
+          <span id="location-load-error" role="alert">
+            Failed to load jobs. Please try again.
+          </span>
+        )}
+        <button type="button" className="filter-button" onClick={clearFilters}>
+          Clear Filters
+        </button>
       </div>
       <table className="jobs-table interviews-table">
         <thead>

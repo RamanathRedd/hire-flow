@@ -51,8 +51,6 @@ def get_jobs(
     db: Session = Depends(get_db),
 ):
     try:
-        print(current_user)
-
         filtered_jobs = service.get_jobs(db, job_filters, current_user)
 
         filtered_jobs = [_serialize_job(job) for job in filtered_jobs]

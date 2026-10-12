@@ -1,7 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCreateJob } from "../../hooks/useJobs";
-import { useDepartments } from "../../hooks/useReferenceData";
+import { useDepartments, useLocations } from "../../hooks/useReferenceData";
 
 const JobForm = () => {
   const [jobTitle, setJobTitle] = useState<string>("");
@@ -22,7 +22,7 @@ const JobForm = () => {
     setDepartment(e.target.value);
   };
 
-  const onLocationChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const onLocationChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setLocation(e.target.value);
   };
 
@@ -43,10 +43,16 @@ const JobForm = () => {
   };
 
   const {
-    data: departments,
+    data: departments = [],
     isPending: departmentsLoading,
     isError: departmentsError,
   } = useDepartments();
+
+  const {
+    data: locations = [],
+    isPending: locationsLoading,
+    isError: locationsError,
+  } = useLocations();
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -141,15 +147,29 @@ const JobForm = () => {
             <label htmlFor="job-location">
               Location<span className="required-field"> *</span>
             </label>
-            <input
+            <select
               id="job-location"
-              type="text"
               name="location"
               value={location}
               onChange={onLocationChange}
-              placeholder="Hyderabad"
+              disabled={locationsLoading || locationsError}
               required
-            />
+            >
+              <option value="" disabled hidden>
+                Select Location
+              </option>
+              {locations &&
+                locations.map((location) => (
+                  <option key={location.id} value={location.name}>
+                    {location.name}
+                  </option>
+                ))}
+            </select>
+            {locationsError && (
+              <span id="location-load-error" role="alert">
+                Failed to load locations. Please try again.
+              </span>
+            )}
           </div>
           <div className="job-form-field">
             <label htmlFor="job-type">

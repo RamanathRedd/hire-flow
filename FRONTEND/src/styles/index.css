@@ -433,7 +433,7 @@ body {
 
 .filter-toolbar {
 	display: grid;
-	grid-template-columns: repeat(3, minmax(130px, 155px));
+	grid-template-columns: repeat(4, minmax(130px, 155px));
 	gap: 12px;
 	width: fit-content;
 	padding: 0;
@@ -442,6 +442,10 @@ body {
 
 .interview-toolbar,.browser-job-toolbar{
 	margin: 0 0 12px 30px;
+}
+
+.interview-toolbar{
+	grid-template-columns: repeat(4, minmax(130px, 183px));
 }
 
 .filter-select {
@@ -479,12 +483,28 @@ body {
 
 .filter-button {
 	padding: 10px 14px;
-	border: 1px solid #313b45;
-	border-radius: 8px;
-	background: transparent;
-	color: #d6dbe5;
+	border: 0;
+	border-radius: 10px;
+	background: linear-gradient(180deg, #4b67f5 0%, #3b57dc 100%);
+	color: #f5f7ff;
 	cursor: pointer;
 	font-size: 0.95rem;
+	font-weight: 600;
+	box-shadow: 0 6px 18px rgba(75, 103, 245, 0.28);
+	transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.filter-button:hover {
+	box-shadow: 0 8px 20px rgba(75, 103, 245, 0.35);
+	filter: brightness(1.05);
+}
+
+.browse-jobs {
+	background: #0e9f8f;
+}
+
+.browse-jobs:hover {
+	background: #16b3a1;
 }
 
 .jobs-table {

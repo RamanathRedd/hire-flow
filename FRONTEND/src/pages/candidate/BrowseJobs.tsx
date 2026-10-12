@@ -1,13 +1,30 @@
+import { useState } from "react";
 import Navbar from "../../components/layout/Navbar";
 import { useGetJobs } from "../../hooks/useJobs";
-import { useDepartments } from "../../hooks/useReferenceData";
+import { useDepartments, useLocations } from "../../hooks/useReferenceData";
 import type { Job } from "../../types/job";
+import { useApplyJob } from "../../hooks/useApplications";
+import Modal from "../../components/ui/Modal";
+import { useQueryClient } from "@tanstack/react-query";
 
 const BrowseJobs = () => {
+  const [selectedDepartment, setSelectedDepartment] = useState<string | null>(
+    null,
+  );
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [applyingJob, setApplyingJob] = useState<{
+    id: number;
+    title: string;
+  } | null>(null);
+
+  const queryClient = useQueryClient();
+  const applyJobMutation = useApplyJob();
+
   const { data: jobs = [] } = useGetJobs({
-    department: null,
+    department: selectedDepartment,
     status: null,
-    location: null,
+    location: selectedLocation,
   });
 
   const {
@@ -16,14 +33,38 @@ const BrowseJobs = () => {
     isError: departmentsError,
   } = useDepartments();
 
-  const locations = [
-    { id: 1, name: "Hyderabad" },
-    { id: 2, name: "Remote" },
-    { id: 3, name: "Bengaluru" },
-  ];
-  const applyJob = (id: number) => {
-    console.log(id);
+  const {
+    data: locations,
+    isPending: locationsLoading,
+    isError: locationsError,
+  } = useLocations();
+
+  const applyJob = (id: number, title: string) => {
+    setApplyingJob({ id, title });
+    setIsModalOpen(true);
   };
+
+  const clearFilters = () => {
+    setSelectedDepartment(null);
+    setSelectedLocation(null);
+  };
+
+  const resetDate = () => {
+    setIsModalOpen(false);
+    setApplyingJob(null);
+  };
+
+  const onConfirm = () => {
+    applyJobMutation.mutate(Number(applyingJob?.id), {
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["jobs"],
+        });
+        resetDate();
+      },
+    });
+  };
+
   return (
     <>
       <Navbar leftTitle="Open roles" rightText="" classString="" />
@@ -33,8 +74,10 @@ const BrowseJobs = () => {
           className="filter-select"
           defaultValue=""
           disabled={departmentsLoading || departmentsError}
+          value={selectedDepartment ?? "department-placeholder"}
+          onChange={(event) => setSelectedDepartment(event.target.value)}
         >
-          <option value="" disabled hidden>
+          <option value="department-placeholder" disabled hidden>
             Department
           </option>
           {departments &&
@@ -47,8 +90,14 @@ const BrowseJobs = () => {
             Failed to load departments. Please try again.
           </span>
         )}
-        <select className="filter-select" defaultValue="">
-          <option value="" disabled hidden>
+        <select
+          className="filter-select"
+          defaultValue=""
+          disabled={locationsLoading || locationsError}
+          value={selectedLocation ?? "location-placeholder"}
+          onChange={(event) => setSelectedLocation(event.target.value)}
+        >
+          <option value="location-placeholder" disabled hidden>
             Location
           </option>
           {locations &&
@@ -56,6 +105,19 @@ const BrowseJobs = () => {
               <option value={location.name}>{location.name}</option>
             ))}
         </select>
+        {locationsError && (
+          <span id="location-load-error" role="alert">
+            Failed to load locations. Please try again.
+          </span>
+        )}
+
+        <button
+          type="button"
+          className="filter-button browse-jobs"
+          onClick={clearFilters}
+        >
+          Clear Filters
+        </button>
       </div>
       <table className="jobs-table interviews-table">
         <thead>
@@ -79,7 +141,7 @@ const BrowseJobs = () => {
           </tr>
         </thead>
         <tbody>
-          {jobs
+          {jobs.length > 0
             ? jobs.map((job: Job) => (
                 <tr key={job.id}>
                   <td>{job.title}</td>
@@ -90,7 +152,7 @@ const BrowseJobs = () => {
                     <button
                       className="apply-button"
                       type="button"
-                      onClick={() => applyJob(job.id)}
+                      onClick={() => applyJob(job.id, job.title)}
                     >
                       Apply
                     </button>
@@ -100,6 +162,27 @@ const BrowseJobs = () => {
             : "No jobs found"}
         </tbody>
       </table>
+      {isModalOpen && (
+        <Modal
+          title="Apply for this job?"
+          message={`Are you sure you want to submit your application for "${applyingJob?.title}"`}
+          cancelText="Cancel"
+          confirmText="Apply Job"
+          confirmClassString="candidate-profile"
+          icon={
+            <path
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8Zm5-2V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 11h18m-8 5 2 2 4-4"
+              color="#16b3a1"
+            />
+          }
+          onConfirm={onConfirm}
+          onCancel={resetDate}
+        />
+      )}
     </>
   );
 };
