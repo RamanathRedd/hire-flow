@@ -17,20 +17,20 @@ STATUS = Literal["Draft", "Open", "Closed", "On-hold"]
 JOB_TYPE = Literal["Full-time", "Contract"]
 ROLE = Literal["Admin", "User"]
 LOCATIONS_LITERAL = Literal[
-    "Hyderabad",
+    "Ahmedabad",
     "Bengaluru",
     "Chennai",
-    "Mumbai",
-    "Pune",
     "Delhi",
     "Gurugram",
-    "Noida",
-    "Kolkata",
-    "Ahmedabad",
+    "Hybrid",
+    "Hyderabad",
     "Jaipur",
     "Kochi",
+    "Kolkata",
+    "Mumbai",
+    "Noida",
+    "Pune",
     "Remote",
-    "Hybrid",
 ]
 LOCATIONS = [
     {"id": id, "name": name}

@@ -15,6 +15,7 @@ import BrowseJobs from "../pages/candidate/BrowseJobs";
 import CandidateProfile from "../pages/candidate/Profile";
 import RecruiterProfile from "../pages/recruiter/Profile";
 import Dashboard from "../pages/recruiter/Dashboard";
+import InterviewScheduleForm from "../pages/recruiter/InterviewScheduleForm";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -32,6 +33,10 @@ const router = createBrowserRouter(
         <Route path="/candidate-profile" element={<CandidateProfile />} />
       </Route>
       <Route path="/jobForm" element={<JobForm />} />
+      <Route
+        path="/interviewScheduleForm"
+        element={<InterviewScheduleForm />}
+      />
     </>,
   ),
 );

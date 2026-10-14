@@ -90,16 +90,16 @@ def get_interviews(
             Interview,
             Candidate.name.label("candidate_name"),
             Job.title.label("job_title"),
+            Recruiter.name.label("interviewer_name"),
         )
         .join(Application, Interview.application_id == Application.id)
         .join(Candidate, Application.candidate_id == Candidate.id)
+        .join(Recruiter, Recruiter.id == Interview.interviewer_id)
         .join(Job, Application.job_id == Job.id)
     )
 
-    if interview_filters.application_id:
-        query = query.where(
-            Interview.application_id == interview_filters.application_id
-        )
+    if interview_filters.job_id:
+        query = query.where(Application.job_id == interview_filters.job_id)
 
     if interview_filters.status:
         query = query.where(Interview.status == interview_filters.status)
@@ -123,7 +123,7 @@ def get_interviews(
                 "round_type": interview.round_type,
                 "scheduled_at": interview.scheduled_at,
                 "interviewer_id": interview.interviewer_id,
-                "interviewer_name": interview.interviewer_name,
+                "interviewer_name": row.interviewer_name,
                 "status": interview.status,
                 "feedback": interview.feedback,
                 "rating": interview.rating,
@@ -134,7 +134,9 @@ def get_interviews(
     return response
 
 
-def list_upcoming_interviews(db: Session, current_user: dict) -> dict:
+def list_upcoming_interviews(
+    db: Session, interview_filters: InterviewFilters, current_user: dict
+) -> dict:
     if current_user["role"] != "Admin":
         raise UnauthorizedError
 
@@ -145,10 +147,12 @@ def list_upcoming_interviews(db: Session, current_user: dict) -> dict:
             Interview,
             Candidate.name.label("candidate_name"),
             Job.title.label("job_title"),
+            Recruiter.name.label("interviewer_name"),
         )
         .join(Application, Interview.application_id == Application.id)
         .join(Candidate, Application.candidate_id == Candidate.id)
         .join(Job, Application.job_id == Job.id)
+        .join(Recruiter, Recruiter.id == Interview.interviewer_id)
         .where(
             Interview.scheduled_at >= now,
             Interview.scheduled_at <= seven_days_later,
@@ -156,6 +160,16 @@ def list_upcoming_interviews(db: Session, current_user: dict) -> dict:
         )
         .order_by(Interview.scheduled_at.asc())
     )
+
+    if interview_filters.job_id:
+        query = query.where(Application.job_id == interview_filters.job_id)
+
+    if interview_filters.status:
+        query = query.where(Interview.status == interview_filters.status)
+
+    if interview_filters.round_type:
+        query = query.where(Interview.round_type == interview_filters.round_type)
+
     result = db.execute(query).all()
 
     upcoming_interviews = []
@@ -168,7 +182,7 @@ def list_upcoming_interviews(db: Session, current_user: dict) -> dict:
                 "round_number": interview.round_number,
                 "round_type": interview.round_type,
                 "scheduled_at": interview.scheduled_at,
-                "interviewer_name": interview.interviewer_name,
+                "interviewer_name": res.interviewer_name,
                 "status": interview.status,
                 "candidate_name": res.candidate_name,
                 "job_title": res.job_title,

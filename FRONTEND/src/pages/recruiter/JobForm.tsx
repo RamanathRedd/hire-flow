@@ -86,8 +86,7 @@ const JobForm = () => {
       <form className="job-form-card" onSubmit={handleSubmit}>
         <header className="job-form-header">
           <div>
-            <h1 id="job-form-title">New job posting</h1>
-            <p>Starts as Draft - publish it from the jobs list when ready</p>
+            <h1 id="job-form-title">Post Job</h1>
           </div>
           <button
             className="job-form-close"

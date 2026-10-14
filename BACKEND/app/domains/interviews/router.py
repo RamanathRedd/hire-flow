@@ -79,7 +79,7 @@ def get_interviews(
 ):
     try:
         response = service.get_interviews(db, interview_filters, current_user)
-        return {"data": response}
+        return response
     except UnauthorizedError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -88,10 +88,14 @@ def get_interviews(
 
 
 @interviews_router.get("/upcoming", status_code=status.HTTP_200_OK)
-def list_upcoming_interviews(current_user: CurrentUser, db: Session = Depends(get_db)):
+def list_upcoming_interviews(
+    current_user: CurrentUser,
+    interview_filters: InterviewFilters = Query(),
+    db: Session = Depends(get_db),
+):
     try:
-        response = service.list_upcoming_interviews(db, current_user)
-        return {"data": response}
+        response = service.list_upcoming_interviews(db, interview_filters, current_user)
+        return response
     except UnauthorizedError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

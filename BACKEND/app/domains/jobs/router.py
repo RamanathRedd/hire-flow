@@ -131,7 +131,7 @@ def update_job_status(
     db: Session = Depends(get_db),
 ):
     try:
-        service.update_job_status(db, job_id, new_status)
+        service.update_job_status(db, job_id, new_status, current_user)
         return {"message": "Job status updated successfully"}
     except UnauthorizedError:
         raise HTTPException(

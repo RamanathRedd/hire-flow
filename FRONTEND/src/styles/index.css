@@ -3,7 +3,7 @@
 :root {
 	font-family: Inter, "Segoe UI", sans-serif;
 	color: #e7e9ee;
-	background: #111318;
+	background-color: #111318;
 	font-synthesis: none;
 	text-rendering: optimizeLegibility;
 	-webkit-font-smoothing: antialiased;
@@ -15,17 +15,20 @@
 }
 
 body {
+	width: 100%;
 	min-width: 320px;
 	min-height: 100vh;
 	margin: 0;
-	background: #11161d;
+	background-color: #111318;
 }
 
 #root {
 	display: flex;
 	min-height: 100vh;
 	width: 100%;
+	min-width: 100vw;
 	padding: 0;
+	background-color: #111318;
 }
 
 .nav-header {
@@ -273,20 +276,20 @@ body {
 	box-shadow: 0 6px 16px rgba(75, 103, 245, 0.24);
 }
 
-.recruiter-profile{
+.recruiter-profile,.job-update{
 	background: #4b67f5;
 }
 
-.recruiter-profile:hover {
+.recruiter-profile:hover,.job-update:hover {
 	background: #5a73f6;
 }
 
 .job-delete{
-	background: #4b67f5;
+	background: #b91c1c;
 }
 
 .job-delete:hover {
-	background: #5a73f6;
+	background: #b83434;
 }
 
 .candidate-profile,.candidate-account{
@@ -333,10 +336,12 @@ body {
 }
 
 .app-shell {
- display: flex;
+	display: flex;
+	flex: 1;
 	min-height: 100vh;
- width: 100%;
-	background: #1b222c;
+	min-width: 100vw;
+	width: 100%;
+	background-color: #111318;
 }
 
 .sidebar {
@@ -392,7 +397,7 @@ body {
 .app-main {
 	flex: 1;
  	min-width: 0;
-	background: #111821;
+	background: #111318;
 }
 
 .main-header {
@@ -445,7 +450,7 @@ body {
 }
 
 .interview-toolbar{
-	grid-template-columns: repeat(4, minmax(130px, 183px));
+	grid-template-columns: repeat(6, minmax(130px, 183px));
 }
 
 .filter-select {
@@ -481,11 +486,23 @@ body {
 	box-shadow: 0 0 0 3px rgba(110, 126, 255, 0.12);
 }
 
+.interview-period-button {
+	padding: 0 14px;
+	text-align: left;
+	background-image: none;
+}
+
+.interview-period-button[aria-pressed="true"] {
+	border-color: rgba(141, 158, 255, 0.64);
+	background-color: rgba(110, 126, 255, 0.12);
+}
+
 .filter-button {
 	padding: 10px 14px;
-	border: 0;
+	border: 1px solid rgba(109, 137, 255, 0.5);
 	border-radius: 10px;
-	background: linear-gradient(180deg, #4b67f5 0%, #3b57dc 100%);
+	background: linear-gradient(180deg, #5a73ff 0%, #3f5fe6 100%);
+	background-color: #4b67f5;
 	color: #f5f7ff;
 	cursor: pointer;
 	font-size: 0.95rem;
@@ -495,8 +512,14 @@ body {
 }
 
 .filter-button:hover {
+	background: linear-gradient(180deg, #687efb 0%, #4b67f5 100%);
 	box-shadow: 0 8px 20px rgba(75, 103, 245, 0.35);
 	filter: brightness(1.05);
+}
+
+.filter-button:focus-visible {
+	outline: 2px solid rgba(110, 126, 255, 0.6);
+	outline-offset: 2px;
 }
 
 .browse-jobs {
@@ -642,7 +665,7 @@ body {
 	outline-offset: 3px;
 }
 
-.job-form-page {
+.job-form-page,.schedule-form-page {
 	display: flex;
 	min-height: 100vh;
 	width: 100%;
@@ -652,7 +675,7 @@ body {
 	background: #11161d;
 }
 
-.job-form-card {
+.job-form-card,.schedule-form-card {
 	width: min(480px, 100%);
 	padding: 22px 24px;
 	border: 1px solid #2a303a;
@@ -660,7 +683,7 @@ body {
 	background: #171b22;
 }
 
-.job-form-header {
+.job-form-header,.schedule-form-header {
 	display: flex;
 	align-items: flex-start;
 	justify-content: space-between;
@@ -668,11 +691,15 @@ body {
 	margin-bottom: 16px;
 }
 
-.job-form-header h1 {
+.job-form-header h1,.schedule-form-header h1 {
 	margin: 0 0 3px;
 	color: #f3f5f8;
 	font-size: 16px;
 	font-weight: 650;
+}
+
+.schedule-form-header h1{
+	font-size: 18px;
 }
 
 .job-form-header p {
@@ -681,7 +708,7 @@ body {
 	font-size: 12px;
 }
 
-.job-form-close {
+.job-form-close,.schedule-form-close {
 	flex: 0 0 auto;
 	padding: 2px 0;
 	border: 0;
@@ -691,24 +718,24 @@ body {
 	font-size: 13px;
 }
 
-.job-form-fields {
+.job-form-fields,.schedule-form-fields {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: 14px 12px;
 }
 
-.job-form-field {
+.job-form-field,.schedule-form-field {
 	display: flex;
 	min-width: 0;
 	flex-direction: column;
 	gap: 6px;
 }
 
-.job-form-field-wide {
+.job-form-field-wide,.schedule-form-field-wide {
 	grid-column: 1 / -1;
 }
 
-.job-form-field label {
+.job-form-field label,.schedule-form-field label {
 	color: #a9b2c0;
 	font-size: 12px;
 }
@@ -719,7 +746,9 @@ body {
 
 .job-form-field input,
 .job-form-field select,
-.job-form-field textarea {
+.job-form-field textarea,
+.schedule-form-field input,
+.schedule-form-field select {
 	width: 100%;
 	min-width: 0;
 	border: 1px solid #dce0e6;
@@ -729,12 +758,12 @@ body {
 	font-size: 14px;
 }
 
-.job-form-field input {
+.job-form-field input,.schedule-form-field input {
 	height: 38px;
 	padding: 0 11px;
 }
 
-.job-form-field select {
+.job-form-field select,.schedule-form-field select {
 	height: 38px;
 	padding: 0 11px;
 }
@@ -745,30 +774,188 @@ body {
 	resize: vertical;
 }
 
-.job-form-actions {
+.job-form-actions,.schedule-form-actions {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	gap: 10px;
 	margin-top: 14px;
 }
 
-.job-form-actions button {
+.job-form-actions button,.schedule-form-actions button {
 	min-height: 42px;
 	border-radius: 8px;
 	color: #f5f7fb;
 	font-size: 13px;
 	font-weight: 600;
 	cursor: pointer;
+	transition: background-color 0.15s ease, border-color 0.15s ease,
+		box-shadow 0.15s ease, transform 0.15s ease;
 }
 
-.job-form-draft {
+
+.job-form-draft,.schedule-form-cancel {
 	border: 1px solid #2b323d;
 	background: transparent;
 }
 
-.job-form-submit {
+.job-form-draft:hover,.schedule-form-cancel:hover {
+	border-color: #46505f;
+	background: #242a34;
+}
+
+.job-form-submit,.schedule-form-schedule {
 	border: 1px solid #3555df;
 	background: #3555df;
+}
+
+.job-form-submit:hover,.schedule-form-schedule:hover {
+	border-color: #4a69f0;
+	background: #4a69f0;
+	box-shadow: 0 4px 12px rgba(53, 85, 223, 0.3);
+}
+
+.job-edit-form {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	padding-top: 20px;
+}
+
+.job-edit-field {
+	display: flex;
+	min-width: 0;
+	flex-direction: column;
+	gap: 7px;
+}
+
+.job-edit-field label {
+	color: #a9b2c0;
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+}
+
+.job-edit-field input,
+.job-edit-field select,
+.job-edit-field textarea {
+	width: 100%;
+	min-width: 0;
+	border: 1px solid #343d4a;
+	border-radius: 9px;
+	background: #191f29;
+	color: #edf3ff;
+	font: inherit;
+	font-size: 14px;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease,
+		background-color 0.15s ease;
+}
+
+.job-edit-field input {
+	min-height: 42px;
+	padding: 0 12px;
+}
+
+.job-edit-field select {
+	min-height: 42px;
+	padding: 0 36px 0 12px;
+	appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23a9b2c0' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+	background-position: right 12px center;
+	background-repeat: no-repeat;
+	background-size: 16px;
+	cursor: pointer;
+}
+
+.job-edit-field select option {
+	background: #191f29;
+	color: #edf3ff;
+}
+
+.job-edit-field textarea {
+	min-height: 96px;
+	padding: 11px 12px;
+	line-height: 1.5;
+	resize: vertical;
+}
+
+.job-edit-field input::placeholder,
+.job-edit-field textarea::placeholder {
+	color: #778395;
+}
+
+.job-edit-field input:focus,
+.job-edit-field select:focus,
+.job-edit-field textarea:focus {
+	border-color: #637cf5;
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(99, 124, 245, 0.18);
+}
+
+.job-edit-field input:disabled {
+	border-color: #2b323d;
+	background: #151a22;
+	color: #818b9b;
+	cursor: not-allowed;
+}
+
+.job-edit-field select:disabled {
+	border-color: #2b323d;
+	background-color: #151a22;
+	color: #818b9b;
+	cursor: not-allowed;
+}
+
+.job-edit-actions {
+	display: flex;
+	justify-content: space-between;
+	gap: 10px;
+	padding-top: 8px;
+}
+
+.job-edit-actions button {
+	min-width: 96px;
+	min-height: 40px;
+	padding: 0 16px;
+	border: 1px solid transparent;
+	border-radius: 9px;
+	color: #f5f7fb;
+	font: inherit;
+	font-size: 13px;
+	font-weight: 650;
+	cursor: pointer;
+	transition: background-color 0.15s ease, border-color 0.15s ease,
+		box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.job-edit-actions button:focus-visible {
+	outline: 2px solid #8a9cff;
+	outline-offset: 3px;
+}
+
+.job-edit-cancel {
+	border-color: #343d4a;
+	background: #1a202a;
+	color: #c4cad4;
+}
+
+.job-edit-cancel:hover {
+	background: #242c38;
+}
+
+.job-edit-submit {
+	background: linear-gradient(180deg, #4b67f5 0%, #3b57dc 100%);
+	box-shadow: 0 6px 16px rgba(75, 103, 245, 0.24);
+}
+
+.job-edit-submit:hover:not(:disabled) {
+	background: #5a73f6;
+	box-shadow: 0 8px 18px rgba(75, 103, 245, 0.32);
+}
+
+.job-edit-submit:disabled {
+	cursor: not-allowed;
+	opacity: 0.55;
+	box-shadow: none;
 }
 
 @media (max-width: 440px) {
@@ -779,8 +966,11 @@ body {
 	.job-form-fields {
 		grid-template-columns: 1fr;
 	}
+	.schedule-form-fields{
+		grid-template-columns: 1fr;
+	}
 
-	.job-form-field-wide {
+	.job-form-field-wide,.schedule-form-field-wide {
 		grid-column: auto;
 	}
 }
@@ -789,12 +979,17 @@ body {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	min-width: 48px;
+	box-sizing: border-box;
+	width: 68px;
 	padding: 4px 10px;
 	border-radius: 6px;
 	font-size: 12px;
 	font-weight: 600;
 	line-height: 1.2;
+}
+
+.interview-badge{
+	width:80px;
 }
 
 .status-badge.Open , .status-badge.Scheduled {
@@ -805,6 +1000,16 @@ body {
 .status-badge.Draft, .status-badge.Completed {
 	background: #F1F2F4;
 	color: #8b909a;
+}
+
+.status-badge.On-hold,.status-badge.Rescheduled {
+	background: #FFF4E5;
+	color: #B45309;
+}
+
+.status-badge.Closed,.status-badge.Cancelled {
+	background: #FDECEC;
+	color: #DC2626;
 }
 
 button,

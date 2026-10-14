@@ -37,11 +37,7 @@ def get_jobs(db: Session, job_filters: JobFilters, current_user: dict) -> list[J
     if current_user["role"] == "User":
         query = query.where(
             Job.status == "Open",
-            not_(
-                Job.applications.any(
-                    Application.candidate_id == current_user["id"]
-                )
-            ),
+            not_(Job.applications.any(Application.candidate_id == current_user["id"])),
         )
 
     if job_filters.department:

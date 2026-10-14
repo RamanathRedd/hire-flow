@@ -14,6 +14,8 @@ export interface Job {
   openings_count: number;
   filled_count: number;
   job_type: string;
+  description: string;
+  requirements: string;
 }
 
 export interface JobCreate {
@@ -25,4 +27,12 @@ export interface JobCreate {
   status: string;
   openings_count: number;
   requirements: string;
+}
+
+export interface JobUpdate {
+  location: string | null;
+  job_type: string | null;
+  openings_count: number | null;
+  description: string | null;
+  requirements: string | null;
 }

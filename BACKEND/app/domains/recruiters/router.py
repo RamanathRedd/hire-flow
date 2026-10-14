@@ -20,14 +20,14 @@ recruiters_router = APIRouter()
 
 
 @recruiters_router.get(
-    "", status_code=status.HTTP_200_OK, response_model=RecruiterListResponse
+    "", status_code=status.HTTP_200_OK, response_model=list[RecruiterListResponse]
 )
 def get_recruiters(
     department: str | None = Query(default=None, min_length=3, max_length=100),
     db: Session = Depends(get_db),
 ):
     response = service.get_recruiters(db, department)
-    return {"data": response}
+    return response
 
 
 @recruiters_router.get(

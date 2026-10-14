@@ -19,14 +19,10 @@ class RecruiterUpdate(BaseModel):
     password: str | None = Field(default=None, min_length=6)
 
 
-class Response(BaseModel):
+class RecruiterListResponse(BaseModel):
     id: int
     name: str
     email: str
     phone: str
     department: str
     created_at: datetime
-
-
-class RecruiterListResponse(BaseModel):
-    data: list[Response]

@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { JobCreate, JobFilter } from "../types/job";
+import type { JobCreate, JobFilter, JobUpdate } from "../types/job";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -47,6 +47,48 @@ export const deleteJob = async (job_id: number) => {
         Authorization: `Bearer ${token}`,
       },
     });
+    return response.data;
+  } catch (error) {
+    // throw new Error(getErrorMessage(error));
+  }
+};
+
+export const updateJob = async (
+  job_id: number,
+  jodUpdateDetails: JobUpdate,
+) => {
+  const token = sessionStorage.getItem("access_token");
+
+  try {
+    const response = await axios.patch(
+      `${API_BASE_URL}/jobs/${job_id}`,
+      jodUpdateDetails,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    // throw new Error(getErrorMessage(error));
+  }
+};
+
+export const updateJobStatus = async (job_id: number, status: string) => {
+  const token = sessionStorage.getItem("access_token");
+
+  try {
+    const response = await axios.patch(
+      `${API_BASE_URL}/jobs/${job_id}/status`,
+      null,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: { new_status: status },
+      },
+    );
     return response.data;
   } catch (error) {
     // throw new Error(getErrorMessage(error));

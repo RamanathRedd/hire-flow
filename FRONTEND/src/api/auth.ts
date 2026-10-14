@@ -4,7 +4,6 @@ import type { LoginResponse, RegisterCredentials } from "../types/auth";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const getErrorMessage = (error: unknown): string => {
-  console.log(error);
   if (!axios.isAxiosError(error)) {
     return error instanceof Error
       ? error.message
