@@ -1,56 +1,31 @@
 import { useState } from "react";
 import Navbar from "../../components/layout/Navbar";
 import { useGetJobs } from "../../hooks/useJobs";
+import {
+  useGetInterviews,
+  useUpcomingInterviews,
+} from "../../hooks/useInterviews";
 
 const Interviews = () => {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [selectedRoundType, setSelectedRoundType] = useState<string | null>(
     null,
   );
-  const [selectedJob, setSelectedJob] = useState<string | null>(null);
+  const [selectedJob, setSelectedJob] = useState<number | null>(null);
+  const [allJobs, setAllJobs] = useState<boolean>(true);
 
-  const interviews = [
-    {
-      id: 1,
-      candidate: "Ramanath Reddy",
-      job: "Backend Engineer",
-      round: "R1",
-      type: "Technical",
-      scheduledTime: "Jun 10, 10:00 AM",
-      interviewer: "Arjun",
-      status: "Scheduled",
-    },
-    {
-      id: 2,
-      candidate: "Arjun Patel",
-      job: "Backend Engineer",
-      round: "R2",
-      type: "System Design",
-      scheduledTime: "Jun 12, 2:00 PM",
-      interviewer: "Riya",
-      status: "Scheduled",
-    },
-    {
-      id: 3,
-      candidate: "Sameer Iqbal",
-      job: "Backend Engineer",
-      round: "HR",
-      type: "HR",
-      scheduledTime: "Jun 6, 11:00 AM",
-      interviewer: "Priya",
-      status: "Completed",
-    },
-    {
-      id: 4,
-      candidate: "Divya Menon",
-      job: "Product Designer",
-      round: "R1",
-      type: "Assignment",
-      scheduledTime: "Jun 14, 4:00 PM",
-      interviewer: "Karan",
-      status: "Scheduled",
-    },
-  ];
+  const { data: interviews = [], isError: interviewsError } = allJobs
+    ? useGetInterviews({
+        status: selectedStatus ?? null,
+        round_type: selectedRoundType ?? null,
+        job_id: selectedJob ?? null,
+      })
+    : useUpcomingInterviews({
+        status: selectedStatus ?? null,
+        round_type: selectedRoundType ?? null,
+        job_id: selectedJob ?? null,
+      });
+
   const {
     data: jobs = [],
     isPending: jobsLoading,
@@ -60,22 +35,59 @@ const Interviews = () => {
     status: null,
     location: null,
   });
+
   const clearFilters = () => {
+    setAllJobs(true);
     setSelectedStatus(null);
     setSelectedRoundType(null);
     setSelectedJob(null);
   };
 
-  const rightText = "Next 7 days: " + interviews.length;
+  const convertTime = (time: string) => {
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(new Date(time));
+  };
+
+  const allInterviews = () => {
+    setAllJobs(true);
+  };
+  const nextSevenDaysInterviews = () => {
+    setAllJobs(false);
+  };
+
+  const button = {
+    text: "+ Schedule interview",
+    navigation: "/interviewScheduleForm",
+  };
 
   return (
     <>
       <Navbar
         leftTitle="Interviews"
-        rightText={rightText}
-        classString="nav-meta"
+        rightText={button}
+        classString="nav-action-button"
       />
       <div className="filter-toolbar interview-toolbar">
+        <button
+          type="button"
+          className="filter-select interview-period-button"
+          aria-pressed={allJobs}
+          onClick={allInterviews}
+        >
+          All
+        </button>
+        <button
+          type="button"
+          className="filter-select interview-period-button"
+          aria-pressed={!allJobs}
+          onClick={nextSevenDaysInterviews}
+        >
+          Next 7 Days
+        </button>
         <select
           className="filter-select"
           value={selectedStatus ?? "status-placeholder"}
@@ -104,8 +116,8 @@ const Interviews = () => {
         </select>
         <select
           className="filter-select"
-          value={selectedJob ?? "job-placeholder"}
-          onChange={(event) => setSelectedJob(event.target.value)}
+          value={selectedJob?.toString() ?? "job-placeholder"}
+          onChange={(event) => setSelectedJob(Number(event.target.value))}
           disabled={jobsLoading || jobsError}
         >
           <option value="job-placeholder" disabled hidden>
@@ -113,7 +125,9 @@ const Interviews = () => {
           </option>
           {jobs &&
             jobs.map((job: { id: number; title: string }) => (
-              <option value={job.title}>{job.title}</option>
+              <option key={job.id} value={job.id}>
+                {job.title}
+              </option>
             ))}
         </select>
         {jobsError && (
@@ -150,22 +164,29 @@ const Interviews = () => {
         </thead>
         <tbody>
           {interviews.length > 0
-            ? interviews.map((interview) => (
+            ? interviews.map((interview: any) => (
                 <tr key={interview.id}>
-                  <td>{interview.candidate}</td>
-                  <td>{interview.job}</td>
-                  <td>{interview.round}</td>
-                  <td>{interview.type}</td>
-                  <td>{interview.scheduledTime}</td>
-                  <td>{interview.interviewer}</td>
+                  <td>{interview.candidate_name}</td>
+                  <td>{interview.job_title}</td>
+                  <td>R{interview.round_number}</td>
+                  <td>{interview.round_type}</td>
+                  <td>{convertTime(interview.scheduled_at)}</td>
+                  <td>{interview.interviewer_name}</td>
                   <td>
-                    <span className={`status-badge ${interview.status}`}>
+                    <span
+                      className={`status-badge ${interview.status} interview-badge`}
+                    >
                       {interview.status}
                     </span>
                   </td>
                 </tr>
               ))
-            : "No interviews Found"}
+            : !interviewsError && "No interviews Found"}
+          {interviewsError && (
+            <span id="interview-load-error" role="alert">
+              Failed to load interviews. Please try again.
+            </span>
+          )}
         </tbody>
       </table>
     </>
