@@ -43,6 +43,10 @@ def create_interview(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Only recruiters can schedule interviews",
         )
+    except RecruiterNotExistsError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Interviewer not found"
+        )
     except ApplicationNotExistsError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Application not found"

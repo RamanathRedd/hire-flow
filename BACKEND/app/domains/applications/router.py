@@ -78,6 +78,18 @@ def get_applications(
         )
 
 
+@applications_router.get("/all", status_code=status.HTTP_200_OK)
+def get_live_applications(current_user: CurrentUser, db: Session = Depends(get_db)):
+    try:
+        response = service.get_live_applications(db, current_user)
+        return response
+    except UnauthorizedError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Only candidates can view applications",
+        )
+
+
 @applications_router.get("/{application_id}", status_code=status.HTTP_200_OK)
 def get_application_details(
     application_id: int, current_user: CurrentUser, db: Session = Depends(get_db)

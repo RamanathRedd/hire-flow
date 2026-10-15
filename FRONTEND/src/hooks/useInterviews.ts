@@ -1,6 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
-import { getInterviews, getUpcomingInterviews } from "../api/interviews";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  getInterviews,
+  getUpcomingInterviews,
+  scheduleInterview,
+} from "../api/interviews";
 import type { InterviewFilters } from "../types/interview";
+
+export const useScheduleInterview = () =>
+  useMutation({
+    mutationFn: (interview_details: any) =>
+      scheduleInterview(interview_details),
+  });
 
 export const useGetInterviews = (interviewFilters: InterviewFilters) =>
   useQuery({

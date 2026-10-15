@@ -99,6 +99,38 @@ def get_applications(
     return db.scalars(query).all()
 
 
+def get_live_applications(db: Session, current_user: dict) -> list[Application]:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
+    query = select(
+        Application,
+    ).where(
+        Application.stage.in_(
+            (
+                "Screened",
+                "Interview_R1",
+                "Interview_R2",
+                "HR_Round",
+            )
+        )
+    )
+    result = db.scalars(query).all()
+
+    response = []
+
+    for res in result:
+        response.append(
+            {
+                "id": res.id,
+                "candidate_name": res.candidate.name,
+                "job_title": res.job.title,
+            }
+        )
+
+    return response
+
+
 def get_application_details(
     db: Session, application_id: int, current_user: dict
 ) -> dict | None:

@@ -20,3 +20,18 @@ export const applyJob = async (job_id: number) => {
     // throw new Error(getErrorMessage(error));
   }
 };
+
+export const getLiveApplications = async () => {
+  const token = sessionStorage.getItem("access_token");
+
+  try {
+    const response = await axios.get(`${API_BASE_URL}/applications/all`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    // throw new Error(getErrorMessage(error));
+  }
+};

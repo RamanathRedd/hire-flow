@@ -36,9 +36,17 @@ def create_interview(
     if current_user["role"] != "Admin":
         raise UnauthorizedError
 
+    if not (
+        db.scalar(
+            select(Recruiter).where(Recruiter.id == interview_details.interviewer_id)
+        )
+    ):
+        raise RecruiterNotExistsError
+
     parsed_date = interview_details.scheduled_at.astimezone(timezone.utc).replace(
         microsecond=0
     )
+
     if parsed_date <= datetime.now(timezone.utc).replace(microsecond=0):
         raise ValueError("The interview date and time must be in the future.")
 
@@ -61,6 +69,7 @@ def create_interview(
         select(Interview.id).where(
             (Interview.application_id == interview_details.application_id)
             & (Interview.round_number == interview_details.round_number)
+            & (Interview.round_type == interview_details.round_type)
         )
     )
 
@@ -72,7 +81,6 @@ def create_interview(
             **{
                 **interview_details.model_dump(),
                 "scheduled_at": parsed_date,
-                "interviewer_id": current_user["id"],
             }
         )
     )

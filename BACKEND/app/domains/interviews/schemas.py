@@ -12,6 +12,7 @@ class InterviewCreate(BaseModel):
     status: INTERVIEW_STATUS = Field(default="Scheduled", min_length=8, max_length=15)
     feedback: str | None = Field(default=None, min_length=3)
     rating: int | None = Field(default=None, gt=-1, lt=6)
+    interviewer_id: int
 
 
 class InterviewFilters(BaseModel):
