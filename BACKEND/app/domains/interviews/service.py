@@ -4,7 +4,6 @@ from core.exceptions import (
     ApplicationNotExistsError,
     ClosedApplicationError,
     DuplicateRoundError,
-    FeedbackAlreadySubmittedError,
     FeedbackEmptyError,
     InterviewAlreadyCancelledError,
     InterviewAlreadyCompletedError,
@@ -255,7 +254,7 @@ def get_interview_details(
     return response
 
 
-def update_interview(
+def reschedule_interview(
     db: Session,
     interview_id: int,
     interview_update: UpdateInterview,
@@ -263,6 +262,13 @@ def update_interview(
 ) -> None:
     if current_user["role"] != "Admin":
         raise UnauthorizedError
+
+    if not (
+        db.scalar(
+            select(Recruiter).where(Recruiter.id == interview_update.interviewer_id)
+        )
+    ):
+        raise RecruiterNotExistsError
 
     interview = db.scalar(select(Interview).where(Interview.id == interview_id))
 
@@ -278,19 +284,15 @@ def update_interview(
     if not (db.scalar(select(Recruiter.id).where(Recruiter.id == current_user["id"]))):
         raise RecruiterNotExistsError
 
-    if interview_update.scheduled_at is not None:
-        parsed_date = interview_update.scheduled_at.astimezone(timezone.utc).replace(
-            microsecond=0
-        )
-        if parsed_date <= datetime.now(timezone.utc).replace(microsecond=0):
-            raise ValueError("The interview date and time must be in the future.")
-        interview.status = "Rescheduled"
+    parsed_date = interview_update.scheduled_at.astimezone(timezone.utc).replace(
+        microsecond=0
+    )
 
-    update_data = interview_update.model_dump(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(interview, key, value)
+    if parsed_date <= datetime.now(timezone.utc).replace(microsecond=0):
+        raise ValueError("The interview date and time must be in the future.")
 
-    interview.interviewer_id = current_user["id"]
+    interview.interviewer_id = interview_update.interviewer_id
+    interview.status = "Rescheduled"
 
     db.commit()
 
@@ -313,7 +315,7 @@ def cancel_interview(
         raise InterviewDetailsNotExistsError
 
     if interview.status == "Completed":
-        raise FeedbackAlreadySubmittedError
+        raise InterviewAlreadyCompletedError
 
     if interview.status == "Cancelled":
         raise InterviewAlreadyCancelledError
@@ -345,7 +347,7 @@ def submit_interview_feedback(
         raise InterviewDetailsNotExistsError
 
     if interview.status == "Completed":
-        raise FeedbackAlreadySubmittedError
+        raise InterviewAlreadyCompletedError
 
     if interview.status == "Cancelled":
         raise InterviewAlreadyCancelledError

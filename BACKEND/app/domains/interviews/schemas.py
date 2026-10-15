@@ -22,8 +22,8 @@ class InterviewFilters(BaseModel):
 
 
 class UpdateInterview(BaseModel):
-    round_type: ROUND_TYPE | None = Field(default=None, min_length=2, max_length=20)
-    scheduled_at: datetime | None = None
+    interviewer_id: int
+    scheduled_at: datetime
 
 
 class CancelInterview(BaseModel):

@@ -137,9 +137,5 @@ class InterviewAlreadyCancelledError(HireFlowException):
     pass
 
 
-class FeedbackAlreadySubmittedError(HireFlowException):
-    pass
-
-
 class FeedbackEmptyError(HireFlowException):
     pass

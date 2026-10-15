@@ -16,6 +16,7 @@ const Dashboard = () => {
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalData, setModalData] = useState<{
+    id: number;
     mode: string;
     title: string;
     message: string;
@@ -75,8 +76,10 @@ const Dashboard = () => {
   }, [openJobMenu]);
 
   const deleteJob = () => {
+    if (!openJobMenu) return;
     setIsModalOpen(true);
     setModalData({
+      id: openJobMenu.id,
       mode: "delete",
       title: "Delete this job posting?",
       message: `This will permanently delete job "${openJobMenu?.title}"`,
@@ -106,8 +109,10 @@ const Dashboard = () => {
   };
 
   const onConfirm = () => {
-    if (modalData && modalData?.mode === "delete") {
-      deleteJobMutation.mutate(Number(openJobMenu?.id), {
+    if (!modalData) return;
+
+    if (modalData.mode === "delete") {
+      deleteJobMutation.mutate(modalData.id, {
         onSuccess: () => {
           queryClient.invalidateQueries({
             queryKey: ["jobs"],
@@ -115,7 +120,7 @@ const Dashboard = () => {
           resetModal();
         },
       });
-    } else if (modalData && modalData?.mode === "update") {
+    } else if (modalData.mode === "update") {
       if (!editJob || !originalEditJob) return;
 
       if (editJob.status != originalEditJob.status) {
@@ -180,8 +185,10 @@ const Dashboard = () => {
   };
 
   const updateJob = () => {
+    if (!editJob) return;
     setIsModalOpen(true);
     setModalData({
+      id: editJob.id,
       mode: "update",
       title: "Update this job posting?",
       message: `This will update job "${editJob?.title}"`,

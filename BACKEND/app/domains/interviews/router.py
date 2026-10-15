@@ -3,7 +3,6 @@ from core.exceptions import (
     ApplicationNotExistsError,
     ClosedApplicationError,
     DuplicateRoundError,
-    FeedbackAlreadySubmittedError,
     FeedbackEmptyError,
     InterviewAlreadyCancelledError,
     InterviewAlreadyCompletedError,
@@ -126,19 +125,23 @@ def get_interview_details(
 
 
 @interviews_router.patch("/{interview_id}", status_code=status.HTTP_200_OK)
-def update_interview(
+def reschedule_interview(
     interview_id: int,
     interview_update: UpdateInterview,
     current_user: CurrentUser,
     db: Session = Depends(get_db),
 ):
     try:
-        service.update_interview(db, interview_id, interview_update, current_user)
+        service.reschedule_interview(db, interview_id, interview_update, current_user)
         return {"message": "updated successfully"}
     except UnauthorizedError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Only recruiters can update this interview",
+        )
+    except RecruiterNotExistsError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Interviewer not found"
         )
     except InterviewDetailsNotExistsError:
         raise HTTPException(
@@ -153,10 +156,6 @@ def update_interview(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Cannot update a cancelled interview",
-        )
-    except RecruiterNotExistsError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Interviewer not found"
         )
     except ValueError as err:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(err))
@@ -185,7 +184,7 @@ def cancel_interview(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Interviewer not found"
         )
-    except FeedbackAlreadySubmittedError:
+    except InterviewAlreadyCompletedError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Cannot cancel completed interview",
@@ -226,7 +225,7 @@ def submit_interview_feedback(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Interviewer not found"
         )
-    except FeedbackAlreadySubmittedError:
+    except InterviewAlreadyCompletedError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Feedback already submitted"
         )
