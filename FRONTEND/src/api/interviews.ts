@@ -63,3 +63,78 @@ export const getUpcomingInterviews = async (
     return response.data.interviews;
   } catch (error) {}
 };
+
+export const reScheduleInterview = async (
+  interview_id: number,
+  interview_details: any,
+) => {
+  const token = sessionStorage.getItem("access_token");
+  if (!token) {
+    throw new Error("No access token found in sessionStorage");
+  }
+
+  try {
+    const response = await axios.patch(
+      `${API_BASE_URL}/interviews/${interview_id}`,
+      interview_details,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    // throw new Error(getErrorMessage(error));
+  }
+};
+
+export const cancelInterview = async (
+  interview_id: number,
+  cancellation_data: any,
+) => {
+  const token = sessionStorage.getItem("access_token");
+  if (!token) {
+    throw new Error("No access token found in sessionStorage");
+  }
+
+  try {
+    const response = await axios.patch(
+      `${API_BASE_URL}/interviews/${interview_id}/cancel`,
+      cancellation_data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    // throw new Error(getErrorMessage(error));
+  }
+};
+
+export const submitInterviewFeedback = async (
+  interview_id: number,
+  submit_feedback: any,
+) => {
+  const token = sessionStorage.getItem("access_token");
+  if (!token) {
+    throw new Error("No access token found in sessionStorage");
+  }
+
+  try {
+    const response = await axios.patch(
+      `${API_BASE_URL}/interviews/${interview_id}/feedback`,
+      submit_feedback,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    // throw new Error(getErrorMessage(error));
+  }
+};
