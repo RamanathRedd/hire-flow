@@ -835,6 +835,32 @@ body {
 	letter-spacing: 0.02em;
 }
 
+.interview-rating-option {
+	width: 38px;
+	height: 36px;
+	padding: 0;
+	border: 1px solid #292f38;
+	border-radius: 8px;
+	background: #17191f;
+	color: #909aaa;
+	font-size: 13px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: border-color 0.15s ease, background-color 0.15s ease,
+		color 0.15s ease;
+}
+
+.interview-rating-option[aria-pressed="true"] {
+	border-color: #3156d9;
+	background: rgba(49, 86, 217, 0.12);
+	color: #5278ff;
+}
+
+.interview-rating-option:focus-visible {
+	outline: 2px solid #5278ff;
+	outline-offset: 2px;
+}
+
 .job-edit-field input,
 .job-edit-field select,
 .job-edit-field textarea {
@@ -902,6 +928,20 @@ body {
 	border-color: #2b323d;
 	background-color: #151a22;
 	color: #818b9b;
+	cursor: not-allowed;
+}
+
+.job-edit-field textarea:disabled {
+	border-color: #2b323d;
+	background-color: #151a22;
+	color: #818b9b;
+	cursor: not-allowed;
+}
+
+.job-edit-field button:disabled {
+	/* border-color: #2b323d;
+	background-color: #151a22;
+	color: #818b9b; */
 	cursor: not-allowed;
 }
 

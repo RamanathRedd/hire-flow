@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { InterviewFilters } from "../types/interview";
+import type { interviewFeedback, InterviewFilters } from "../types/interview";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -66,7 +66,7 @@ export const getUpcomingInterviews = async (
 
 export const reScheduleInterview = async (
   interview_id: number,
-  interview_details: any,
+  interview_details: { interviewer_id: number; scheduled_at: string },
 ) => {
   const token = sessionStorage.getItem("access_token");
   if (!token) {
@@ -91,7 +91,7 @@ export const reScheduleInterview = async (
 
 export const cancelInterview = async (
   interview_id: number,
-  cancellation_data: any,
+  cancellation_data: string | null,
 ) => {
   const token = sessionStorage.getItem("access_token");
   if (!token) {
@@ -101,7 +101,7 @@ export const cancelInterview = async (
   try {
     const response = await axios.patch(
       `${API_BASE_URL}/interviews/${interview_id}/cancel`,
-      cancellation_data,
+      { cancellation_data },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -116,7 +116,7 @@ export const cancelInterview = async (
 
 export const submitInterviewFeedback = async (
   interview_id: number,
-  submit_feedback: any,
+  submit_feedback: interviewFeedback,
 ) => {
   const token = sessionStorage.getItem("access_token");
   if (!token) {
