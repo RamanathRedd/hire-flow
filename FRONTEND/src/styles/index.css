@@ -38,6 +38,7 @@ body {
 	padding: 18px 20px 16px;
 	background: rgba(17, 20, 27, 0.92);
 	border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+	border-bottom-color: #2a313b;
 }
 
 .nav-title {
@@ -442,12 +443,14 @@ body {
 	gap: 12px;
 	width: fit-content;
 	padding: 0;
-	margin: 0 0 4px 42px;
+	margin: 16px 0 4px 42px;
 }
 
 .interview-toolbar,.browser-job-toolbar{
-	margin: 0 0 12px 30px;
+	margin: 16px 0 12px 30px;
 }
+
+
 
 .interview-toolbar{
 	grid-template-columns: repeat(6, minmax(130px, 183px));
@@ -486,13 +489,13 @@ body {
 	box-shadow: 0 0 0 3px rgba(110, 126, 255, 0.12);
 }
 
-.interview-period-button {
+.interview-period-button,.application-period-button {
 	padding: 0 14px;
-	text-align: left;
+	text-align: center;
 	background-image: none;
 }
 
-.interview-period-button[aria-pressed="true"] {
+.interview-period-button[aria-pressed="true"],.application-period-button[aria-pressed="true"] {
 	border-color: rgba(141, 158, 255, 0.64);
 	background-color: rgba(110, 126, 255, 0.12);
 }

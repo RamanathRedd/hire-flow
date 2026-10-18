@@ -105,6 +105,19 @@ def get_interviews(
         .join(Job, Application.job_id == Job.id)
     )
 
+    now = datetime.now(timezone.utc).replace(microsecond=0)
+    seven_days_later = now + timedelta(days=7)
+
+    upcoming_interviews_count = len(
+        db.scalars(
+            query.where(
+                Interview.scheduled_at >= now,
+                Interview.scheduled_at <= seven_days_later,
+                Interview.status.in_(["Scheduled", "Rescheduled"]),
+            )
+        ).all()
+    )
+
     if interview_filters.job_id:
         query = query.where(Application.job_id == interview_filters.job_id)
 
@@ -138,7 +151,7 @@ def get_interviews(
             }
         )
 
-    return response
+    return {"upcoming_interviews": upcoming_interviews_count, "interviews": response}
 
 
 def list_upcoming_interviews(
@@ -292,6 +305,7 @@ def reschedule_interview(
         raise ValueError("The interview date and time must be in the future.")
 
     interview.interviewer_id = interview_update.interviewer_id
+    interview.scheduled_at = parsed_date
     interview.status = "Rescheduled"
 
     db.commit()

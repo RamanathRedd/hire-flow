@@ -2,10 +2,15 @@ import { useEffect, useState } from "react";
 import Navbar from "../../components/layout/Navbar";
 import { useGetJobs } from "../../hooks/useJobs";
 import {
+  useCancelInterview,
   useGetInterviews,
+  useReScheduleInterview,
+  useSubmitInterviewFeedback,
   useUpcomingInterviews,
 } from "../../hooks/useInterviews";
 import { useGetInterviewers } from "../../hooks/useRecruiters";
+import Modal from "../../components/ui/Modal";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Interviews = () => {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
@@ -19,18 +24,49 @@ const Interviews = () => {
   const [sideBarTitle, setSideBarTitle] = useState<string>("");
   const [editInterview, setEditInterview] = useState<any>(null);
   const [mode, setMode] = useState<string>("");
+  const [reason, setReason] = useState<string | null>(null);
+  const [rating, setRating] = useState<number>(0);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const queryClient = useQueryClient();
+  const cancelInterviewMutation = useCancelInterview();
+  const submitInterviewFeedbackMutation = useSubmitInterviewFeedback();
+  const reScheduleInterviewMutation = useReScheduleInterview();
 
-  const { data: interviews = [], isError: interviewsError } = allJobs
-    ? useGetInterviews({
-        status: selectedStatus ?? null,
-        round_type: selectedRoundType ?? null,
-        job_id: selectedJob ?? null,
-      })
-    : useUpcomingInterviews({
-        status: selectedStatus ?? null,
-        round_type: selectedRoundType ?? null,
-        job_id: selectedJob ?? null,
-      });
+  const [modalData, setModalData] = useState<{
+    id: number;
+    mode: string;
+    title: string;
+    message: string;
+    confirmText: string;
+    confirmClassString: string;
+    iconColor: string;
+    icon: string;
+  } | null>(null);
+
+  const interviewFilters = {
+    status: selectedStatus,
+    round_type: selectedRoundType,
+    job_id: selectedJob,
+  };
+  const allInterviewsQuery = useGetInterviews(interviewFilters, allJobs);
+  const upcomingInterviewsQuery = useUpcomingInterviews(
+    interviewFilters,
+    !allJobs,
+  );
+  const {
+    data: allInterviewsData = { upcoming_interviews: 0, interviews: [] },
+    isError: allInterviewsError,
+  } = allInterviewsQuery;
+  const {
+    data: upcomingInterviewsData = { interviews: [] },
+    isError: upcomingInterviewsError,
+  } = upcomingInterviewsQuery;
+  const interviews = allJobs
+    ? allInterviewsData.interviews
+    : upcomingInterviewsData.interviews;
+  const interviewsError = allJobs
+    ? allInterviewsError
+    : upcomingInterviewsError;
 
   useEffect(() => {
     if (openInterviewMenu === null) return;
@@ -93,14 +129,140 @@ const Interviews = () => {
     )}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
   };
 
-  const allInterviews = () => {
+  const getAllInterviews = () => {
     setAllJobs(true);
   };
+
   const nextSevenDaysInterviews = () => {
     setAllJobs(false);
   };
 
-  const updateInterview = () => {};
+  const reset = () => {
+    setMode("");
+    setSideBarTitle("");
+    setEditInterview(null);
+    setReason(null);
+    setRating(0);
+    setIsModalOpen(false);
+    setAllJobs(true);
+  };
+
+  const updateInterview = () => {
+    if (mode == "Rescheduled") {
+      if (!editInterview?.id) return;
+      setIsModalOpen(true);
+      setModalData({
+        id: editInterview.id,
+        mode: "reschedule",
+        title: "Reschedule this interview?",
+        message:
+          "This will update the scheduled date and time for this interview.",
+        confirmText: "Reschedule Interview",
+        confirmClassString: "reschedule-interview",
+        iconColor: "#4b67f5",
+        icon: "M12 8v4l3 2m6-2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z",
+      });
+    } else if (mode == "Cancelled") {
+      if (!editInterview?.id) return;
+      setIsModalOpen(true);
+      setModalData({
+        id: editInterview.id,
+        mode: "cancel",
+        title: "Cancel this interview?",
+        message:
+          "This will cancel the interview. This action cannot be undone.",
+        confirmText: "Cancel Interview",
+        confirmClassString: "interview-cancel",
+        iconColor: "#b91c1c",
+        icon: "M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z",
+      });
+    } else if (mode == "Completed") {
+      if (!editInterview?.id) return;
+      setIsModalOpen(true);
+      setModalData({
+        id: editInterview.id,
+        mode: "feedback",
+        title: "Submit interview feedback?",
+        message:
+          "This will submit your feedback and rating for this interview.",
+        confirmText: "Submit Feedback",
+        confirmClassString: "feedback-submit",
+        iconColor: "#4b67f5",
+        icon: "M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4 12 14.01l-3-3",
+      });
+    }
+  };
+
+  const onConfirm = () => {
+    if (mode == "Completed") {
+      submitInterviewFeedbackMutation.mutate(
+        {
+          interview_id: editInterview.id,
+          submit_feedback: {
+            feedback: reason ?? "",
+            rating,
+          },
+        },
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries({
+              queryKey: ["interviews"],
+            });
+            queryClient.invalidateQueries({
+              queryKey: ["upcomingInterviews"],
+            });
+            reset();
+            setIsDrawerOpen(false);
+          },
+        },
+      );
+    } else if (mode == "Cancelled") {
+      cancelInterviewMutation.mutate(
+        {
+          interview_id: editInterview.id,
+          cancellation_data: reason,
+        },
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries({
+              queryKey: ["interviews"],
+            });
+            queryClient.invalidateQueries({
+              queryKey: ["upcomingInterviews"],
+            });
+            reset();
+            setIsDrawerOpen(false);
+          },
+        },
+      );
+    } else if (mode == "Rescheduled") {
+      reScheduleInterviewMutation.mutate(
+        {
+          interview_id: editInterview.id,
+          interview_details: {
+            interviewer_id: editInterview.interviewer_id,
+            scheduled_at: editInterview.scheduled_at,
+          },
+        },
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries({
+              queryKey: ["interviews"],
+            });
+            queryClient.invalidateQueries({
+              queryKey: ["upcomingInterviews"],
+            });
+            reset();
+            setIsDrawerOpen(false);
+          },
+        },
+      );
+    }
+  };
+
+  const onCancel = () => {
+    setIsModalOpen(false);
+  };
 
   const button = {
     text: "+ Schedule interview",
@@ -119,7 +281,7 @@ const Interviews = () => {
           type="button"
           className="filter-select interview-period-button"
           aria-pressed={allJobs}
-          onClick={allInterviews}
+          onClick={getAllInterviews}
         >
           All
         </button>
@@ -129,7 +291,7 @@ const Interviews = () => {
           aria-pressed={!allJobs}
           onClick={nextSevenDaysInterviews}
         >
-          Next 7 Days
+          Next 7 Days: {allInterviewsData.upcoming_interviews}
         </button>
         <select
           className="filter-select"
@@ -206,7 +368,7 @@ const Interviews = () => {
           </tr>
         </thead>
         <tbody>
-          {interviews.length > 0
+          {interviews && interviews.length > 0
             ? interviews.map((interview: any) => (
                 <tr key={interview.id}>
                   <td>{interview.candidate_name}</td>
@@ -245,28 +407,26 @@ const Interviews = () => {
                     {openInterviewMenu &&
                       openInterviewMenu.id === interview.id && (
                         <div className="job-actions-menu" role="menu">
-                          {interview.status != "Completed" && (
-                            <button
-                              className="job-actions-menu-item"
-                              type="button"
-                              role="menuitem"
-                              aria-controls="side-bar-navigation"
-                              aria-expanded={isDrawerOpen}
-                              onClick={() => {
-                                setEditInterview(interview);
-                                setMode("Rescheduled");
-                                //   setOriginalEditJob(job);
-                                setSideBarTitle("Reschedule Interview");
-                                setIsDrawerOpen(true);
-                              }}
-                            >
-                              Reschedule
-                            </button>
-                          )}
                           {["Scheduled", "Rescheduled"].includes(
                             interview.status,
                           ) && (
                             <>
+                              <button
+                                className="job-actions-menu-item"
+                                type="button"
+                                role="menuitem"
+                                aria-controls="side-bar-navigation"
+                                aria-expanded={isDrawerOpen}
+                                onClick={() => {
+                                  setEditInterview(interview);
+                                  setMode("Rescheduled");
+                                  //   setOriginalEditJob(job);
+                                  setSideBarTitle("Reschedule Interview");
+                                  setIsDrawerOpen(true);
+                                }}
+                              >
+                                Reschedule
+                              </button>
                               <button
                                 className="job-actions-menu-item"
                                 type="button"
@@ -299,6 +459,42 @@ const Interviews = () => {
                               </button>
                             </>
                           )}
+                          {interview.status == "Completed" && (
+                            <button
+                              className="job-actions-menu-item"
+                              type="button"
+                              role="menuitem"
+                              aria-controls="side-bar-navigation"
+                              aria-expanded={isDrawerOpen}
+                              onClick={() => {
+                                setEditInterview(interview);
+                                setMode("Completed");
+                                setReason(interview.feedback);
+                                setRating(interview.rating);
+                                setSideBarTitle("View Feedback");
+                                setIsDrawerOpen(true);
+                              }}
+                            >
+                              View Feedback
+                            </button>
+                          )}
+                          {interview.status == "Cancelled" && (
+                            <button
+                              className="job-actions-menu-item"
+                              type="button"
+                              role="menuitem"
+                              aria-controls="side-bar-navigation"
+                              aria-expanded={isDrawerOpen}
+                              onClick={() => {
+                                setEditInterview(interview);
+                                setMode("Cancelled");
+                                setSideBarTitle("Cancelled Reason");
+                                setIsDrawerOpen(true);
+                              }}
+                            >
+                              Cancel Reason
+                            </button>
+                          )}
                         </div>
                       )}
                   </td>
@@ -312,6 +508,28 @@ const Interviews = () => {
           )}
         </tbody>
       </table>
+
+      {isModalOpen && (
+        <Modal
+          title={modalData?.title ?? ""}
+          message={modalData?.message ?? ""}
+          cancelText="Cancel"
+          confirmText={modalData?.confirmText ?? ""}
+          confirmClassString={modalData?.confirmClassString ?? ""}
+          icon={
+            <path
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d={modalData?.icon}
+              color={modalData?.iconColor ?? ""}
+            />
+          }
+          onConfirm={onConfirm}
+          onCancel={onCancel}
+        />
+      )}
 
       <div
         id="side-bar-navigation"
@@ -334,7 +552,9 @@ const Interviews = () => {
             aria-controls="side-bar-navigation"
             aria-label="Close navigation"
             className="text-body bg-transparent hover:text-heading hover:bg-neutral-tertiary rounded-base w-9 h-9 absolute top-2.5 end-2.5 flex items-center justify-center"
-            onClick={() => setIsDrawerOpen(false)}
+            onClick={() => {
+              setIsDrawerOpen(false);
+            }}
             style={{ cursor: "pointer" }}
           >
             x
@@ -380,66 +600,62 @@ const Interviews = () => {
           <div className="job-edit-field">
             <label htmlFor="job-title">Interview Status</label>
             <input id="job-title" type="text" value={mode} disabled />
-            {/* <select
-              id="job-title"
-              name="status"
-              value={editInterview?.status ?? ""}
-              onChange={(event) =>
-                setEditInterview((currentInterview: any) =>
-                  currentInterview
-                    ? { ...currentInterview, status: event.target.value }
-                    : currentInterview,
-                )
-              }
-              required
-              disabled={mode == "Reschedule"}
-            >
-              <option value="Scheduled">Scheduled</option>
-              <option value="Completed">Completed</option>
-              <option value="Cancelled">Cancelled</option>
-              <option value="Rescheduled">Rescheduled</option>
-            </select> */}
           </div>
-          <div className="schedule-form-field">
-            <label htmlFor="schedule-interviewer">
-              Interviewer<span className="required-field"> *</span>
-            </label>
-            <select
-              id="schedule-interviewer"
-              name="interviewers"
-              value={editInterview?.interviewer_name ?? ""}
-              onChange={(event) =>
-                setEditInterview((currentInterview: any) =>
-                  currentInterview
-                    ? {
-                        ...currentInterview,
-                        interviewer_name: event.target.value,
-                      }
-                    : currentInterview,
-                )
-              }
-              disabled={interviewersLoading || interviewersError}
-              required
-            >
-              {interviewers &&
-                interviewers.map(
-                  (interviewer: { id: number; name: string }) => (
-                    <option key={interviewer.id} value={interviewer.id}>
-                      {interviewer.name}
-                    </option>
-                  ),
+          <div className="job-edit-field">
+            <label htmlFor="job-title">Interviewer</label>
+            {["Cancelled", "Completed"].includes(mode) ? (
+              <input
+                id="job-title"
+                type="text"
+                value={editInterview?.interviewer_name ?? ""}
+                disabled
+              />
+            ) : (
+              <>
+                <select
+                  id="schedule-interviewer"
+                  name="interviewers"
+                  value={
+                    editInterview?.interviewer_id ??
+                    interviewers.find(
+                      (interviewer: { id: number; name: string }) =>
+                        interviewer.name === editInterview?.interviewer_name,
+                    )?.id ??
+                    ""
+                  }
+                  onChange={(event) =>
+                    setEditInterview((currentInterview: any) =>
+                      currentInterview
+                        ? {
+                            ...currentInterview,
+                            interviewer_id: Number(event.target.value),
+                          }
+                        : currentInterview,
+                    )
+                  }
+                  disabled={interviewersLoading || interviewersError}
+                  required
+                >
+                  {interviewers &&
+                    interviewers.map(
+                      (interviewer: { id: number; name: string }) => (
+                        <option key={interviewer.id} value={interviewer.id}>
+                          {interviewer.name}
+                        </option>
+                      ),
+                    )}
+                </select>
+
+                {interviewersError && (
+                  <span id="interviewers-load-error" role="alert">
+                    Failed to load interviewers. Please try again.
+                  </span>
                 )}
-            </select>
-            {interviewersError && (
-              <span id="interviewers-load-error" role="alert">
-                Failed to load interviewers. Please try again.
-              </span>
+              </>
             )}
           </div>
-          <div className="schedule-form-field">
-            <label htmlFor="schedule-date-time">
-              Date & time<span className="required-field"> *</span>
-            </label>
+          <div className="job-edit-field">
+            <label htmlFor="schedule-date-time">Date & time</label>
             <input
               id="schedule-date-time"
               type="datetime-local"
@@ -455,25 +671,78 @@ const Interviews = () => {
                     : currentInterview,
                 )
               }
-              required
+              required={mode == "Rescheduled"}
+              disabled={mode != "Rescheduled"}
             />
           </div>
+          {mode !== "Rescheduled" && (
+            <>
+              {mode === "Completed" && (
+                <div className="job-edit-field">
+                  <label>Rating</label>
+
+                  <div className="flex gap-2 ">
+                    {[1, 2, 3, 4, 5].map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        aria-label={`Rate ${option}`}
+                        aria-pressed={rating === option}
+                        disabled={sideBarTitle === "View Feedback"}
+                        onClick={() => setRating(option)}
+                        className="interview-rating-option"
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className="job-edit-field">
+                <label htmlFor="schedule-cancel-reason">
+                  {mode === "Cancelled" ? "Reason (optional)" : "Feedback"}
+                </label>
+                <textarea
+                  id="schedule-cancel-reason"
+                  name="reason"
+                  value={reason ?? ""}
+                  onChange={(event) => setReason(event.target.value)}
+                  rows={3}
+                  placeholder={
+                    mode === "Cancelled"
+                      ? "e.g. Candidate unavailable, interviewer on leave…"
+                      : "Clear communicator, strong culture fit, comfortable with the compensation range…"
+                  }
+                  required={
+                    mode === "Completed" && sideBarTitle != "View Feedback"
+                  }
+                  disabled={sideBarTitle == "View Feedback"}
+                />
+              </div>
+            </>
+          )}
           <div className="job-edit-actions">
             <button
               className="job-edit-cancel"
               type="button"
-              onClick={() => setIsDrawerOpen(false)}
+              onClick={() => {
+                setIsDrawerOpen(false);
+                setRating(0);
+                setReason(null);
+              }}
             >
               Cancel
             </button>
-            <button
-              className="job-edit-submit"
-              type="submit"
-              onClick={updateInterview}
-              // disabled={!hasJobChanges}
-            >
-              Update Interview
-            </button>
+            {!["View Feedback", "Cancelled Reason"].includes(sideBarTitle) && (
+              <button
+                className="job-edit-submit"
+                type="submit"
+                onClick={updateInterview}
+                // disabled={!hasJobChanges}
+              >
+                {sideBarTitle}
+              </button>
+            )}
           </div>
         </div>
       </div>

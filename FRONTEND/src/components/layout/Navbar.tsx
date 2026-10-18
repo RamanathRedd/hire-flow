@@ -10,7 +10,7 @@ interface Button {
 interface NavProps {
   leftTitle: string;
   rightText: Button | string;
-  classString: string;
+  classString?: string;
 }
 
 const Navbar = (props: NavProps) => {

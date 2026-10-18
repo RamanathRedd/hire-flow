@@ -7,7 +7,7 @@ import {
   scheduleInterview,
   submitInterviewFeedback,
 } from "../api/interviews";
-import type { InterviewFilters } from "../types/interview";
+import type { interviewFeedback, InterviewFilters } from "../types/interview";
 
 export const useScheduleInterview = () =>
   useMutation({
@@ -15,7 +15,10 @@ export const useScheduleInterview = () =>
       scheduleInterview(interview_details),
   });
 
-export const useGetInterviews = (interviewFilters: InterviewFilters) =>
+export const useGetInterviews = (
+  interviewFilters: InterviewFilters,
+  enabled = true,
+) =>
   useQuery({
     queryKey: [
       "interviews",
@@ -24,9 +27,13 @@ export const useGetInterviews = (interviewFilters: InterviewFilters) =>
       interviewFilters.job_id ?? null,
     ],
     queryFn: () => getInterviews(interviewFilters),
+    enabled,
   });
 
-export const useUpcomingInterviews = (interviewFilters: InterviewFilters) =>
+export const useUpcomingInterviews = (
+  interviewFilters: InterviewFilters,
+  enabled = true,
+) =>
   useQuery({
     queryKey: [
       "upcomingInterviews",
@@ -35,22 +42,39 @@ export const useUpcomingInterviews = (interviewFilters: InterviewFilters) =>
       interviewFilters.job_id ?? null,
     ],
     queryFn: () => getUpcomingInterviews(interviewFilters),
+    enabled,
   });
 
 export const useReScheduleInterview = () =>
   useMutation({
-    mutationFn: (interview_id: number, interview_details: any) =>
+    mutationFn: ({
+      interview_id,
+      interview_details,
+    }: {
+      interview_id: number;
+      interview_details: { interviewer_id: number; scheduled_at: string };
+    }) =>
       reScheduleInterview(interview_id, interview_details),
   });
 
 export const useCancelInterview = () =>
   useMutation({
-    mutationFn: (interview_id: number, cancellation_data: any) =>
-      cancelInterview(interview_id, cancellation_data),
+    mutationFn: ({
+      interview_id,
+      cancellation_data,
+    }: {
+      interview_id: number;
+      cancellation_data: string | null;
+    }) => cancelInterview(interview_id, cancellation_data),
   });
 
 export const useSubmitInterviewFeedback = () =>
   useMutation({
-    mutationFn: (interview_id: number, submit_feedback: any) =>
-      submitInterviewFeedback(interview_id, submit_feedback),
+    mutationFn: ({
+      interview_id,
+      submit_feedback,
+    }: {
+      interview_id: number;
+      submit_feedback: interviewFeedback;
+    }) => submitInterviewFeedback(interview_id, submit_feedback),
   });

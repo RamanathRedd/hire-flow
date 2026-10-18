@@ -59,8 +59,7 @@ export const getUpcomingInterviews = async (
       },
       params: interviewFilters,
     });
-
-    return response.data.interviews;
+    return response.data;
   } catch (error) {}
 };
 
