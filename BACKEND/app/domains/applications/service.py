@@ -81,13 +81,30 @@ def create_application(
     db.commit()
 
 
-def get_applications(
+def get_candidate_applications(
     db: Session, application_filters: ApplicationFilters, current_user: dict
-) -> list[Application]:
+) -> dict:
     if current_user["role"] != "User":
         raise UnauthorizedError
 
-    query = select(Application)
+    query = (
+        select(
+            Application,
+            Candidate.name.label("candidate_name"),
+            Job.title.label("job_title"),
+            Job.department,
+            Job.location,
+            Job.job_type,
+            StageHistory.id.label("history_id"),
+            StageHistory.from_stage,
+            StageHistory.to_stage,
+            StageHistory.created_at,
+        )
+        .join(Candidate, Application.candidate_id == Candidate.id)
+        .join(Job, Application.job_id == Job.id)
+        .outerjoin(StageHistory, StageHistory.application_id == Application.id)
+    )
+
     query = query.where(Application.candidate_id == current_user["id"])
 
     if application_filters.job_id:
@@ -96,7 +113,76 @@ def get_applications(
     if application_filters.stage:
         query = query.where(Application.stage == application_filters.stage)
 
-    return db.scalars(query).all()
+    result = db.execute(query.order_by(Application.stage_updated_at.desc())).all()
+
+    applications_by_id = {}
+    for res in result:
+        application = res.Application
+        if application.id not in applications_by_id:
+            applications_by_id[application.id] = {
+                "id": application.id,
+                "job_id": application.job_id,
+                "candidate_id": application.candidate_id,
+                "stage": application.stage,
+                "stage_updated_at": application.stage_updated_at,
+                "applied_at": application.applied_at,
+                "candidate_name": res.candidate_name,
+                "job_title": res.job_title,
+                "department": res.department,
+                "location": res.location,
+                "job_type": res.job_type,
+                "stage_step": STAGES.index(application.stage) + 1,
+                "cover_note": application.cover_note,
+                "notes": application.notes,
+                "rejection_reason": application.rejection_reason,
+                "stage_history": [],
+            }
+
+        if res.history_id is not None:
+            applications_by_id[application.id]["stage_history"].append(
+                {
+                    "id": res.history_id,
+                    "from_stage": res.from_stage,
+                    "to_stage": res.to_stage,
+                    "created_at": res.created_at,
+                }
+            )
+
+    all_applications_list = list(applications_by_id.values())
+
+    active_applications = sum(
+        application["stage"] != "Rejected" for application in all_applications_list
+    )
+
+    closed_applications = sum(
+        application["stage"] == "Rejected" for application in all_applications_list
+    )
+
+    all_applications = len(all_applications_list)
+
+    if application_filters.status == "Active":
+        applications = [
+            application
+            for application in all_applications_list
+            if application["stage"] != "Rejected"
+        ]
+    elif application_filters.status == "Closed":
+        applications = [
+            application
+            for application in all_applications_list
+            if application["stage"] == "Rejected"
+        ]
+    else:
+        applications = all_applications_list
+
+    response = {
+        "active_applications": active_applications,
+        "closed_applications": closed_applications,
+        "applications": applications,
+        "all_applications": all_applications,
+    }
+
+    return response
 
 
 def get_live_applications(db: Session, current_user: dict) -> list[Application]:
