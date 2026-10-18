@@ -35,3 +35,19 @@ export const getLiveApplications = async () => {
     // throw new Error(getErrorMessage(error));
   }
 };
+
+export const getCandidateApplications = async (status: string | null) => {
+  const token = sessionStorage.getItem("access_token");
+
+  try {
+    const response = await axios.get(`${API_BASE_URL}/applications`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: { status },
+    });
+    return response.data;
+  } catch (error) {
+    // throw new Error(getErrorMessage(error));
+  }
+};

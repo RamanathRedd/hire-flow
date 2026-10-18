@@ -1083,9 +1083,227 @@ body {
 	color: #DC2626;
 }
 
+.application-list {
+	display: grid;
+	gap: 10px;
+	margin: 12px 42px 28px;
+}
+
+.application-card {
+	min-width: 0;
+	padding: 14px 16px 12px;
+	border: 1px solid #303238;
+	border-radius: 12px;
+	background: #191a1c;
+}
+
+.application-card-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 16px;
+}
+
+.application-card-header h2 {
+	margin: 0;
+	color: #edf0f4;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+.application-card-meta {
+	margin: 2px 0 0;
+	color: #b7bbc2;
+	font-size: 13px;
+	line-height: 1.35;
+}
+
+.application-stage-badge {
+	flex: 0 0 auto;
+	padding: 8px 11px;
+	border-radius: 7px;
+	background: #092449;
+	color: #69a9ff;
+	font-size: 12px;
+	line-height: 1.2;
+}
+
+.application-stage-offer,
+.application-stage-hired {
+	background: #0a2c18;
+	color: #22c55e;
+}
+
+.application-stage-interview_r1,
+.application-stage-interview_r2,
+.application-stage-hr_round {
+	background: #351f00;
+	color: #f59e0b;
+}
+
+.application-stage-rejected {
+	background: #351719;
+	color: #f87171;
+}
+
+.application-progress {
+	display: flex;
+	gap: 5px;
+	margin-top: 10px;
+}
+
+.application-progress-step {
+	height: 6px;
+	flex: 1;
+	border-radius: 999px;
+	background: #45474b;
+}
+
+.application-progress-step.is-complete {
+	background: #0fae9d;
+}
+
+.application-step-label {
+	margin: 6px 0 8px;
+	color: #b7bbc2;
+	font-size: 12px;
+	line-height: 1.3;
+}
+
+.application-stage-message {
+	margin: 0;
+	padding: 8px 10px;
+	border-radius: 8px;
+	background: #151618;
+	color: #e2e5e9;
+	font-size: 13px;
+	line-height: 1.4;
+}
+
+.application-card-footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-top: 8px;
+}
+
+.application-card-footer p {
+	margin: 0;
+	color: #b7bbc2;
+	font-size: 12px;
+	line-height: 1.4;
+}
+
+.application-timeline-button {
+	flex: 0 0 auto;
+	padding: 2px 0;
+	border: 0;
+	background: transparent;
+	color: #64a5ff;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+.application-timeline-button:focus-visible {
+	border-radius: 3px;
+	outline: 2px solid #64a5ff;
+	outline-offset: 3px;
+}
+
+.application-timeline {
+	margin-top: 16px;
+	padding-top: 14px;
+	border-top: 1px solid #303238;
+}
+
+.application-timeline h3 {
+	margin: 0 0 12px;
+	color: #edf0f4;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.application-timeline-track {
+	position: relative;
+	display: grid;
+	gap: 0;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+
+.application-timeline-track::before {
+	position: absolute;
+	top: 7px;
+	bottom: 7px;
+	left: 5px;
+	width: 2px;
+	background: #3b3d40;
+	content: "";
+}
+
+.application-timeline-stage {
+	position: relative;
+	display: flex;
+	min-height: 32px;
+	align-items: center;
+	gap: 12px;
+	color: #969ba3;
+	font-size: 13px;
+}
+
+.application-timeline-marker {
+	z-index: 1;
+	width: 12px;
+	height: 12px;
+	flex: 0 0 12px;
+	border: 2px solid #55585d;
+	border-radius: 50%;
+	background: #191a1c;
+}
+
+.application-timeline-stage.is-complete .application-timeline-marker,
+.application-timeline-stage.is-current .application-timeline-marker {
+	border-color: #0fae9d;
+	background: #0fae9d;
+}
+
+.application-timeline-stage.is-current {
+	color: #edf0f4;
+	font-weight: 600;
+}
+
+.application-timeline-stage.is-rejected.is-current .application-timeline-marker {
+	border-color: #f87171;
+	background: #f87171;
+}
+
+.application-timeline-stage.is-rejected.is-current {
+	color: #fca5a5;
+}
+
 button,
 input {
 	font: inherit;
+}
+
+@media (max-width: 640px) {
+	.application-list {
+		margin-right: 16px;
+		margin-left: 16px;
+	}
+
+	.application-card {
+		padding: 12px;
+	}
+
+	.application-card-footer {
+		align-items: flex-start;
+		flex-direction: column;
+		gap: 6px;
+	}
 }
 
 .auth-page {

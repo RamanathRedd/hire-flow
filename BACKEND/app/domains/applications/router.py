@@ -63,14 +63,16 @@ def create_application(
 
 
 @applications_router.get("", status_code=status.HTTP_200_OK)
-def get_applications(
+def get_candidate_applications(
     current_user: CurrentUser,
     application_filters: ApplicationFilters = Query(),
     db: Session = Depends(get_db),
 ):
     try:
-        response = service.get_applications(db, application_filters, current_user)
-        return {"data": response}
+        response = service.get_candidate_applications(
+            db, application_filters, current_user
+        )
+        return response
     except UnauthorizedError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

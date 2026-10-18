@@ -1,3 +1,5 @@
+from typing import Literal
+
 from core.constants import STAGE_LITERAL
 from pydantic import BaseModel, Field
 
@@ -13,6 +15,7 @@ class ApplicationCreate(BaseModel):
 class ApplicationFilters(BaseModel):
     job_id: int | None = None
     stage: STAGE_LITERAL | None = Field(default=None, max_length=20)
+    status: Literal["Active", "Closed"] | None = None
 
 
 class UpdateStage(BaseModel):
