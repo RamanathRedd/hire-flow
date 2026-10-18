@@ -2,13 +2,14 @@ import { useState } from "react";
 import Navbar from "../../components/layout/Navbar";
 import ProfileForm from "../../components/profile/ProfileForm";
 import Modal from "../../components/ui/Modal";
+import { useGetRecruiterDetails } from "../../hooks/useRecruiters";
 
 const inputFieldDetails = [
   {
     type: "text",
-    placeHolder: "Ramanath Reddy",
+    placeHolder: "Enter Your name",
     name: "Full name",
-    key: "fullName",
+    key: "name",
     required: true,
   },
   {
@@ -32,21 +33,13 @@ const inputFieldDetails = [
     key: "department",
     required: true,
   },
-  {
-    type: "password",
-    placeHolder: "••••••••••",
-    name: "Password",
-    key: "password",
-    required: true,
-  },
 ];
 
 interface UserDetails {
-  fullName: string;
+  name: string;
   email: string;
   phone: string;
   department: string;
-  password: string;
 }
 
 const Profile = () => {
@@ -77,13 +70,8 @@ const Profile = () => {
     onClickEditButton: onClickEditButton,
   };
 
-  const userData: UserDetails = {
-    fullName: "Ramanath Reddy",
-    email: "ram@example.com",
-    phone: "9391233969",
-    department: "Engineering",
-    password: "Ram@1432",
-  };
+  const { data: userData = {} as UserDetails, isError: userDataError } =
+    useGetRecruiterDetails();
 
   return (
     <>
@@ -92,11 +80,19 @@ const Profile = () => {
         rightText={rightText}
         classString="nav-action-button"
       />
-      <ProfileForm
-        inputFields={inputFieldDetails}
-        userData={userData}
-        isEditable={isEditable}
-      />
+      {userData && (
+        <ProfileForm
+          inputFields={inputFieldDetails}
+          userData={userData}
+          isEditable={isEditable}
+        />
+      )}
+      {userDataError && (
+        <span id="user-data-load-error" role="alert">
+          Failed to load user data. Please try again.
+        </span>
+      )}
+
       {isModalOpen && (
         <Modal
           title="Save profile changes?"

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface inputField {
   type: string;
@@ -9,7 +9,7 @@ interface inputField {
 }
 
 interface UserDetails {
-  fullName: string;
+  name: string;
   email: string;
   phone: string;
   experience?: number;
@@ -31,6 +31,10 @@ const ProfileForm = (props: ProfileFormProps) => {
   const { inputFields, userData, isEditable } = props;
   const [draftUserDetails, setDraftUserDetails] =
     useState<UserDetails>(userData);
+
+  useEffect(() => {
+    setDraftUserDetails(userData);
+  });
 
   const onFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

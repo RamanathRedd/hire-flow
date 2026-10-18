@@ -46,16 +46,14 @@ def get_recruiters(
     return db.scalars(query).all()
 
 
-def get_recruiter_details(
-    db: Session, recruiter_id: int, current_user: dict
-) -> Recruiter | None:
+def get_recruiter_details(db: Session, current_user: dict) -> Recruiter | None:
     if current_user["role"] != "Admin":
         raise UnauthorizedError
 
     query = (
         select(Recruiter)
         .options(defer(Recruiter.password))
-        .where(Recruiter.id == recruiter_id)
+        .where(Recruiter.id == current_user["id"])
     )
     return db.scalar(query)
 

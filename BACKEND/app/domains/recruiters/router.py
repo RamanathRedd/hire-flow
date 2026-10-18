@@ -40,24 +40,22 @@ def get_recruiters(
 
 
 @recruiters_router.get(
-    "/{recruiter_id}",
+    "/recruiter",
     status_code=status.HTTP_200_OK,
 )
 def get_recruiter_details(
-    recruiter_id: int,
     current_user: CurrentUser,
     db: Session = Depends(get_db),
 ):
     try:
-        response = service.get_recruiter_details(db, recruiter_id, current_user)
-
+        response = service.get_recruiter_details(db, current_user)
         if not response:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Recruiter does not exists",
             )
 
-        jobs = db.scalars(select(Job).where(Job.created_by == recruiter_id)).all()
+        jobs = db.scalars(select(Job).where(Job.created_by == response.id)).all()
         filtered_jobs = []
         active_jobs = 0
 
@@ -88,6 +86,7 @@ def get_recruiter_details(
             },
             "jobs": filtered_jobs,
         }
+
     except UnauthorizedError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
