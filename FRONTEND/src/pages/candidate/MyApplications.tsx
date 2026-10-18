@@ -2,6 +2,7 @@ import { useState } from "react";
 import Navbar from "../../components/layout/Navbar";
 import { useCandidateApplications } from "../../hooks/useApplications";
 import ApplicationTimeline from "../../components/layout/ApplicationTimeline";
+import { formatDate } from "../../hooks/useReferenceData";
 
 const MyApplications = () => {
   const [allApplications, setAllApplications] = useState<boolean>(true);
@@ -27,13 +28,6 @@ const MyApplications = () => {
     setAllApplications(false);
     setActiveApplications(false);
     setClosedApplications(true);
-  };
-
-  const convertTime = (time: string) => {
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-    }).format(new Date(time));
   };
 
   const {
@@ -158,8 +152,8 @@ const MyApplications = () => {
 
                   <div className="application-card-footer">
                     <p>
-                      Applied {convertTime(application.applied_at)} · Updated{" "}
-                      {convertTime(application.stage_updated_at)}
+                      Applied {formatDate(application.applied_at)} · Updated{" "}
+                      {formatDate(application.stage_updated_at)}
                     </p>
                     <button
                       type="button"
