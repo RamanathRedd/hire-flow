@@ -18,7 +18,6 @@ interface UserDetails {
   resume?: string;
   linkedIn?: string;
   department?: string;
-  password?: string;
   skills?: string[];
 }
 

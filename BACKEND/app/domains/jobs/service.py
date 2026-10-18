@@ -19,7 +19,9 @@ def create_job(db: Session, job_data: JobCreate, current_user: dict) -> None:
     if current_user["role"] != "Admin":
         raise UnauthorizedError
 
-    recruiter_exists = get_recruiter_details(db, current_user["id"])
+    recruiter_exists = get_recruiter_details(
+        db, current_user["id"], current_user
+    )
 
     if not recruiter_exists:
         raise RecruiterNotExistsError

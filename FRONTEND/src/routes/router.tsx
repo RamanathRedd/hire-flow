@@ -10,12 +10,12 @@ import AppLayout from "../components/layout/AppLayout";
 import Analytics from "../pages/recruiter/Analytics";
 import Interviews from "../pages/recruiter/Interviews";
 import JobForm from "../pages/recruiter/JobForm";
-import KanbanBoard from "../pages/recruiter/KanbanBoard";
 import BrowseJobs from "../pages/candidate/BrowseJobs";
 import CandidateProfile from "../pages/candidate/Profile";
 import RecruiterProfile from "../pages/recruiter/Profile";
 import Dashboard from "../pages/recruiter/Dashboard";
 import InterviewScheduleForm from "../pages/recruiter/InterviewScheduleForm";
+import Applications from "../pages/recruiter/Applications";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -24,7 +24,7 @@ const router = createBrowserRouter(
       <Route path="/register" element={<RegisterPage />} />
       <Route element={<AppLayout />}>
         <Route path="/jobs" element={<Dashboard />} />
-        <Route path="/kanbanBoard" element={<KanbanBoard />} />
+        <Route path="/applications" element={<Applications />} />
         <Route path="/interviews" element={<Interviews />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/profile" element={<RecruiterProfile />} />

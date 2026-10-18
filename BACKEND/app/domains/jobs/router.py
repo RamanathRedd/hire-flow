@@ -154,7 +154,7 @@ def get_job_applications(
     job_id: int, current_user: CurrentUser, db: Session = Depends(get_db)
 ):
     try:
-        response = service.get_job_applications(db, job_id)
+        response = service.get_job_applications(db, job_id, current_user)
         return {"data": response}
     except UnauthorizedError:
         raise HTTPException(

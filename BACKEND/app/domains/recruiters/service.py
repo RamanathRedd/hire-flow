@@ -5,6 +5,7 @@ from core.exceptions import (
     PhoneAlreadyExistsError,
     RecruiterAlreadyExistsError,
     RecruiterNotExistsError,
+    UnauthorizedError,
 )
 from domains.jobs.model import Job
 from domains.recruiters.model import Recruiter
@@ -32,7 +33,12 @@ def create_recruiter(db: Session, recruiter_data: RecruiterCreate) -> None:
     db.commit()
 
 
-def get_recruiters(db: Session, department: str | None) -> list[Recruiter]:
+def get_recruiters(
+    db: Session, department: str | None, current_user: dict
+) -> list[Recruiter]:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
     query = select(Recruiter)
     if department:
         query = query.where(Recruiter.department == department)
@@ -40,7 +46,12 @@ def get_recruiters(db: Session, department: str | None) -> list[Recruiter]:
     return db.scalars(query).all()
 
 
-def get_recruiter_details(db: Session, recruiter_id: int) -> Recruiter | None:
+def get_recruiter_details(
+    db: Session, recruiter_id: int, current_user: dict
+) -> Recruiter | None:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
     query = (
         select(Recruiter)
         .options(defer(Recruiter.password))
@@ -50,8 +61,14 @@ def get_recruiter_details(db: Session, recruiter_id: int) -> Recruiter | None:
 
 
 def update_recruiter(
-    db: Session, recruiter_id: int, recruiter_update: RecruiterUpdate
+    db: Session,
+    recruiter_id: int,
+    recruiter_update: RecruiterUpdate,
+    current_user: dict,
 ) -> None:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
     query = select(Recruiter).where(Recruiter.id == recruiter_id)
     recruiter = db.scalar(query)
 
@@ -79,7 +96,10 @@ def update_recruiter(
     db.commit()
 
 
-def delete_recruiter(db: Session, recruiter_id: int) -> None:
+def delete_recruiter(db: Session, recruiter_id: int, current_user: dict) -> None:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
     job_exists = db.scalar(
         select(Job).where((Job.created_by == recruiter_id) & (Job.status == "Open"))
     )
