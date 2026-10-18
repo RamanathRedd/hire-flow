@@ -12,3 +12,9 @@ export const useLocations = () =>
     queryKey: ["locations"],
     queryFn: getLocations,
   });
+
+export const formatDate = (date: string) =>
+  new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+  }).format(new Date(date));
