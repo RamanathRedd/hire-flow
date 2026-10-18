@@ -74,7 +74,7 @@ const Interviews = () => {
     const closeMenuOnOutsideClick = (event: MouseEvent) => {
       if (
         event.target instanceof Element &&
-        !event.target.closest(".job-actions-cell")
+        !event.target.closest(".interview-actions-cell")
       ) {
         setOpenInterviewMenu(null);
       }
@@ -321,11 +321,11 @@ const Interviews = () => {
         </select>
         <select
           className="filter-select"
-          value={selectedJob?.toString() ?? "job-placeholder"}
+          value={selectedJob?.toString() ?? "interview-job-placeholder"}
           onChange={(event) => setSelectedJob(Number(event.target.value))}
           disabled={jobsLoading || jobsError}
         >
-          <option value="job-placeholder" disabled hidden>
+          <option value="interview-job-placeholder" disabled hidden>
             Job
           </option>
           {jobs &&
@@ -384,9 +384,9 @@ const Interviews = () => {
                       {interview.status}
                     </span>
                   </td>
-                  <td className="job-actions-cell">
+                  <td className="interview-actions-cell">
                     <button
-                      className="job-actions-trigger"
+                      className="interview-actions-trigger"
                       type="button"
                       aria-label={`Actions for ${interview.candidate_name} - ${interview.job_title}`}
                       aria-haspopup="menu"
@@ -406,13 +406,13 @@ const Interviews = () => {
                     </button>
                     {openInterviewMenu &&
                       openInterviewMenu.id === interview.id && (
-                        <div className="job-actions-menu" role="menu">
+                        <div className="interview-actions-menu" role="menu">
                           {["Scheduled", "Rescheduled"].includes(
                             interview.status,
                           ) && (
                             <>
                               <button
-                                className="job-actions-menu-item"
+                                className="interview-actions-menu-item"
                                 type="button"
                                 role="menuitem"
                                 aria-controls="side-bar-navigation"
@@ -428,7 +428,7 @@ const Interviews = () => {
                                 Reschedule
                               </button>
                               <button
-                                className="job-actions-menu-item"
+                                className="interview-actions-menu-item"
                                 type="button"
                                 role="menuitem"
                                 aria-controls="side-bar-navigation"
@@ -443,7 +443,7 @@ const Interviews = () => {
                                 Cancel
                               </button>
                               <button
-                                className="job-actions-menu-item"
+                                className="interview-actions-menu-item"
                                 type="button"
                                 role="menuitem"
                                 aria-controls="side-bar-navigation"
@@ -461,7 +461,7 @@ const Interviews = () => {
                           )}
                           {interview.status == "Completed" && (
                             <button
-                              className="job-actions-menu-item"
+                              className="interview-actions-menu-item"
                               type="button"
                               role="menuitem"
                               aria-controls="side-bar-navigation"
@@ -480,7 +480,7 @@ const Interviews = () => {
                           )}
                           {interview.status == "Cancelled" && (
                             <button
-                              className="job-actions-menu-item"
+                              className="interview-actions-menu-item"
                               type="button"
                               role="menuitem"
                               aria-controls="side-bar-navigation"
@@ -560,17 +560,17 @@ const Interviews = () => {
             x
           </button>
         </div>
-        <div className="job-edit-form">
-          <div className="job-edit-field">
-            <label htmlFor="job-title">Candidate Name</label>
+        <div className="interview-edit-form">
+          <div className="interview-edit-field">
+            <label htmlFor="candidate-name">Candidate Name</label>
             <input
-              id="job-title"
+              id="candidate-name"
               type="text"
               value={editInterview?.candidate_name ?? ""}
               disabled
             />
           </div>
-          <div className="job-edit-field">
+          <div className="interview-edit-field">
             <label htmlFor="job-title">Job Title</label>
             <input
               id="job-title"
@@ -579,33 +579,33 @@ const Interviews = () => {
               disabled
             />
           </div>
-          <div className="job-edit-field">
-            <label htmlFor="job-title">Round Number</label>
+          <div className="interview-edit-field">
+            <label htmlFor="round-number">Round Number</label>
             <input
-              id="job-title"
+              id="round-number"
               type="text"
               value={`R ${editInterview?.round_number ?? ""}`}
               disabled
             />
           </div>
-          <div className="job-edit-field">
-            <label htmlFor="job-title">Round Type</label>
+          <div className="interview-edit-field">
+            <label htmlFor="round-type">Round Type</label>
             <input
-              id="job-title"
+              id="round-type"
               type="text"
               value={editInterview?.round_type ?? ""}
               disabled
             />
           </div>
-          <div className="job-edit-field">
-            <label htmlFor="job-title">Interview Status</label>
-            <input id="job-title" type="text" value={mode} disabled />
+          <div className="interview-edit-field">
+            <label htmlFor="interview-status">Interview Status</label>
+            <input id="interview-status" type="text" value={mode} disabled />
           </div>
-          <div className="job-edit-field">
-            <label htmlFor="job-title">Interviewer</label>
+          <div className="interview-edit-field">
+            <label htmlFor="interviewer">Interviewer</label>
             {["Cancelled", "Completed"].includes(mode) ? (
               <input
-                id="job-title"
+                id="interviewer"
                 type="text"
                 value={editInterview?.interviewer_name ?? ""}
                 disabled
@@ -613,7 +613,7 @@ const Interviews = () => {
             ) : (
               <>
                 <select
-                  id="schedule-interviewer"
+                  id="interviewer"
                   name="interviewers"
                   value={
                     editInterview?.interviewer_id ??
@@ -654,10 +654,10 @@ const Interviews = () => {
               </>
             )}
           </div>
-          <div className="job-edit-field">
-            <label htmlFor="schedule-date-time">Date & time</label>
+          <div className="interview-edit-field">
+            <label htmlFor="date-time">Date & time</label>
             <input
-              id="schedule-date-time"
+              id="date-time"
               type="datetime-local"
               name="scheduledAt"
               value={toDateTimeLocal(editInterview?.scheduled_at)}
@@ -678,9 +678,8 @@ const Interviews = () => {
           {mode !== "Rescheduled" && (
             <>
               {mode === "Completed" && (
-                <div className="job-edit-field">
+                <div className="interview-edit-field">
                   <label>Rating</label>
-
                   <div className="flex gap-2 ">
                     {[1, 2, 3, 4, 5].map((option) => (
                       <button
@@ -698,12 +697,12 @@ const Interviews = () => {
                   </div>
                 </div>
               )}
-              <div className="job-edit-field">
-                <label htmlFor="schedule-cancel-reason">
+              <div className="interview-edit-field">
+                <label htmlFor="cancel-feedback-reason">
                   {mode === "Cancelled" ? "Reason (optional)" : "Feedback"}
                 </label>
                 <textarea
-                  id="schedule-cancel-reason"
+                  id="cancel-feedback-reason"
                   name="reason"
                   value={reason ?? ""}
                   onChange={(event) => setReason(event.target.value)}
@@ -721,9 +720,9 @@ const Interviews = () => {
               </div>
             </>
           )}
-          <div className="job-edit-actions">
+          <div className="interview-edit-actions">
             <button
-              className="job-edit-cancel"
+              className="interview-edit-cancel"
               type="button"
               onClick={() => {
                 setIsDrawerOpen(false);
@@ -735,7 +734,7 @@ const Interviews = () => {
             </button>
             {!["View Feedback", "Cancelled Reason"].includes(sideBarTitle) && (
               <button
-                className="job-edit-submit"
+                className="interview-edit-submit"
                 type="submit"
                 onClick={updateInterview}
                 // disabled={!hasJobChanges}

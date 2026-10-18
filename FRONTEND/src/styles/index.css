@@ -560,13 +560,13 @@ body {
 	text-transform: none;
 }
 
-.job-actions-cell {
+.job-actions-cell,.interview-actions-cell {
 	position: relative;
 	width: 1%;
 	white-space: nowrap;
 }
 
-.job-actions-trigger {
+.job-actions-trigger,.interview-actions-trigger {
 	display: inline-flex;
 	width: 34px;
 	height: 34px;
@@ -583,19 +583,23 @@ body {
 }
 
 .job-actions-trigger:hover,
-.job-actions-trigger[aria-expanded="true"] {
+.job-actions-trigger[aria-expanded="true"],
+.interview-actions-trigger:hover,
+.interview-actions-trigger[aria-expanded="true"] {
 	border-color: rgba(255, 255, 255, 0.12);
 	background: rgba(255, 255, 255, 0.06);
 	color: #f4f7fb;
 }
 
 .job-actions-trigger:focus-visible,
-.job-actions-menu-item:focus-visible {
+.interview-actions-trigger:focus-visible
+.job-actions-menu-item:focus-visible,
+.interview-actions-menu-item:focus-visible {
 	outline: 2px solid #6f87ff;
 	outline-offset: 2px;
 }
 
-.job-actions-menu {
+.job-actions-menu,.interview-actions-menu {
 	position: absolute;
 	top: calc(100% - 8px);
 	right: 10px;
@@ -610,7 +614,7 @@ body {
 	box-shadow: 0 10px 28px rgba(0, 0, 0, 0.38);
 }
 
-.job-actions-menu-item {
+.job-actions-menu-item,.interview-actions-menu-item {
 	padding: 9px 11px;
 	border: 0;
 	border-radius: 6px;
@@ -621,7 +625,9 @@ body {
 	cursor: pointer;
 }
 
-.job-actions-menu-item:hover {
+.job-actions-menu-item:hover,
+.interview-actions-menu-item:hover
+ {
 	background: rgba(255, 255, 255, 0.07);
 }
 
@@ -817,21 +823,21 @@ body {
 	box-shadow: 0 4px 12px rgba(53, 85, 223, 0.3);
 }
 
-.job-edit-form {
+.job-edit-form,.interview-edit-form {
 	display: flex;
 	flex-direction: column;
 	gap: 16px;
 	padding-top: 20px;
 }
 
-.job-edit-field {
+.job-edit-field,.interview-edit-field {
 	display: flex;
 	min-width: 0;
 	flex-direction: column;
 	gap: 7px;
 }
 
-.job-edit-field label {
+.job-edit-field label,.interview-edit-field label {
 	color: #a9b2c0;
 	font-size: 12px;
 	font-weight: 600;
@@ -866,7 +872,10 @@ body {
 
 .job-edit-field input,
 .job-edit-field select,
-.job-edit-field textarea {
+.job-edit-field textarea,
+.interview-edit-field input,
+.interview-edit-field select,
+.interview-edit-field textarea {
 	width: 100%;
 	min-width: 0;
 	border: 1px solid #343d4a;
@@ -879,12 +888,21 @@ body {
 		background-color 0.15s ease;
 }
 
-.job-edit-field input {
+.job-edit-field input,
+.interview-edit-field input {
 	min-height: 42px;
 	padding: 0 12px;
 }
 
-.job-edit-field select {
+.interview-edit-field input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+.schedule-form-field input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+	filter: invert(1);
+	opacity: 0.85;
+	cursor: pointer;
+}
+
+.job-edit-field select,
+.interview-edit-field select {
 	min-height: 42px;
 	padding: 0 36px 0 12px;
 	appearance: none;
@@ -895,12 +913,14 @@ body {
 	cursor: pointer;
 }
 
-.job-edit-field select option {
+.job-edit-field select option,
+.interview-edit-field select option {
 	background: #191f29;
 	color: #edf3ff;
 }
 
-.job-edit-field textarea {
+.job-edit-field textarea,
+.interview-edit-field textarea {
 	min-height: 96px;
 	padding: 11px 12px;
 	line-height: 1.5;
@@ -908,54 +928,59 @@ body {
 }
 
 .job-edit-field input::placeholder,
-.job-edit-field textarea::placeholder {
+.job-edit-field textarea::placeholder,
+.interview-edit-field textarea::placeholder {
 	color: #778395;
 }
 
 .job-edit-field input:focus,
 .job-edit-field select:focus,
-.job-edit-field textarea:focus {
+.job-edit-field textarea:focus,
+.interview-edit-field input:focus
+.interview-edit-field select:focus,
+.interview-edit-field textarea:focus{
 	border-color: #637cf5;
 	outline: none;
 	box-shadow: 0 0 0 3px rgba(99, 124, 245, 0.18);
 }
 
-.job-edit-field input:disabled {
+.job-edit-field input:disabled,
+.interview-edit-field input:disabled {
 	border-color: #2b323d;
 	background: #151a22;
 	color: #818b9b;
 	cursor: not-allowed;
 }
 
-.job-edit-field select:disabled {
+.job-edit-field select:disabled,
+.interview-edit-field select:disabled {
 	border-color: #2b323d;
 	background-color: #151a22;
 	color: #818b9b;
 	cursor: not-allowed;
 }
 
-.job-edit-field textarea:disabled {
+.job-edit-field textarea:disabled,
+.interview-edit-field textarea:disabled {
 	border-color: #2b323d;
 	background-color: #151a22;
 	color: #818b9b;
 	cursor: not-allowed;
 }
 
-.job-edit-field button:disabled {
-	/* border-color: #2b323d;
-	background-color: #151a22;
-	color: #818b9b; */
+.job-edit-field button:disabled,
+.interview-edit-field button:disabled {
 	cursor: not-allowed;
 }
 
-.job-edit-actions {
+.job-edit-actions,.interview-edit-actions {
 	display: flex;
 	justify-content: space-between;
 	gap: 10px;
 	padding-top: 8px;
 }
 
-.job-edit-actions button {
+.job-edit-actions button,.interview-edit-actions button {
 	min-width: 96px;
 	min-height: 40px;
 	padding: 0 16px;
@@ -970,32 +995,35 @@ body {
 		box-shadow 0.15s ease, transform 0.15s ease;
 }
 
-.job-edit-actions button:focus-visible {
+.job-edit-actions button:focus-visible,
+.interview-edit-actions button:focus-visible {
 	outline: 2px solid #8a9cff;
 	outline-offset: 3px;
 }
 
-.job-edit-cancel {
+.job-edit-cancel,.interview-edit-cancel {
 	border-color: #343d4a;
 	background: #1a202a;
 	color: #c4cad4;
 }
 
-.job-edit-cancel:hover {
+.job-edit-cancel:hover,.interview-edit-cancel:hover {
 	background: #242c38;
 }
 
-.job-edit-submit {
+.job-edit-submit,.interview-edit-submit {
 	background: linear-gradient(180deg, #4b67f5 0%, #3b57dc 100%);
 	box-shadow: 0 6px 16px rgba(75, 103, 245, 0.24);
 }
 
-.job-edit-submit:hover:not(:disabled) {
+.job-edit-submit:hover:not(:disabled),
+.interview-edit-submit:hover:not(:disabled) {
 	background: #5a73f6;
 	box-shadow: 0 8px 18px rgba(75, 103, 245, 0.32);
 }
 
-.job-edit-submit:disabled {
+.job-edit-submit:disabled,
+.interview-edit-submit:disabled {
 	cursor: not-allowed;
 	opacity: 0.55;
 	box-shadow: none;
