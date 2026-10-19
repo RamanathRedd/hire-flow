@@ -3,7 +3,7 @@ import Sidebar from "./Sidebar";
 
 const RecruiterNavItems = [
   { to: "/jobs", title: "Jobs" },
-  { to: "/kanbanBoard", title: "Applications" },
+  { to: "/applications", title: "Applications" },
   { to: "/interviews", title: "Interviews" },
   { to: "/analytics", title: "Analytics" },
   { to: "/profile", title: "Profile" },
