@@ -1491,6 +1491,10 @@ input {
   min-width: 0;
 }
 
+.profile-form-field .skill-input-row .profile-form-input {
+  width: auto;
+}
+
 .auth-field label {
 	color: #a4aab5;
 	font-size: 13px;

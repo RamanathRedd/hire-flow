@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import type { CandidateUpdate } from "../../types/candidate";
+import type { RecruiterUpdate } from "../../types/recruiter";
 
 interface inputField {
   type: string;
@@ -15,36 +17,89 @@ interface UserDetails {
   name: string;
   email: string;
   phone: string;
-  experience?: number;
-  currentTitle?: string;
-  currentCompany?: string;
-  resume?: string;
-  linkedIn?: string;
+  experience_years?: number;
+  current_title?: string;
+  current_company?: string;
+  resume_url?: string;
+  linkedin_url?: string | null;
   department?: string;
   skills?: string[];
 }
 
-interface ProfileDetails {
-  name: string;
-  phone: string;
-  department: string;
-}
-
-interface ProfileFormProps {
+interface BaseProfileFormProps {
   inputFields: inputField[];
   userData: UserDetails;
   isEditable: boolean;
-  onDetailsChange?: (details: ProfileDetails) => void;
 }
 
+type ProfileFormProps = BaseProfileFormProps &
+  (
+    | {
+        profileType: "candidate";
+        onDetailsChange?: (details: CandidateUpdate) => void;
+      }
+    | {
+        profileType: "recruiter";
+        onDetailsChange?: (details: RecruiterUpdate) => void;
+      }
+  );
+
 const ProfileForm = (props: ProfileFormProps) => {
-  const { inputFields, userData, isEditable, onDetailsChange } = props;
+  const { inputFields, userData, isEditable, profileType, onDetailsChange } =
+    props;
+  const [skill, setSkill] = useState<string>("");
   const [draftUserDetails, setDraftUserDetails] =
     useState<UserDetails>(userData);
 
   useEffect(() => {
     setDraftUserDetails(userData);
   }, [userData]);
+
+  const notifyDetailsChange = (details: UserDetails) => {
+    if (profileType === "candidate") {
+      onDetailsChange?.({
+        name: details.name,
+        phone: details.phone,
+        resume_url: details.resume_url,
+        linkedin_url: details.linkedin_url || null,
+        experience_years: Number(details.experience_years),
+        skills: details.skills,
+        current_title: details.current_title,
+        current_company: details.current_company,
+      });
+    } else {
+      onDetailsChange?.({
+        name: details.name,
+        phone: details.phone,
+        department: details.department ?? "",
+      });
+    }
+  };
+
+  const addSkill = () => {
+    const normalizedSkill = skill.trim();
+    const skills = draftUserDetails.skills ?? [];
+    if (!normalizedSkill || skills.includes(normalizedSkill)) return;
+
+    const updatedDetails = {
+      ...draftUserDetails,
+      skills: [...skills, normalizedSkill],
+    };
+    setDraftUserDetails(updatedDetails);
+    notifyDetailsChange(updatedDetails);
+    setSkill("");
+  };
+
+  const removeSkill = (skillToRemove: string) => {
+    const updatedDetails = {
+      ...draftUserDetails,
+      skills: (draftUserDetails.skills ?? []).filter(
+        (existingSkill) => existingSkill !== skillToRemove,
+      ),
+    };
+    setDraftUserDetails(updatedDetails);
+    notifyDetailsChange(updatedDetails);
+  };
 
   const onFieldChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -55,11 +110,7 @@ const ProfileForm = (props: ProfileFormProps) => {
       [name]: value,
     };
     setDraftUserDetails(updatedDetails);
-    onDetailsChange?.({
-      name: updatedDetails.name,
-      phone: updatedDetails.phone,
-      department: updatedDetails.department ?? "",
-    });
+    notifyDetailsChange(updatedDetails);
   };
 
   return (
@@ -74,16 +125,59 @@ const ProfileForm = (props: ProfileFormProps) => {
               className="profile-form-field profile-form-field-wide"
             >
               <label className="profile-form-label">{inputField.name}</label>
-              <div className="profile-form-skill-list">
-                {skills.map((skill, index) => (
-                  <span
-                    key={`${skill}-${index}`}
-                    className="profile-form-skill"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
+              {!isEditable ? (
+                <div className="profile-form-skill-list">
+                  {skills.map((skill, index) => (
+                    <span
+                      key={`${skill}-${index}`}
+                      className="profile-form-skill"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <div className="skill-input-row">
+                    <input
+                      className="profile-form-input"
+                      id="skill"
+                      type="text"
+                      name="skill"
+                      value={skill}
+                      onChange={(event) => setSkill(event.target.value)}
+                      placeholder="Enter Your skill"
+                    />
+
+                    <button
+                      type="button"
+                      className="add-skill-button"
+                      onClick={addSkill}
+                      disabled={!skill.trim() || skills.includes(skill.trim())}
+                    >
+                      Add Skill
+                    </button>
+                  </div>
+                  <div className="profile-form-skill-list ">
+                    {skills.map((skill, index) => (
+                      <span
+                        key={`${skill}-${index}`}
+                        className="profile-form-skill"
+                      >
+                        {skill}
+                        <button
+                          type="button"
+                          onClick={() => removeSkill(skill)}
+                          style={{ cursor: "pointer" }}
+                          aria-label={`Remove ${skill}`}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           );
         }
@@ -126,7 +220,7 @@ const ProfileForm = (props: ProfileFormProps) => {
                 type={inputField.type}
                 name={inputField.key}
                 placeholder={inputField.placeHolder}
-                value={value}
+                value={isEditable ? value : value || " — "}
                 onChange={onFieldChange}
                 readOnly={inputField.type !== "email" ? !isEditable : true}
                 required={inputField.required}
