@@ -73,13 +73,6 @@ def update_recruiter(
     if not recruiter:
         raise RecruiterNotExistsError
 
-    if recruiter_update.email and recruiter_update.email != recruiter.email:
-        email_query = select(Recruiter).where(
-            (Recruiter.id != recruiter_id) & (Recruiter.email == recruiter_update.email)
-        )
-        if db.scalar(email_query):
-            raise EmailAlreadyExistsError
-
     if recruiter_update.phone and recruiter_update.phone != recruiter.phone:
         phone_query = select(Recruiter).where(
             (Recruiter.id != recruiter_id) & (Recruiter.phone == recruiter_update.phone)

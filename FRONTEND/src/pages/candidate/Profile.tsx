@@ -70,7 +70,7 @@ const inputFieldDetails = [
 ];
 
 interface UserDetails {
-  fullName: string;
+  name: string;
   email: string;
   phone: string;
   experience: number;
@@ -107,7 +107,7 @@ const Profile = () => {
     onClickEditButton: onClickEditButton,
   };
   const userData: UserDetails = {
-    fullName: "Ramanath Reddy",
+    name: "Ramanath Reddy",
     email: "ram@example.com",
     phone: "9391233969",
     experience: 3.09,
