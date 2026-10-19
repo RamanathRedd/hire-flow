@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 
 interface NavItem {
@@ -11,10 +12,21 @@ interface SideBarProps {
 
 const Sidebar = (props: SideBarProps) => {
   const { navItems } = props;
+  const [sideBarOpen, setSideBarOpen] = useState<boolean>(true);
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar-brand">HireFlow</div>
+    <aside className={`sidebar${sideBarOpen ? "" : " is-collapsed"}`}>
+      <div className="sidebar-brand">
+        <span className="sidebar-brand-name">HireFlow</span>
+        <button
+          className="sidebar-toggle"
+          type="button"
+          aria-label={sideBarOpen ? "Collapse sidebar" : "Expand sidebar"}
+          onClick={() => setSideBarOpen((prev) => !prev)}
+        >
+          {sideBarOpen ? "«" : "»"}
+        </button>
+      </div>
       <nav className="sidebar-nav" aria-label="Sidebar navigation">
         {navItems.map((navItem) => (
           <NavLink

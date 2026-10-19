@@ -122,6 +122,7 @@ const Profile = () => {
         leftTitle="My profile"
         rightText={rightText}
         classString="nav-action-button"
+        headerClassName="profile-page-header"
       />
       {userData && (
         <ProfileForm

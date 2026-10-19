@@ -140,6 +140,7 @@ const Profile = () => {
         leftTitle="My profile"
         rightText={rightText}
         classString="nav-action-candidate-button"
+        headerClassName="profile-page-header"
       />
 
       {userData && (

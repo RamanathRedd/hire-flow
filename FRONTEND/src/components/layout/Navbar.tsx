@@ -11,10 +11,11 @@ interface NavProps {
   leftTitle: string;
   rightText: Button | string;
   classString?: string;
+  headerClassName?: string;
 }
 
 const Navbar = (props: NavProps) => {
-  const { leftTitle, rightText, classString } = props;
+  const { leftTitle, rightText, classString, headerClassName } = props;
   const navigate = useNavigate();
 
   const onButtonClick = () => {
@@ -26,7 +27,9 @@ const Navbar = (props: NavProps) => {
   };
 
   return (
-    <header className="nav-header">
+    <header
+      className={`nav-header${headerClassName ? ` ${headerClassName}` : ""}`}
+    >
       <h1 className="nav-title">{leftTitle}</h1>
 
       {typeof rightText === "object" && rightText ? (
