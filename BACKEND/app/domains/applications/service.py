@@ -67,6 +67,8 @@ def create_application(
         **application.model_dump(), candidate_id=current_user["id"]
     )
 
+    db_application.stage = "Screened"
+
     db.add(db_application)
     db.flush()
 
@@ -74,6 +76,16 @@ def create_application(
         application_id=db_application.id,
         from_stage=None,
         to_stage=application.stage,
+        notes=application.notes or None,
+    )
+
+    db.add(history_entry)
+    db.flush()
+
+    history_entry = StageHistory(
+        application_id=db_application.id,
+        from_stage="Applied",
+        to_stage="Screened",
         notes=application.notes or None,
     )
 
