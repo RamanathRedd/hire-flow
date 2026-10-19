@@ -22,7 +22,6 @@ class CandidateFilters(BaseModel):
 
 class CandidateUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=3, max_length=100)
-    email: EmailStr | None = None
     phone: str | None = Field(default=None, min_length=10, max_length=15)
     resume_url: HttpUrl | None = None
     linkedin_url: HttpUrl | None = None

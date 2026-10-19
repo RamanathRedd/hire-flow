@@ -7,6 +7,7 @@ from core.exceptions import (
     MinGreaterThanMax,
     PhoneAlreadyExistsError,
     ResumeAlreadyExistsError,
+    UnauthorizedError,
 )
 from domains.applications.model import Application
 from domains.candidates.model import Candidate
@@ -17,7 +18,7 @@ from domains.candidates.schemas import (
 )
 from domains.jobs.model import Job
 from sqlalchemy import and_, func, or_, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, defer
 
 
 def create_candidate(db: Session, candidate: CandidateCreate) -> None:
@@ -44,7 +45,12 @@ def create_candidate(db: Session, candidate: CandidateCreate) -> None:
     db.commit()
 
 
-def get_candidates(db: Session, candidate_filters: CandidateFilters) -> list:
+def get_candidates(
+    db: Session, candidate_filters: CandidateFilters, current_user: dict
+) -> list:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
     query = select(Candidate)
 
     if (
@@ -77,7 +83,10 @@ def get_candidates(db: Session, candidate_filters: CandidateFilters) -> list:
     return db.scalars(query.order_by(Candidate.created_at.asc())).all()
 
 
-def search_candidates(db: Session, search_data: str):
+def search_candidates(db: Session, search_data: str, current_user: dict):
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
     query = select(Candidate).where(
         Candidate.name.ilike(f"%{search_data}%")
         | Candidate.current_title.ilike(f"%{search_data}%")
@@ -88,22 +97,27 @@ def search_candidates(db: Session, search_data: str):
     return response
 
 
-def get_candidate_details(db: Session, candidate_id: int) -> dict | None:
-    candidate = db.scalar(select(Candidate).where(Candidate.id == candidate_id))
+def get_candidate_details(db: Session, current_user: dict) -> dict | None:
+    if not current_user["role"]:
+        raise UnauthorizedError
+
+    candidate = db.scalar(select(Candidate).where(Candidate.id == current_user["id"]))
 
     if not candidate:
         raise CandidateNotExistsError
 
     # Get all candidate columns
     candidate_data = {
-        col.name: getattr(candidate, col.name) for col in candidate.__table__.columns
+        col.name: getattr(candidate, col.name)
+        for col in candidate.__table__.columns
+        if col.name != "password"
     }
 
     # Get applications with related jobs
     applications_data = db.execute(
         select(Application, Job)
         .join(Job, Application.job_id == Job.id)
-        .where(Application.candidate_id == candidate_id)
+        .where(Application.candidate_id == current_user["id"])
     ).all()
 
     # Process applications and compute summary
@@ -151,8 +165,11 @@ def get_candidate_details(db: Session, candidate_id: int) -> dict | None:
 
 
 def update_candidate(
-    db: Session, candidate_id: int, update_data: CandidateUpdate
+    db: Session, candidate_id: int, update_data: CandidateUpdate, current_user: dict
 ) -> None:
+    if not current_user["role"]:
+        raise UnauthorizedError
+
     candidate = db.scalar(select(Candidate).where(Candidate.id == candidate_id))
 
     if not candidate:
@@ -163,18 +180,6 @@ def update_candidate(
 
     if not payload:
         return
-
-    # Check for duplicate email
-    if (
-        "email" in payload
-        and payload["email"] != candidate.email
-        and db.scalar(
-            select(Candidate).where(
-                and_(Candidate.id != candidate_id, Candidate.email == payload["email"])
-            )
-        )
-    ):
-        raise EmailAlreadyExistsError
 
     # Check for duplicate phone
     if (

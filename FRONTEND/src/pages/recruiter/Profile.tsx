@@ -8,6 +8,7 @@ import {
   useUpdateRecruiterDetails,
 } from "../../hooks/useRecruiters";
 import type { RecruiterUpdate } from "../../types/recruiter";
+import { useQueryClient } from "@tanstack/react-query";
 
 const inputFieldDetails = [
   {
@@ -52,6 +53,7 @@ const Profile = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [recruiterDraft, setRecruiterDraft] = useState<RecruiterUpdate>({});
   const updateRecruiterDetailsMutation = useUpdateRecruiterDetails();
+  const queryClient = useQueryClient();
 
   const onClickEditButton = () => {
     if (isEditable) {
@@ -87,6 +89,7 @@ const Profile = () => {
       },
       {
         onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["recruiterDetails"] });
           setIsEditable(false);
           setIsModalOpen(false);
         },
@@ -122,6 +125,7 @@ const Profile = () => {
       />
       {userData && (
         <ProfileForm
+          profileType="recruiter"
           inputFields={profileInputFields}
           userData={userData}
           isEditable={isEditable}

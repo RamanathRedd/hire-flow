@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   getInterviewers,
   getRecruiterDetails,
@@ -18,10 +18,8 @@ export const useGetRecruiterDetails = () =>
     queryFn: getRecruiterDetails,
   });
 
-export const useUpdateRecruiterDetails = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+export const useUpdateRecruiterDetails = () =>
+  useMutation({
     mutationFn: ({
       recruiter_id,
       recruiter_details,
@@ -29,7 +27,4 @@ export const useUpdateRecruiterDetails = () => {
       recruiter_id: number;
       recruiter_details: RecruiterUpdate;
     }) => updateRecruiterDetails(recruiter_id, recruiter_details),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["recruiterDetails"] }),
   });
-};

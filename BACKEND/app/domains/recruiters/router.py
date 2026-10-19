@@ -2,7 +2,6 @@ from core.security import CurrentUser
 from core.database import get_db
 from core.exceptions import (
     ActiveJobExistsError,
-    EmailAlreadyExistsError,
     PhoneAlreadyExistsError,
     RecruiterNotExistsError,
     UnauthorizedError,
@@ -113,12 +112,6 @@ def update_recruiter(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Recruiter not found"
         )
-
-    except EmailAlreadyExistsError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Email already exists"
-        )
-
     except PhoneAlreadyExistsError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
