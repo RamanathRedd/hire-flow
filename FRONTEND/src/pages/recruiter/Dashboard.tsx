@@ -90,7 +90,7 @@ const Dashboard = () => {
   };
 
   const {
-    data: departments,
+    data: departments = [],
     isPending: departmentsLoading,
     isError: departmentsError,
   } = useDepartments();
