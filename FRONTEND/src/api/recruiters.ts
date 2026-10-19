@@ -1,12 +1,7 @@
 import axios from "axios";
+import type { RecruiterUpdate } from "../types/recruiter";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-export interface RecruiterUpdate {
-  name?: string;
-  phone?: string;
-  department?: string;
-}
 
 export const getInterviewers = async () => {
   const token = sessionStorage.getItem("access_token");

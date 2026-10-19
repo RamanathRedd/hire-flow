@@ -2,7 +2,12 @@ import { useState } from "react";
 import Navbar from "../../components/layout/Navbar";
 import ProfileForm from "../../components/profile/ProfileForm";
 import Modal from "../../components/ui/Modal";
-import { useGetRecruiterDetails } from "../../hooks/useRecruiters";
+import { useDepartments } from "../../hooks/useReferenceData";
+import {
+  useGetRecruiterDetails,
+  useUpdateRecruiterDetails,
+} from "../../hooks/useRecruiters";
+import type { RecruiterUpdate } from "../../types/recruiter";
 
 const inputFieldDetails = [
   {
@@ -27,8 +32,7 @@ const inputFieldDetails = [
     required: true,
   },
   {
-    type: "text",
-    placeHolder: "Engineering",
+    type: "select",
     name: "Department",
     key: "department",
     required: true,
@@ -36,6 +40,7 @@ const inputFieldDetails = [
 ];
 
 interface UserDetails {
+  id: number;
   name: string;
   email: string;
   phone: string;
@@ -45,6 +50,8 @@ interface UserDetails {
 const Profile = () => {
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [recruiterDraft, setRecruiterDraft] = useState<RecruiterUpdate>({});
+  const updateRecruiterDetailsMutation = useUpdateRecruiterDetails();
 
   const onClickEditButton = () => {
     if (isEditable) {
@@ -53,11 +60,6 @@ const Profile = () => {
     }
 
     setIsEditable(true);
-  };
-
-  const onConfirm = () => {
-    setIsEditable(false);
-    setIsModalOpen(false);
   };
 
   const onCancel = () => {
@@ -73,6 +75,44 @@ const Profile = () => {
   const { data: userData = {} as UserDetails, isError: userDataError } =
     useGetRecruiterDetails();
 
+  const onConfirm = () => {
+    if (!userData.id || updateRecruiterDetailsMutation.isPending) {
+      return;
+    }
+
+    updateRecruiterDetailsMutation.mutate(
+      {
+        recruiter_id: userData.id,
+        recruiter_details: recruiterDraft,
+      },
+      {
+        onSuccess: () => {
+          setIsEditable(false);
+          setIsModalOpen(false);
+        },
+      },
+    );
+  };
+
+  const {
+    data: departments = [],
+    isPending: departmentsLoading,
+    isError: departmentsError,
+  } = useDepartments();
+
+  const profileInputFields = inputFieldDetails.map((inputField) =>
+    inputField.key === "department"
+      ? {
+          ...inputField,
+          options: departments.map((department) => department.name),
+          disabled: departmentsLoading || departmentsError,
+          error: departmentsError
+            ? "Failed to load departments. Please try again."
+            : undefined,
+        }
+      : inputField,
+  );
+
   return (
     <>
       <Navbar
@@ -82,14 +122,20 @@ const Profile = () => {
       />
       {userData && (
         <ProfileForm
-          inputFields={inputFieldDetails}
+          inputFields={profileInputFields}
           userData={userData}
           isEditable={isEditable}
+          onDetailsChange={setRecruiterDraft}
         />
       )}
       {userDataError && (
         <span id="user-data-load-error" role="alert">
           Failed to load user data. Please try again.
+        </span>
+      )}
+      {updateRecruiterDetailsMutation.isError && (
+        <span id="profile-update-error" role="alert">
+          {updateRecruiterDetailsMutation.error.message}
         </span>
       )}
 

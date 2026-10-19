@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 
 interface inputField {
   type: string;
-  placeHolder: string;
+  placeHolder?: string;
   name: string;
   key: string;
   required: boolean;
+  options?: string[];
+  disabled?: boolean;
+  error?: string;
 }
 
 interface UserDetails {
@@ -21,27 +24,42 @@ interface UserDetails {
   skills?: string[];
 }
 
+interface ProfileDetails {
+  name: string;
+  phone: string;
+  department: string;
+}
+
 interface ProfileFormProps {
   inputFields: inputField[];
   userData: UserDetails;
   isEditable: boolean;
+  onDetailsChange?: (details: ProfileDetails) => void;
 }
 
 const ProfileForm = (props: ProfileFormProps) => {
-  const { inputFields, userData, isEditable } = props;
+  const { inputFields, userData, isEditable, onDetailsChange } = props;
   const [draftUserDetails, setDraftUserDetails] =
     useState<UserDetails>(userData);
 
   useEffect(() => {
     setDraftUserDetails(userData);
-  });
+  }, [userData]);
 
-  const onFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFieldChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
-    setDraftUserDetails((prev) => ({
-      ...prev,
+    const updatedDetails = {
+      ...draftUserDetails,
       [name]: value,
-    }));
+    };
+    setDraftUserDetails(updatedDetails);
+    onDetailsChange?.({
+      name: updatedDetails.name,
+      phone: updatedDetails.phone,
+      department: updatedDetails.department ?? "",
+    });
   };
 
   return (
@@ -70,20 +88,50 @@ const ProfileForm = (props: ProfileFormProps) => {
           );
         }
 
+        const value = String(
+          draftUserDetails[inputField.key as keyof UserDetails] ?? "",
+        );
+        const fieldId = `profile-${inputField.key}`;
+
         return (
           <div key={inputField.key} className="profile-form-field">
-            <label className="profile-form-label">{inputField.name}</label>
-            <input
-              className="profile-form-input"
-              id={inputField.key}
-              type={inputField.type}
-              name={inputField.key}
-              placeholder={inputField.placeHolder}
-              value={draftUserDetails[inputField.key as keyof UserDetails]}
-              onChange={onFieldChange}
-              readOnly={inputField.type != "email" ? !isEditable : true}
-              required={inputField.required}
-            />
+            <label className="profile-form-label" htmlFor={fieldId}>
+              {inputField.name}
+            </label>
+            {inputField.type === "select" ? (
+              <>
+                <select
+                  className="profile-form-input"
+                  id={fieldId}
+                  name={inputField.key}
+                  value={value}
+                  onChange={onFieldChange}
+                  disabled={!isEditable || inputField.disabled}
+                  required={inputField.required}
+                >
+                  {inputField.options?.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+                {inputField.error && (
+                  <span role="alert">{inputField.error}</span>
+                )}
+              </>
+            ) : (
+              <input
+                className="profile-form-input"
+                id={fieldId}
+                type={inputField.type}
+                name={inputField.key}
+                placeholder={inputField.placeHolder}
+                value={value}
+                onChange={onFieldChange}
+                readOnly={inputField.type !== "email" ? !isEditable : true}
+                required={inputField.required}
+              />
+            )}
           </div>
         );
       })}
