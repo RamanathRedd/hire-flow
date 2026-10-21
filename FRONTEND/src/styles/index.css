@@ -584,6 +584,153 @@ body {
 	color: #edf3ff;
 }
 
+.recruiter-application-table-wrap {
+	margin: 0 42px;
+	border: 1px solid rgba(133, 151, 190, 0.2);
+	border-radius: 12px;
+	background: rgba(12, 18, 29, 0.9);
+	overflow: hidden;
+}
+
+.recruiter-application-table {
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	color: #edf3ff;
+}
+
+.application-column-candidate {
+	width: 34%;
+}
+
+.application-column-stage {
+	width: 18%;
+}
+
+.application-column-applied {
+	width: 22%;
+}
+
+.application-column-duration {
+	width: 15%;
+}
+
+.application-column-action {
+	width: 11%;
+}
+
+.application-column-centered {
+	text-align: center !important;
+}
+
+.recruiter-application-table th,
+.recruiter-application-table td {
+	padding: 12px 18px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	text-align: left;
+	vertical-align: middle;
+}
+
+.recruiter-application-table th {
+	background: rgba(255, 255, 255, 0.02);
+	color: #a7b5d1;
+	font-size: 0.74rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+}
+
+.recruiter-application-table tbody td {
+	color: #dce5f4;
+	font-size: 0.86rem;
+	line-height: 1.35;
+}
+
+.application-empty-state {
+	padding: 24px 18px !important;
+	color: #9aa9c7 !important;
+	text-align: center !important;
+}
+
+.recruiter-application-table tbody tr:hover {
+	background: rgba(255, 255, 255, 0.02);
+}
+
+.candidate-name {
+	font-size: 0.96rem;
+	font-weight: 600;
+	color: #f0f5ff;
+}
+
+.stage-badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 6px 10px;
+	border-radius: 999px;
+	border: 1px solid transparent;
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+}
+
+.stage-applied {
+	background: rgba(96, 165, 250, 0.14);
+	border-color: rgba(96, 165, 250, 0.35);
+	color: #96d0ff;
+}
+
+.stage-screened {
+	background: rgba(74, 222, 128, 0.14);
+	border-color: rgba(74, 222, 128, 0.32);
+	color: #7be0a0;
+}
+
+.stage-interview-r1,
+.stage-interview-r2,
+.stage-hr-round {
+	background: rgba(250, 204, 21, 0.12);
+	border-color: rgba(250, 204, 21, 0.3);
+	color: #f5d76b;
+}
+
+.stage-offer {
+	background: rgba(168, 85, 247, 0.15);
+	border-color: rgba(168, 85, 247, 0.32);
+	color: #d8b0ff;
+}
+
+.stage-hired {
+	background: rgba(45, 212, 191, 0.14);
+	border-color: rgba(45, 212, 191, 0.32);
+	color: #7fe7d8;
+}
+
+.stage-rejected {
+	background: rgba(248, 113, 113, 0.12);
+	border-color: rgba(248, 113, 113, 0.32);
+	color: #f7a5a5;
+}
+
+.next-step-btn,
+.menu-btn {
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+	font: inherit;
+}
+
+.next-step-btn {
+	color: #dfe8ff;
+	padding: 0;
+	font-size: 0.84rem;
+}
+
+.menu-btn {
+	color: #c8d2eb;
+	font-size: 1.4rem;
+	line-height: 1;
+}
+
 .jobs-table th,
 .jobs-table td {
 	padding: 14px 10px 13px;
@@ -1154,8 +1301,8 @@ body {
 }
 
 .recruiter-applications-job-bar select {
-	flex: 0 1 414px;
-	width: min(414px, 100%);
+	flex: 0 1 200px;
+	width: min(200px, 100%);
 	min-width: 180px;
 	height: 44px;
 	padding: 0 14px;
@@ -1192,6 +1339,62 @@ body {
 	stroke-width: 1.8;
 }
 
+.recruiter-application-filters {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 8px;
+	margin: 0 42px 14px;
+}
+
+.recruiter-application-filter {
+	display: flex;
+	flex: 0 0 124px;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+	padding: 7px 10px 6px;
+	border: 1px solid #26313d;
+	border-radius: 6px;
+	background: #101720;
+	color: #aab6c8;
+}
+
+.recruiter-application-filter > span {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 9px;
+	line-height: 1;
+}
+
+.recruiter-application-filter svg {
+	width: 12px;
+	height: 12px;
+	fill: none;
+	stroke: currentColor;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	stroke-width: 1.2;
+}
+
+.recruiter-application-filter select {
+	width: 100%;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	background: transparent;
+	color: #e5eaf2;
+	font-size: 10px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.recruiter-application-filter option {
+	background: #101720;
+	color: #e5eaf2;
+}
+
 .recruiter-application-stats {
 	display: grid;
 	grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -1209,6 +1412,7 @@ body {
 	padding: 14px 16px;
 	border: 1px solid transparent;
 	border-radius: 9px;
+	cursor: pointer;
 }
 
 .recruiter-application-stat-value,
@@ -1519,6 +1723,16 @@ input {
 		margin-left: 16px;
 	}
 
+	.recruiter-application-table-wrap {
+		margin-right: 16px;
+		margin-left: 16px;
+		overflow-x: auto;
+	}
+
+	.recruiter-application-table {
+		min-width: 620px;
+	}
+
 	.recruiter-applications-job-bar {
 		align-items: stretch;
 		flex-direction: column;
@@ -1538,6 +1752,11 @@ input {
 		gap: 8px;
 		margin-left: 0;
 		white-space: normal;
+	}
+
+	.recruiter-application-filters {
+		margin-right: 16px;
+		margin-left: 16px;
 	}
 
 	.application-list {

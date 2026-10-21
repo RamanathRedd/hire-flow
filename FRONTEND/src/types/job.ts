@@ -36,3 +36,12 @@ export interface JobUpdate {
   description: string | null;
   requirements: string | null;
 }
+
+export interface JobApplicationFilters {
+  this_week: boolean;
+  needs_attention: boolean;
+  interview_round: boolean;
+  offer_stage: boolean;
+  stage_filter: string | null;
+  date_applied_filter: number | null;
+}

@@ -1,4 +1,4 @@
-from core.constants import JOB_TYPE, LOCATIONS_LITERAL, STATUS
+from core.constants import JOB_TYPE, LOCATIONS_LITERAL, STAGE_LITERAL, STATUS
 from pydantic import BaseModel, Field
 
 
@@ -26,3 +26,12 @@ class JobUpdate(BaseModel):
     openings_count: int | None = Field(default=None, gt=0)
     job_type: JOB_TYPE | None = None
     requirements: str | None = Field(default=None, min_length=5, max_length=1000)
+
+
+class JobApplicationFilters(BaseModel):
+    this_week: bool = Field(default=False)
+    needs_attention: bool = Field(default=False)
+    interview_round: bool = Field(default=False)
+    offer_stage: bool = Field(default=False)
+    stage_filter: STAGE_LITERAL | None = None
+    date_applied_filter: int | None = None

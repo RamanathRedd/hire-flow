@@ -1,8 +1,14 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import type { JobCreate, JobFilter, JobUpdate } from "../types/job";
+import type {
+  JobApplicationFilters,
+  JobCreate,
+  JobFilter,
+  JobUpdate,
+} from "../types/job";
 import {
   createJob,
   deleteJob,
+  getJobApplications,
   getJobs,
   updateJob,
   updateJobStatus,
@@ -44,4 +50,20 @@ export const useUpdateJobStatus = () =>
   useMutation({
     mutationFn: ({ job_id, status }: { job_id: number; status: string }) =>
       updateJobStatus(job_id, status),
+  });
+
+export const useGetJobApplications = (
+  job_id: number | null,
+  application_filters: JobApplicationFilters,
+) =>
+  useQuery({
+    queryKey: ["jobApplications", job_id, application_filters],
+    queryFn: () => {
+      if (job_id === null) {
+        throw new Error("A job must be selected to load applications.");
+      }
+
+      return getJobApplications(job_id, application_filters);
+    },
+    enabled: job_id !== null,
   });

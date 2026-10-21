@@ -1,5 +1,10 @@
 import axios from "axios";
-import type { JobCreate, JobFilter, JobUpdate } from "../types/job";
+import type {
+  JobApplicationFilters,
+  JobCreate,
+  JobFilter,
+  JobUpdate,
+} from "../types/job";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -87,6 +92,29 @@ export const updateJobStatus = async (job_id: number, status: string) => {
           Authorization: `Bearer ${token}`,
         },
         params: { new_status: status },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    // throw new Error(getErrorMessage(error));
+  }
+};
+
+export const getJobApplications = async (
+  job_id: number,
+  application_filters: JobApplicationFilters,
+) => {
+  if (!job_id) return;
+  const token = sessionStorage.getItem("access_token");
+
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/jobs/${job_id}/applications/filters`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: application_filters,
       },
     );
     return response.data;
