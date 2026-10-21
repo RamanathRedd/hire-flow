@@ -10,6 +10,7 @@ import type { Job } from "../../types/job";
 import { useDepartments, useLocations } from "../../hooks/useReferenceData";
 import { useQueryClient } from "@tanstack/react-query";
 import Modal from "../../components/ui/Modal";
+import EmptyPage from "../../components/layout/EmptyPage";
 
 const Dashboard = () => {
   const button = { text: "+ New job", navigation: "/jobForm" };
@@ -200,169 +201,187 @@ const Dashboard = () => {
 
   return (
     <>
-      <section>
+      <section className="jobs-dashboard">
         <Navbar
           leftTitle="Jobs"
           rightText={button}
           classString="nav-action-button"
         />
-        <div className="filter-toolbar">
-          <select
-            className="filter-select"
-            value={selectedDepartment ?? "department-placeholder"}
-            onChange={(event) => setSelectedDepartment(event.target.value)}
-            disabled={departmentsLoading || departmentsError}
-          >
-            <option value="department-placeholder" disabled hidden>
-              Department
-            </option>
-            {departments &&
-              departments.map((department) => (
-                <option key={department.id} value={department.name}>
-                  {department.name}
+        {jobs.length === 0 &&
+        !selectedDepartment &&
+        !selectedLocation &&
+        !selectedStatus ? (
+          <EmptyPage
+            icon="M9 6V4.75A1.75 1.75 0 0 1 10.75 3h2.5A1.75 1.75 0 0 1 15 4.75V6M4 8.5A2.5 2.5 0 0 1 6.5 6h11A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5zM4 11h16M10 11v2h4v-2"
+            title="No jobs yet"
+            subTitle="Create your first job posting to start hiring."
+            button={button}
+          />
+        ) : (
+          <>
+            <div className="filter-toolbar">
+              <select
+                className="filter-select"
+                value={selectedDepartment ?? "department-placeholder"}
+                onChange={(event) => setSelectedDepartment(event.target.value)}
+                disabled={departmentsLoading || departmentsError}
+              >
+                <option value="department-placeholder" disabled hidden>
+                  Department
                 </option>
-              ))}
-          </select>
-          {departmentsError && (
-            <span id="department-load-error" role="alert">
-              Failed to load departments. Please try again.
-            </span>
-          )}
-          <select
-            className="filter-select"
-            value={selectedStatus ?? "status-placeholder"}
-            onChange={(event) => setSelectedStatus(event.target.value)}
-          >
-            <option value="status-placeholder" disabled hidden>
-              Status
-            </option>
-            {status.map((item) => (
-              <option key={item.id} value={item.name}>
-                {item.name}
-              </option>
-            ))}
-          </select>
-          <select
-            className="filter-select"
-            value={selectedLocation ?? "location-placeholder"}
-            onChange={(event) => setSelectedLocation(event.target.value)}
-            disabled={locationsLoading || locationsError}
-          >
-            <option value="location-placeholder" disabled hidden>
-              Location
-            </option>
-            {locations &&
-              locations.map((location: { id: number; name: string }) => (
-                <option key={location.id} value={location.name}>
-                  {location.name}
-                </option>
-              ))}
-          </select>
-          {locationsError && (
-            <span id="location-load-error" role="alert">
-              Failed to load locations. Please try again.
-            </span>
-          )}
-          <button
-            type="button"
-            className="filter-button"
-            onClick={clearFilters}
-          >
-            Clear Filters
-          </button>
-        </div>
-        <div className="content-panel">
-          <table className="jobs-table">
-            <thead>
-              <tr>
-                <th scope="col">
-                  <button
-                    className="table-sort-button"
-                    type="button"
-                    // onClick={"sortDirection"}
-                  >
-                    Title{" "}
-                    <span aria-hidden="true">
-                      {"ascending" === "ascending" ? "↑" : "↓"}
-                    </span>
-                  </button>
-                </th>
-                <th scope="col">Department</th>
-                <th scope="col">Location</th>
-                <th scope="col">Status</th>
-                <th scope="col">Applicants</th>
-                <th scope="col">Openings</th>
-              </tr>
-            </thead>
-            <tbody>
-              {jobs.length > 0 ? (
-                jobs.map((job: Job) => (
-                  <tr key={job.id}>
-                    <td>{job.title}</td>
-                    <td>{job.department}</td>
-                    <td>{job.location}</td>
-                    <td>
-                      <span className={`status-badge ${job.status}`}>
-                        {job.status}
-                      </span>
-                    </td>
-                    <td>{job.applicant_count}</td>
-                    <td>{job.openings_count - job.filled_count}</td>
-                    <td className="job-actions-cell">
-                      <button
-                        className="job-actions-trigger"
-                        type="button"
-                        aria-label={`Actions for ${job.title}`}
-                        aria-haspopup="menu"
-                        aria-expanded={openJobMenu?.id === job.id}
-                        onClick={() =>
-                          setOpenJobMenu((currentJob) =>
-                            currentJob?.id === job.id
-                              ? null
-                              : { id: job.id, title: job.title },
-                          )
-                        }
-                      >
-                        <span aria-hidden="true">⋮</span>
-                      </button>
-                      {openJobMenu && openJobMenu.id === job.id && (
-                        <div className="job-actions-menu" role="menu">
-                          <button
-                            className="job-actions-menu-item"
-                            type="button"
-                            role="menuitem"
-                            aria-controls="side-bar-navigation"
-                            aria-expanded={isDrawerOpen}
-                            onClick={() => {
-                              setEditJob(job);
-                              setOriginalEditJob(job);
-                              setIsDrawerOpen(true);
-                            }}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            className="job-actions-menu-item job-actions-delete"
-                            type="button"
-                            role="menuitem"
-                            onClick={deleteJob}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6}>No jobs found</td>
-                </tr>
+                {departments &&
+                  departments.map((department) => (
+                    <option key={department.id} value={department.name}>
+                      {department.name}
+                    </option>
+                  ))}
+              </select>
+              {departmentsError && (
+                <span id="department-load-error" role="alert">
+                  Failed to load departments. Please try again.
+                </span>
               )}
-            </tbody>
-          </table>
-        </div>
+              <select
+                className="filter-select"
+                value={selectedStatus ?? "status-placeholder"}
+                onChange={(event) => setSelectedStatus(event.target.value)}
+              >
+                <option value="status-placeholder" disabled hidden>
+                  Status
+                </option>
+                {status.map((item) => (
+                  <option key={item.id} value={item.name}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+              <select
+                className="filter-select"
+                value={selectedLocation ?? "location-placeholder"}
+                onChange={(event) => setSelectedLocation(event.target.value)}
+                disabled={locationsLoading || locationsError}
+              >
+                <option value="location-placeholder" disabled hidden>
+                  Location
+                </option>
+                {locations &&
+                  locations.map((location: { id: number; name: string }) => (
+                    <option key={location.id} value={location.name}>
+                      {location.name}
+                    </option>
+                  ))}
+              </select>
+              {locationsError && (
+                <span id="location-load-error" role="alert">
+                  Failed to load locations. Please try again.
+                </span>
+              )}
+              <button
+                type="button"
+                className="filter-button"
+                onClick={clearFilters}
+              >
+                Clear Filters
+              </button>
+            </div>
+            {jobs.length === 0 ? (
+              <EmptyPage
+                icon="M4 5h16l-6.5 7.5v5l-3-1.5v-3.5L4 5zM4 4l16 16"
+                title="No jobs match these filters"
+                subTitle="Try removing a filter to see more jobs."
+                button={{ text: "Clear filters", onClick: clearFilters }}
+              />
+            ) : (
+              <div className="content-panel">
+                <table className="jobs-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">
+                        <button
+                          className="table-sort-button"
+                          type="button"
+                          // onClick={"sortDirection"}
+                        >
+                          Title{" "}
+                          <span aria-hidden="true">
+                            {"ascending" === "ascending" ? "↑" : "↓"}
+                          </span>
+                        </button>
+                      </th>
+                      <th scope="col">Department</th>
+                      <th scope="col">Location</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Applicants</th>
+                      <th scope="col">Openings</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {jobs.map((job: Job) => (
+                      <tr key={job.id}>
+                        <td>{job.title}</td>
+                        <td>{job.department}</td>
+                        <td>{job.location}</td>
+                        <td>
+                          <span className={`status-badge ${job.status}`}>
+                            {job.status}
+                          </span>
+                        </td>
+                        <td>{job.applicant_count}</td>
+                        <td>{job.openings_count - job.filled_count}</td>
+                        <td className="job-actions-cell">
+                          <button
+                            className="job-actions-trigger"
+                            type="button"
+                            aria-label={`Actions for ${job.title}`}
+                            aria-haspopup="menu"
+                            aria-expanded={openJobMenu?.id === job.id}
+                            onClick={() =>
+                              setOpenJobMenu((currentJob) =>
+                                currentJob?.id === job.id
+                                  ? null
+                                  : { id: job.id, title: job.title },
+                              )
+                            }
+                          >
+                            <span aria-hidden="true">⋮</span>
+                          </button>
+                          {openJobMenu && openJobMenu.id === job.id && (
+                            <div className="job-actions-menu" role="menu">
+                              <button
+                                className="job-actions-menu-item"
+                                type="button"
+                                role="menuitem"
+                                aria-controls="side-bar-navigation"
+                                aria-expanded={isDrawerOpen}
+                                onClick={() => {
+                                  setEditJob(job);
+                                  setOriginalEditJob(job);
+                                  setIsDrawerOpen(true);
+                                }}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                className="job-actions-menu-item job-actions-delete"
+                                type="button"
+                                role="menuitem"
+                                onClick={deleteJob}
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
+        )}
       </section>
+
       {isModalOpen && (
         <Modal
           title={modalData?.title ?? ""}

@@ -28,7 +28,7 @@ const router = createBrowserRouter(
         <Route path="/interviews" element={<Interviews />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/profile" element={<RecruiterProfile />} />
-        <Route path="/browseJobs" element={<BrowseJobs />} />
+        <Route path="/browse-jobs" element={<BrowseJobs />} />
         <Route path="/my-applications" element={<MyApplications />} />
         <Route path="/candidate-profile" element={<CandidateProfile />} />
       </Route>

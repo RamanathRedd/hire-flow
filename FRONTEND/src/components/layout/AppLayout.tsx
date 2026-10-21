@@ -10,7 +10,7 @@ const RecruiterNavItems = [
 ];
 
 const CandidateNavItems = [
-  { to: "/browseJobs", title: "BrowseJobs" },
+  { to: "/browse-jobs", title: "BrowseJobs" },
   { to: "/my-applications", title: "My Applications" },
   { to: "/candidate-profile", title: "Profile" },
 ];

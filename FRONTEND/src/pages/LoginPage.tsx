@@ -41,7 +41,7 @@ const LoginPage = () => {
           sessionStorage.setItem("access_token", result.access_token);
           sessionStorage.setItem("role", result.role);
           resetForm();
-          navigate(isAdmin ? "/jobs" : "/browseJobs");
+          navigate(isAdmin ? "/jobs" : "/browse-jobs");
         },
       },
     );
