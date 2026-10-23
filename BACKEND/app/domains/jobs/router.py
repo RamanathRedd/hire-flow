@@ -8,7 +8,7 @@ from core.exceptions import (
     UnauthorizedError,
 )
 from domains.jobs import service
-from domains.jobs.schemas import JobCreate, JobFilters, JobUpdate
+from domains.jobs.schemas import JobApplicationFilters, JobCreate, JobFilters, JobUpdate
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from starlette import status
@@ -151,11 +151,36 @@ def update_job_status(
 
 @jobs_router.get("/{job_id}/applications", status_code=status.HTTP_200_OK)
 def get_job_applications(
-    job_id: int, current_user: CurrentUser, db: Session = Depends(get_db)
+    job_id: int,
+    current_user: CurrentUser,
+    db: Session = Depends(get_db),
 ):
     try:
         response = service.get_job_applications(db, job_id, current_user)
         return {"data": response}
+    except UnauthorizedError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Only recruiters can view job applications",
+        )
+    except JobNotExistsError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Job not found"
+        )
+
+
+@jobs_router.get("/{job_id}/applications/filters", status_code=status.HTTP_200_OK)
+def get_job_filtered_applications(
+    job_id: int,
+    current_user: CurrentUser,
+    applications_filters: JobApplicationFilters = Query(),
+    db: Session = Depends(get_db),
+):
+    try:
+        response = service.get_job_filtered_applications(
+            db, job_id, applications_filters, current_user
+        )
+        return response
     except UnauthorizedError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

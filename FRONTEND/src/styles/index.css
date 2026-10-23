@@ -494,6 +494,64 @@ body {
 	flex-direction: column;
 }
 
+.recruiter-applications-page {
+	display: flex;
+	height: 100vh;
+	flex-direction: column;
+}
+
+.recruiter-applications-page.is-empty > .empty-page {
+	margin: 0;
+	border: 0;
+	background: transparent;
+}
+
+.recruiter-applications-page.is-no-applicants > .empty-page {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.recruiter-interviews-page.is-empty {
+	display: flex;
+	height: 100vh;
+	min-height: 0;
+	flex-direction: column;
+}
+
+.recruiter-interviews-page.is-empty > .empty-page {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.recruiter-interviews-page.is-no-upcoming {
+	display: flex;
+	height: 100vh;
+	min-height: 0;
+	flex-direction: column;
+}
+
+.recruiter-interviews-page.is-no-upcoming > .empty-page {
+	margin: 0 32px;
+}
+
+.recruiter-interviews-page.is-no-filtered {
+	display: flex;
+	height: 100vh;
+	min-height: 0;
+	flex-direction: column;
+}
+
+.interviews-results.is-empty {
+	display: flex;
+	flex: 1;
+	min-height: 0;
+	flex-direction: column;
+}
+
+.interviews-results.is-empty > .empty-page {
+	margin: 0 32px 24px;
+}
+
 .empty-page {
 	display: flex;
 	flex: 1;
@@ -1934,15 +1992,6 @@ input {
 .register-heading {
 	margin-bottom: 18px;
 }
-
-/* .register-heading a {
-	color: #4261ee;
-	text-decoration: none;
-}
-
-.register-heading a:hover {
-	text-decoration: underline;
-} */
 
 .role-switch {
 	display: grid;

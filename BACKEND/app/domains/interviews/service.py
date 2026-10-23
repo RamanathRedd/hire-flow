@@ -209,10 +209,20 @@ def list_upcoming_interviews(
             }
         )
 
+    if not upcoming_interviews:
+        first_upcoming_interview_date = db.scalar(
+            select(Interview.scheduled_at)
+            .where(Interview.status.in_(["Scheduled", "Rescheduled"]))
+            .order_by(Interview.scheduled_at.asc())
+        )
+
     response = {
         "period": f"{now} to {seven_days_later}",
         "total_upcoming": len(upcoming_interviews),
         "interviews": upcoming_interviews,
+        "first_upcoming_interview_date": first_upcoming_interview_date
+        if first_upcoming_interview_date
+        else None,
     }
 
     return response
