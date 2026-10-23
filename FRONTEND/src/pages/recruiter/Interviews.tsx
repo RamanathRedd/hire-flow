@@ -425,80 +425,103 @@ const Interviews = () => {
                   </tr>
                 </thead>
                 {!showNoFilteredInterviews && (
-                <tbody>
-                  {interviews.map((interview: any) => (
-                    <tr key={interview.id}>
-                      <td>{interview.candidate_name}</td>
-                      <td>{interview.job_title}</td>
-                      <td>R{interview.round_number}</td>
-                      <td>{interview.round_type}</td>
-                      <td>{convertTime(interview.scheduled_at)}</td>
-                      <td>{interview.interviewer_name}</td>
-                      <td>
-                        <span
-                          className={`status-badge ${interview.status} interview-badge`}
-                        >
-                          {interview.status}
-                        </span>
-                      </td>
-                      <td className="interview-actions-cell">
-                        <button
-                          className="interview-actions-trigger"
-                          type="button"
-                          aria-label={`Actions for ${interview.candidate_name} - ${interview.job_title}`}
-                          aria-haspopup="menu"
-                          aria-expanded={openInterviewMenu?.id === interview.id}
-                          onClick={() =>
-                            setOpenInterviewMenu((currentInterview: any) =>
-                              currentInterview?.id === interview.id
-                                ? null
-                                : {
-                                    id: interview.id,
-                                    interview_details: `${interview.candidate_name} - ${interview.job_title}`,
-                                  },
-                            )
-                          }
-                        >
-                          <span aria-hidden="true">⋮</span>
-                        </button>
-                        {openInterviewMenu &&
-                          openInterviewMenu.id === interview.id && (
-                            <div className="interview-actions-menu" role="menu">
-                              {["Scheduled", "Rescheduled"].includes(
-                                interview.status,
-                              ) && (
-                                <>
-                                  <button
-                                    className="interview-actions-menu-item"
-                                    type="button"
-                                    role="menuitem"
-                                    aria-controls="side-bar-navigation"
-                                    aria-expanded={isDrawerOpen}
-                                    onClick={() => {
-                                      setEditInterview(interview);
-                                      setMode("Rescheduled");
-                                      //   setOriginalEditJob(job);
-                                      setSideBarTitle("Reschedule Interview");
-                                      setIsDrawerOpen(true);
-                                    }}
-                                  >
-                                    Reschedule
-                                  </button>
-                                  <button
-                                    className="interview-actions-menu-item"
-                                    type="button"
-                                    role="menuitem"
-                                    aria-controls="side-bar-navigation"
-                                    aria-expanded={isDrawerOpen}
-                                    onClick={() => {
-                                      setEditInterview(interview);
-                                      setMode("Cancelled");
-                                      setSideBarTitle("Cancel Interview");
-                                      setIsDrawerOpen(true);
-                                    }}
-                                  >
-                                    Cancel
-                                  </button>
+                  <tbody>
+                    {interviews.map((interview: any) => (
+                      <tr key={interview.id}>
+                        <td>{interview.candidate_name}</td>
+                        <td>{interview.job_title}</td>
+                        <td>R{interview.round_number}</td>
+                        <td>{interview.round_type}</td>
+                        <td>{convertTime(interview.scheduled_at)}</td>
+                        <td>{interview.interviewer_name}</td>
+                        <td>
+                          <span
+                            className={`status-badge ${interview.status} interview-badge`}
+                          >
+                            {interview.status}
+                          </span>
+                        </td>
+                        <td className="interview-actions-cell">
+                          <button
+                            className="interview-actions-trigger"
+                            type="button"
+                            aria-label={`Actions for ${interview.candidate_name} - ${interview.job_title}`}
+                            aria-haspopup="menu"
+                            aria-expanded={
+                              openInterviewMenu?.id === interview.id
+                            }
+                            onClick={() =>
+                              setOpenInterviewMenu((currentInterview: any) =>
+                                currentInterview?.id === interview.id
+                                  ? null
+                                  : {
+                                      id: interview.id,
+                                      interview_details: `${interview.candidate_name} - ${interview.job_title}`,
+                                    },
+                              )
+                            }
+                          >
+                            <span aria-hidden="true">⋮</span>
+                          </button>
+                          {openInterviewMenu &&
+                            openInterviewMenu.id === interview.id && (
+                              <div
+                                className="interview-actions-menu"
+                                role="menu"
+                              >
+                                {["Scheduled", "Rescheduled"].includes(
+                                  interview.status,
+                                ) && (
+                                  <>
+                                    <button
+                                      className="interview-actions-menu-item"
+                                      type="button"
+                                      role="menuitem"
+                                      aria-controls="side-bar-navigation"
+                                      aria-expanded={isDrawerOpen}
+                                      onClick={() => {
+                                        setEditInterview(interview);
+                                        setMode("Rescheduled");
+                                        //   setOriginalEditJob(job);
+                                        setSideBarTitle("Reschedule Interview");
+                                        setIsDrawerOpen(true);
+                                      }}
+                                    >
+                                      Reschedule
+                                    </button>
+                                    <button
+                                      className="interview-actions-menu-item"
+                                      type="button"
+                                      role="menuitem"
+                                      aria-controls="side-bar-navigation"
+                                      aria-expanded={isDrawerOpen}
+                                      onClick={() => {
+                                        setEditInterview(interview);
+                                        setMode("Cancelled");
+                                        setSideBarTitle("Cancel Interview");
+                                        setIsDrawerOpen(true);
+                                      }}
+                                    >
+                                      Cancel
+                                    </button>
+                                    <button
+                                      className="interview-actions-menu-item"
+                                      type="button"
+                                      role="menuitem"
+                                      aria-controls="side-bar-navigation"
+                                      aria-expanded={isDrawerOpen}
+                                      onClick={() => {
+                                        setEditInterview(interview);
+                                        setMode("Completed");
+                                        setSideBarTitle("Submit Feedback");
+                                        setIsDrawerOpen(true);
+                                      }}
+                                    >
+                                      Close
+                                    </button>
+                                  </>
+                                )}
+                                {interview.status == "Completed" && (
                                   <button
                                     className="interview-actions-menu-item"
                                     type="button"
@@ -508,61 +531,43 @@ const Interviews = () => {
                                     onClick={() => {
                                       setEditInterview(interview);
                                       setMode("Completed");
-                                      setSideBarTitle("Submit Feedback");
+                                      setReason(interview.feedback);
+                                      setRating(interview.rating);
+                                      setSideBarTitle("View Feedback");
                                       setIsDrawerOpen(true);
                                     }}
                                   >
-                                    Close
+                                    View Feedback
                                   </button>
-                                </>
-                              )}
-                              {interview.status == "Completed" && (
-                                <button
-                                  className="interview-actions-menu-item"
-                                  type="button"
-                                  role="menuitem"
-                                  aria-controls="side-bar-navigation"
-                                  aria-expanded={isDrawerOpen}
-                                  onClick={() => {
-                                    setEditInterview(interview);
-                                    setMode("Completed");
-                                    setReason(interview.feedback);
-                                    setRating(interview.rating);
-                                    setSideBarTitle("View Feedback");
-                                    setIsDrawerOpen(true);
-                                  }}
-                                >
-                                  View Feedback
-                                </button>
-                              )}
-                              {interview.status == "Cancelled" && (
-                                <button
-                                  className="interview-actions-menu-item"
-                                  type="button"
-                                  role="menuitem"
-                                  aria-controls="side-bar-navigation"
-                                  aria-expanded={isDrawerOpen}
-                                  onClick={() => {
-                                    setEditInterview(interview);
-                                    setMode("Cancelled");
-                                    setSideBarTitle("Cancelled Reason");
-                                    setIsDrawerOpen(true);
-                                  }}
-                                >
-                                  Cancel Reason
-                                </button>
-                              )}
-                            </div>
-                          )}
-                      </td>
-                    </tr>
-                  ))}
-                  {interviewsError && (
-                    <span id="interview-load-error" role="alert">
-                      Failed to load interviews. Please try again.
-                    </span>
-                  )}
-                </tbody>
+                                )}
+                                {interview.status == "Cancelled" && (
+                                  <button
+                                    className="interview-actions-menu-item"
+                                    type="button"
+                                    role="menuitem"
+                                    aria-controls="side-bar-navigation"
+                                    aria-expanded={isDrawerOpen}
+                                    onClick={() => {
+                                      setEditInterview(interview);
+                                      setMode("Cancelled");
+                                      setSideBarTitle("Cancelled Reason");
+                                      setIsDrawerOpen(true);
+                                    }}
+                                  >
+                                    Cancel Reason
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                        </td>
+                      </tr>
+                    ))}
+                    {interviewsError && (
+                      <span id="interview-load-error" role="alert">
+                        Failed to load interviews. Please try again.
+                      </span>
+                    )}
+                  </tbody>
                 )}
               </table>
               {showNoFilteredInterviews && (
