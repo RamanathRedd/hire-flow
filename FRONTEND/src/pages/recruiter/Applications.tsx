@@ -478,7 +478,9 @@ const Applications = () => {
                 <div>
                   <dt>Applied on</dt>
                   <dd>
-                    {convertTime(selectedCandidateApplication.applied_at)}
+                    {selectedCandidateApplication?.applied_at
+                      ? convertTime(selectedCandidateApplication?.applied_at)
+                      : "NA"}
                   </dd>
                 </div>
               </div>
@@ -554,8 +556,8 @@ const Applications = () => {
                   Experience
                 </dt>
                 <dd>
-                  {`${selectedCandidateApplication.experience_years} ${
-                    selectedCandidateApplication.experience_years === 1
+                  {`${selectedCandidateApplication?.experience_years} ${
+                    selectedCandidateApplication?.experience_years === 1
                       ? "year"
                       : "years"
                   }`}
@@ -570,7 +572,7 @@ const Applications = () => {
                 </dt>
                 <dd>
                   <a
-                    href={selectedCandidateApplication.resume_url}
+                    href={selectedCandidateApplication?.resume_url}
                     target="_blank"
                     rel="noreferrer"
                   >
