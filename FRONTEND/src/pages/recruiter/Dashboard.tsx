@@ -54,6 +54,14 @@ const Dashboard = () => {
       editJob.description !== originalEditJob.description ||
       editJob.requirements !== originalEditJob.requirements);
 
+  const showUpdateChanges =
+    hasJobChanges &&
+    editJob.openings_count > 0 &&
+    editJob.description &&
+    editJob.description.length >= 5 &&
+    editJob.requirements &&
+    editJob.requirements.length >= 5;
+
   const [openJobMenu, setOpenJobMenu] = useState<{
     id: number;
     title: string;
@@ -437,7 +445,9 @@ const Dashboard = () => {
         </div>
         <div className="job-edit-form">
           <div className="job-edit-field">
-            <label htmlFor="job-title">Title</label>
+            <label htmlFor="job-title">
+              Title<span className="required-field"> *</span>
+            </label>
             <input
               id="job-title"
               type="text"
@@ -446,7 +456,9 @@ const Dashboard = () => {
             />
           </div>
           <div className="job-edit-field">
-            <label htmlFor="job-department">Department</label>
+            <label htmlFor="job-department">
+              Department<span className="required-field"> *</span>
+            </label>
             <input
               id="job-department"
               type="text"
@@ -455,7 +467,9 @@ const Dashboard = () => {
             />
           </div>
           <div className="job-edit-field">
-            <label htmlFor="job-location">Location</label>
+            <label htmlFor="job-location">
+              Location<span className="required-field"> *</span>
+            </label>
             <select
               id="job-location"
               name="location"
@@ -484,7 +498,9 @@ const Dashboard = () => {
             )}
           </div>
           <div className="job-edit-field">
-            <label htmlFor="job-status">Status</label>
+            <label htmlFor="job-status">
+              Status<span className="required-field"> *</span>
+            </label>
             <select
               id="job-status"
               name="status"
@@ -504,7 +520,9 @@ const Dashboard = () => {
             </select>
           </div>
           <div className="job-edit-field">
-            <label htmlFor="job-type">Job Type</label>
+            <label htmlFor="job-type">
+              Job Type<span className="required-field"> *</span>
+            </label>
             <select
               id="job-type"
               name="jobType"
@@ -526,7 +544,9 @@ const Dashboard = () => {
             </select>
           </div>
           <div className="job-edit-field">
-            <label htmlFor="job-openings_count">Opening Count</label>
+            <label htmlFor="job-openings_count">
+              Opening Count<span className="required-field"> *</span>
+            </label>
             <input
               id="job-openings_count"
               name="openings_count"
@@ -547,7 +567,9 @@ const Dashboard = () => {
             />
           </div>
           <div className="job-edit-field">
-            <label htmlFor="job-description">Description</label>
+            <label htmlFor="job-description">
+              Description<span className="required-field"> *</span>
+            </label>
             <textarea
               id="job-description"
               name="description"
@@ -565,7 +587,9 @@ const Dashboard = () => {
             />
           </div>
           <div className="job-edit-field">
-            <label htmlFor="job-requirements">Requirements</label>
+            <label htmlFor="job-requirements">
+              Requirements<span className="required-field"> *</span>
+            </label>
             <textarea
               id="job-requirements"
               name="requirements"
@@ -594,7 +618,7 @@ const Dashboard = () => {
               className="job-edit-submit"
               type="submit"
               onClick={updateJob}
-              disabled={!hasJobChanges}
+              disabled={!showUpdateChanges}
             >
               Update Job
             </button>
