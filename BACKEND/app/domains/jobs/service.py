@@ -299,6 +299,8 @@ def get_job_filtered_applications(
             "candidate_name": candidate.name,
             "email": candidate.email,
             "experience_years": candidate.experience_years,
+            "phone": candidate.phone,
+            "resume_url": candidate.resume_url,
         }
 
         applications.append(app_data)
@@ -382,6 +384,8 @@ def get_job_filtered_applications(
         "job_id": job_id,
         "job_title": target_job.title,
         "job_status": target_job.status,
+        "job_location": target_job.location,
+        "job_department": target_job.department,
         "total_active": total_active,
         "needs_attention": needs_attention,
         "this_week": this_week,
