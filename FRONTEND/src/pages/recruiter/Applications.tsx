@@ -3,6 +3,7 @@ import Navbar from "../../components/layout/Navbar";
 import { useGetJobApplications, useGetJobs } from "../../hooks/useJobs";
 import type { Job } from "../../types/job";
 import EmptyPage from "../../components/layout/EmptyPage";
+import UpdateApplicationStageModal from "../../components/layout/UpdateApplicationStageModal";
 
 const Applications = () => {
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
@@ -14,6 +15,8 @@ const Applications = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [selectedCandidateApplication, setSelectedCandidateApplication] =
     useState<any | null>(null);
+  const [isUpdateApplicationModalOpen, setIsUpdateApplicationModalOpen] =
+    useState<boolean>(false);
 
   const {
     data: jobs = [],
@@ -437,9 +440,9 @@ const Applications = () => {
               <div>
                 <h3>{selectedCandidateApplication?.candidate_name}</h3>
                 <p>
-                  {jobApplications.job_department || "Department not provided"}
+                  {jobApplications.job_department}
                   <span aria-hidden="true"> · </span>
-                  {jobApplications.job_location || "Location not provided"}
+                  {jobApplications.job_location}
                 </p>
                 <span className="candidate-application-id">
                   APP-
@@ -457,8 +460,7 @@ const Applications = () => {
                 .toLowerCase()
                 .replace(/_/g, "-")}`}
             >
-              {selectedCandidateApplication?.stage?.replace(/_/g, " ") ??
-                "Unknown"}
+              {selectedCandidateApplication?.stage.replace(/_/g, " ")}
             </span>
           </section>
 
@@ -476,9 +478,7 @@ const Applications = () => {
                 <div>
                   <dt>Applied on</dt>
                   <dd>
-                    {selectedCandidateApplication?.applied_at
-                      ? convertTime(selectedCandidateApplication.applied_at)
-                      : "Not provided"}
+                    {convertTime(selectedCandidateApplication.applied_at)}
                   </dd>
                 </div>
               </div>
@@ -490,8 +490,8 @@ const Applications = () => {
                 <div>
                   <dt>Time in stage</dt>
                   <dd>
-                    {selectedCandidateApplication?.in_stage ?? 0}{" "}
-                    {(selectedCandidateApplication?.in_stage ?? 0) === 1
+                    {selectedCandidateApplication?.in_stage}{" "}
+                    {selectedCandidateApplication?.in_stage === 1
                       ? "day"
                       : "days"}
                   </dd>
@@ -504,7 +504,7 @@ const Applications = () => {
                 </svg>
                 <div>
                   <dt>Job</dt>
-                  <dd>{jobApplications.job_department || "Not provided"}</dd>
+                  <dd>{jobApplications.job_department}</dd>
                 </div>
               </div>
               <div className="candidate-application-detail">
@@ -514,7 +514,7 @@ const Applications = () => {
                 </svg>
                 <div>
                   <dt>Location</dt>
-                  <dd>{jobApplications.job_location || "Not provided"}</dd>
+                  <dd>{jobApplications.job_location}</dd>
                 </div>
               </div>
             </dl>
@@ -534,7 +534,7 @@ const Applications = () => {
                   </svg>
                   Email
                 </dt>
-                <dd>{selectedCandidateApplication?.email || "Not provided"}</dd>
+                <dd>{selectedCandidateApplication?.email}</dd>
               </div>
               <div>
                 <dt>
@@ -543,7 +543,7 @@ const Applications = () => {
                   </svg>
                   Phone
                 </dt>
-                <dd>{selectedCandidateApplication?.phone || "Not provided"}</dd>
+                <dd>{selectedCandidateApplication?.phone}</dd>
               </div>
               <div>
                 <dt>
@@ -554,13 +554,11 @@ const Applications = () => {
                   Experience
                 </dt>
                 <dd>
-                  {selectedCandidateApplication?.experience_years != null
-                    ? `${selectedCandidateApplication.experience_years} ${
-                        selectedCandidateApplication.experience_years === 1
-                          ? "year"
-                          : "years"
-                      }`
-                    : "Not provided"}
+                  {`${selectedCandidateApplication.experience_years} ${
+                    selectedCandidateApplication.experience_years === 1
+                      ? "year"
+                      : "years"
+                  }`}
                 </dd>
               </div>
               <div>
@@ -571,17 +569,13 @@ const Applications = () => {
                   Resume
                 </dt>
                 <dd>
-                  {selectedCandidateApplication?.resume_url ? (
-                    <a
-                      href={selectedCandidateApplication.resume_url}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      View resume
-                    </a>
-                  ) : (
-                    "Not provided"
-                  )}
+                  <a
+                    href={selectedCandidateApplication.resume_url}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    View resume
+                  </a>
                 </dd>
               </div>
             </dl>
@@ -594,9 +588,17 @@ const Applications = () => {
             </div>
           </section>
         </div>
-        <button>Reject</button>
-        <button>Update Stage</button>
+        {selectedCandidateApplication?.stage != "Applied" && (
+          <>
+            <button>Reject</button>
+            <button onClick={() => setIsUpdateApplicationModalOpen}>
+              Update Stage
+            </button>
+          </>
+        )}
       </div>
+
+      {isUpdateApplicationModalOpen && <UpdateApplicationStageModal />}
     </>
   );
 };
