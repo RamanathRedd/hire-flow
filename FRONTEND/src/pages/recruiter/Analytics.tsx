@@ -8,7 +8,7 @@ const Analytics = () => {
     isError: stagesError,
   } = useApplicationCounts();
 
-  const totalApplications = funnelStages[funnelStages.length - 1].count || 0;
+  const totalApplications = funnelStages[funnelStages.length - 1]?.count || 0;
 
   const summaryMetrics = [
     { value: totalApplications, label: "Active applications" },
