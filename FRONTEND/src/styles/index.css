@@ -67,20 +67,6 @@ body {
 	transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.nav-action-candidate-button {
-	padding: 10px 18px;
-	border: 0;
-	border-radius: 12px;
-	background: linear-gradient(180deg, #57e0cf 0%, #2ec4af 100%);
-	color: #0a1e1e;
-	font-size: 1rem;
-	font-weight: 700;
-	cursor: pointer;
-	box-shadow: 0 6px 18px rgba(46, 196, 175, 0.28);
-	transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-
 .nav-meta {
 	display: flex;
 	align-items: center;
@@ -2573,9 +2559,9 @@ input {
   justify-content: center;
   height: 38px;
   padding: 0 16px;
-  border: 1px solid #0e9f8f;
+  border: 1px solid #354ed5;
   border-radius: 8px;
-  background: #0e9f8f;
+  background: #354ed5;
   color: #ffffff;
   font-size: 14px;
   font-weight: 600;
@@ -2585,7 +2571,7 @@ input {
 }
 
 .add-skill-button:hover:not(:disabled) {
-  background: #31867c;
+  background: #4059e3;
 }
 
 .add-skill-button:disabled {

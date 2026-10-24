@@ -139,7 +139,7 @@ const Profile = () => {
       <Navbar
         leftTitle="My profile"
         rightText={rightText}
-        classString="nav-action-candidate-button"
+        classString="nav-action-button"
         headerClassName="profile-page-header"
       />
 
