@@ -125,7 +125,7 @@ const BrowseJobs = () => {
 
             <button
               type="button"
-              className="filter-button browse-jobs"
+              className="filter-button"
               onClick={clearFilters}
             >
               Clear Filters

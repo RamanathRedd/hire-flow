@@ -837,14 +837,6 @@ body {
 	outline-offset: 2px;
 }
 
-.browse-jobs {
-	background: #0e9f8f;
-}
-
-.browse-jobs:hover {
-	background: #16b3a1;
-}
-
 .jobs-table {
 	width: 100%;
 	border-collapse: collapse;
@@ -1125,8 +1117,8 @@ body {
 	padding: 6px 14px;
 	border: 0;
 	border-radius: 8px;
-	background: #0e9f8f;
-	color: #fff;
+	background: #4b67f5;
+	color: #f5f7ff;
 	cursor: pointer;
 	font-size: 0.85rem;
 	font-weight: 650;
@@ -1135,11 +1127,11 @@ body {
 }
 
 .apply-button:hover {
-	background: #16b3a1;
+	background: #5a73f6;
 }
 
 .apply-button:focus-visible {
-	outline: 2px solid #7fe2ac;
+	outline: 2px solid #5278ff;
 	outline-offset: 3px;
 }
 
