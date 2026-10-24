@@ -157,6 +157,7 @@ def get_candidate_applications(
                     "from_stage": res.from_stage,
                     "to_stage": res.to_stage,
                     "created_at": res.created_at,
+                    "days_in_stage": (res.created_at - application.applied_at).days,
                 }
             )
 
