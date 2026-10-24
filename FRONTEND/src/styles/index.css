@@ -301,15 +301,15 @@ body {
 	background: #b83434;
 }
 
-.candidate-profile,.candidate-account{
+.candidate-profile{
 	background: #0e9f8f;
 }
 
-.candidate-profile:hover,.candidate-account:hover {
+.candidate-profile:hover {
 	background: #31867c;
 }
 
-.candidate-profile:hover,.candidate-account:disabled {
+.candidate-profile:hover {
 	background: #0e9f8f;
 }
 
@@ -2457,17 +2457,11 @@ input {
 	color: #4261ee;
 }
 
-.role-option.is-active.candidate {
-	border-color: #0e9f8f;
-	background: #0e9f8f;
-	color: #fff;
-}
-
-.candidate-profile,.candidate-account{
+.candidate-profile{
 	background: #0e9f8f;
 }
 
-.candidate-profile:hover,.candidate-account:hover {
+.candidate-profile:hover{
 	background: #31867c;
 }
 
@@ -2567,21 +2561,16 @@ input {
 	cursor: pointer;
 	font-size: 14px;
 	font-weight: 600;
-}
-
-.recruiter-account{
 	background: #354ed5;
 }
 
-.recruiter-account:hover {
+.auth-submit:hover {
 	background: #4059e3;
 }
 
-.recruiter-account:disabled{
-	background: #354ed5;
-}
 
 .auth-submit:disabled {
+	background: #354ed5;
 	opacity: 0.7;
 	cursor: not-allowed;
 }
@@ -2634,19 +2623,15 @@ input {
 	text-align: center;
 }
 
-.recruiter-link {
+.create-link {
 	color: #4261ee;
 	text-decoration: none;
 }
 
-.recruiter-link:hover,.candidate-link:hover {
+.create-link:hover {
 	text-decoration: underline;
 }
 
-.candidate-link {
-	color: #0e9f8f;
-	text-decoration: none;
-}
 
 @media (max-width: 640px) {
 	#root {

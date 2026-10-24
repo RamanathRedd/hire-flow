@@ -68,9 +68,7 @@ const LoginPage = () => {
               Recruiter
             </button>
             <button
-              className={
-                !isAdmin ? "role-option is-active candidate" : "role-option"
-              }
+              className={!isAdmin ? "role-option is-active" : "role-option"}
               type="button"
               onClick={onRoleChange}
               name="candidate"
@@ -109,7 +107,7 @@ const LoginPage = () => {
             />
           </div>
           <button
-            className={`auth-submit ${isAdmin ? `recruiter-account` : `candidate-account`}`}
+            className="auth-submit"
             type="submit"
             disabled={loginMutation.isPending}
           >
@@ -122,10 +120,7 @@ const LoginPage = () => {
           )}
           <p className="auth-footer">
             Don't have an account?{" "}
-            <Link
-              to="/register"
-              className={`${isAdmin ? "recruiter-link" : "candidate-link"}`}
-            >
+            <Link to="/register" className="create-link">
               Create an Account
             </Link>
           </p>
