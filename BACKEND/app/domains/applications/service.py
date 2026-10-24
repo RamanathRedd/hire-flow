@@ -26,7 +26,7 @@ from domains.applications.schemas import (
 from domains.candidates.model import Candidate
 from domains.jobs.model import Job
 from domains.recruiters.model import Recruiter
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session, joinedload
 
 
@@ -523,3 +523,24 @@ def get_application_timeline(
         response["rejection_details"] = rejection_details
 
     return response
+
+
+def get_application_counts(db: Session, current_user: dict) -> dict:
+    if current_user["role"] != "Admin":
+        raise UnauthorizedError
+
+    query = select(Application.stage, func.count(Application.id)).group_by(
+        Application.stage
+    )
+    result = db.execute(query).all()
+
+    counts = [{"label": stage, "count": 0} for stage in STAGES]
+    for stage, count in result:
+        for item in counts:
+            if item["label"] == stage:
+                item["count"] = count
+                break
+
+    counts.append({"label": "All", "count": sum(item["count"] for item in counts)})
+
+    return counts

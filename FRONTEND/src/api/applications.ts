@@ -51,3 +51,18 @@ export const getCandidateApplications = async (status: string | null) => {
     // throw new Error(getErrorMessage(error));
   }
 };
+
+export const getApplicationCounts = async () => {
+  const token = sessionStorage.getItem("access_token");
+
+  try {
+    const response = await axios.get(`${API_BASE_URL}/applications/counts`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    // throw new Error(getErrorMessage(error));
+  }
+};

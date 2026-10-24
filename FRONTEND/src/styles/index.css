@@ -446,6 +446,134 @@ body {
 	background: #111318;
 }
 
+.analytics-card {
+	max-width: 980px;
+	margin: 6px 12px 24px 24px;
+	padding-bottom: 52px;
+	overflow: hidden;
+	border: 1px solid #272c33;
+	border-radius: 12px;
+	background: #191d22;
+}
+
+.nav-header.analytics-header {
+	min-height: 52px;
+	padding: 0 24px;
+	background: transparent;
+	border-bottom-color: #242930;
+}
+
+.nav-header.analytics-header .nav-title {
+	font-size: 1rem;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+}
+
+.analytics-summary {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 12px;
+	margin: 19px 24px 16px;
+}
+
+.analytics-metric {
+	min-width: 0;
+	padding: 12px 14px;
+	border: 1px solid #292e35;
+	border-radius: 12px;
+}
+
+.analytics-metric-value,
+.analytics-metric-label {
+	margin: 0;
+}
+
+.analytics-metric-value {
+	color: #f1f3f6;
+	font-size: 1.4rem;
+	font-weight: 700;
+	line-height: 1.15;
+	letter-spacing: -0.03em;
+}
+
+.analytics-metric-label {
+	margin-top: 2px;
+	color: #8d96a4;
+	font-size: 0.75rem;
+	line-height: 1.3;
+}
+
+.analytics-funnel {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	margin: 0 24px;
+}
+
+.analytics-stage {
+	display: grid;
+	grid-template-columns: 98px minmax(0, 1fr) 32px;
+	align-items: center;
+	gap: 12px;
+	min-height: 24px;
+}
+
+.analytics-stage-label,
+.analytics-stage-count {
+	color: #8d96a4;
+	font-size: 0.75rem;
+	line-height: 1.2;
+}
+
+.analytics-stage-count {
+	text-align: right;
+}
+
+.analytics-stage-track {
+	height: 16px;
+	overflow: hidden;
+	border-radius: 5px;
+	background: #f0f1f3;
+}
+
+.analytics-stage-fill {
+	display: block;
+	height: 100%;
+	min-width: 0;
+	border-radius: inherit;
+	background: #3b57dc;
+}
+
+@media (max-width: 640px) {
+	.analytics-card {
+		margin: 8px 12px;
+		padding-bottom: 28px;
+	}
+
+	.nav-header.analytics-header {
+		padding: 0 16px;
+	}
+
+	.analytics-summary {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 8px;
+		margin: 16px;
+	}
+
+	.analytics-metric {
+		padding: 10px 12px;
+	}
+
+	.analytics-funnel {
+		margin: 0 16px;
+	}
+
+	.analytics-stage {
+		grid-template-columns: 82px minmax(0, 1fr) 28px;
+		gap: 8px;
+	}
+}
+
 .main-header {
 	display: flex;
 	align-items: center;
@@ -1861,6 +1989,90 @@ body {
 
 .candidate-application-contact dd a:hover {
 	text-decoration: underline;
+}
+
+.candidate-application-notes > h3 {
+	margin: 0 0 8px;
+	color: #e5edf7;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.candidate-application-notes-field {
+	position: relative;
+	border: 1px solid #1d2b3e;
+	border-radius: 7px;
+	background: #0e1927;
+}
+
+.candidate-application-notes-field:focus-within {
+	border-color: #637cf5;
+}
+
+.candidate-application-notes-field > svg {
+	position: absolute;
+	top: 11px;
+	left: 10px;
+	width: 16px;
+	height: 16px;
+	fill: none;
+	stroke: #a8bad3;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	stroke-width: 1.7;
+	pointer-events: none;
+}
+
+.candidate-application-notes-field textarea {
+	display: block;
+	width: 100%;
+	min-height: 48px;
+	padding: 10px 12px 10px 32px;
+	border: 0;
+	border-radius: inherit;
+	outline: none;
+	background: transparent;
+	color: #e0e8f3;
+	font: inherit;
+	font-size: 12px;
+	resize: vertical;
+}
+
+.candidate-application-notes-field textarea::placeholder {
+	color: #8293aa;
+	opacity: 1;
+}
+
+.candidate-application-actions {
+	position: sticky;
+	bottom: 0;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	padding: 12px 0 0;
+	border-top: 1px solid #1e2a39;
+	background: #0b121c;
+}
+
+.candidate-application-actions button {
+	min-height: 34px;
+	border-radius: 6px;
+	font: inherit;
+	font-size: 11px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.candidate-application-reject {
+	border: 1px solid #e11d48;
+	background: rgba(225, 29, 72, 0.08);
+	color: #fb7185;
+}
+
+.candidate-application-update-stage {
+	border: 1px solid #0879ed;
+	background: #0879ed;
+	color: #fff;
 }
 
 .application-card {

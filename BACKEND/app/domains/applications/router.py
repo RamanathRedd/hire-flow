@@ -92,6 +92,18 @@ def get_live_applications(current_user: CurrentUser, db: Session = Depends(get_d
         )
 
 
+@applications_router.get("/counts", status_code=status.HTTP_200_OK)
+def get_application_counts(current_user: CurrentUser, db: Session = Depends(get_db)):
+    try:
+        response = service.get_application_counts(db, current_user)
+        return response
+    except UnauthorizedError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Only candidates can view application counts",
+        )
+
+
 @applications_router.get("/{application_id}", status_code=status.HTTP_200_OK)
 def get_application_details(
     application_id: int, current_user: CurrentUser, db: Session = Depends(get_db)
