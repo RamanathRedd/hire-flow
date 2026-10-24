@@ -149,10 +149,7 @@ const RegisterPage = () => {
             <h1 id="register-title">Create your account</h1>
             <p>
               Already have one?{" "}
-              <Link
-                to="/"
-                className={`${isAdmin ? "recruiter-link" : "candidate-link"}`}
-              >
+              <Link to="/" className="login-link">
                 Sign in instead
               </Link>
             </p>

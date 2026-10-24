@@ -267,16 +267,18 @@ body {
 }
 
 .modal-button-primary {
+	background: #4b67f5;
 	color: #fff;
 	box-shadow: 0 6px 16px rgba(75, 103, 245, 0.24);
 }
 
-.recruiter-profile,.job-update{
-	background: #4b67f5;
+.modal-button-primary:hover,.job-update:hover  {
+	background: #5a73f6;
 }
 
-.recruiter-profile:hover,.job-update:hover {
-	background: #5a73f6;
+
+.job-update{
+	background: #4b67f5;
 }
 
 .job-delete{
@@ -287,7 +289,7 @@ body {
 	background: #b83434;
 }
 
-.candidate-profile{
+/* .candidate-profile{
 	background: #0e9f8f;
 }
 
@@ -297,7 +299,7 @@ body {
 
 .candidate-profile:hover {
 	background: #0e9f8f;
-}
+} */
 
 @keyframes modal-enter {
 	from {
@@ -2589,10 +2591,6 @@ input {
 	color: #ff8d96;
 }
 
-.auth-message.is-success {
-	color: #83d6ae;
-}
-
 .auth-footer {
 	margin: 12px 0 0;
 	color: #8e95a3;
@@ -2601,12 +2599,12 @@ input {
 	text-align: center;
 }
 
-.create-link {
+.create-link,.login-link {
 	color: #4261ee;
 	text-decoration: none;
 }
 
-.create-link:hover {
+.create-link:hover, .login-link:hover {
 	text-decoration: underline;
 }
 
