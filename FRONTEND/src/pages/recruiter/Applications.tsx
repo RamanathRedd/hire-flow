@@ -583,24 +583,44 @@ const Applications = () => {
             </dl>
           </section>
 
-          <section>
-            <h1>Recruiter notes</h1>
-            <div>
-              <textarea rows={3} placeholder="Enter your notes" required />
+          <section className="candidate-application-notes">
+            <h3>Recruiter notes</h3>
+            <div className="candidate-application-notes-field">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h5" />
+              </svg>
+              <textarea
+                rows={3}
+                placeholder="Enter your notes here..."
+                required
+                aria-label="Recruiter notes"
+              />
             </div>
           </section>
         </div>
         {selectedCandidateApplication?.stage != "Applied" && (
-          <>
-            <button>Reject</button>
-            <button onClick={() => setIsUpdateApplicationModalOpen}>
+          <div className="candidate-application-actions">
+            <button type="button" className="candidate-application-reject">
+              Reject
+            </button>
+            <button
+              type="button"
+              className="candidate-application-update-stage"
+              onClick={() => setIsUpdateApplicationModalOpen(true)}
+            >
               Update Stage
             </button>
-          </>
+          </div>
         )}
       </div>
 
-      {isUpdateApplicationModalOpen && <UpdateApplicationStageModal />}
+      {isUpdateApplicationModalOpen && (
+        <UpdateApplicationStageModal
+          applicationDetails={selectedCandidateApplication}
+          job_department={jobApplications.job_department}
+          job_location={jobApplications.job_location}
+        />
+      )}
     </>
   );
 };
