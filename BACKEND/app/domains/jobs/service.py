@@ -220,7 +220,6 @@ def get_job_filtered_applications(
     applications_filters: JobApplicationFilters,
     current_user: dict,
 ) -> dict | None:
-    print(applications_filters)
     if current_user["role"] != "Admin":
         raise UnauthorizedError
 
@@ -270,6 +269,11 @@ def get_job_filtered_applications(
 
     if applications_filters.offer_stage:
         query = query.where(Application.stage == "Offer")
+
+    if applications_filters.name_filter:
+        query = query.where(
+            Candidate.name.ilike(f"%{applications_filters.name_filter}%")
+        )
 
     if applications_filters.stage_filter:
         query = query.where(Application.stage == applications_filters.stage_filter)

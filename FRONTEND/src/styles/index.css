@@ -1587,29 +1587,70 @@ body {
 .recruiter-application-filters {
 	display: flex;
 	flex-wrap: wrap;
+	align-items: stretch;
 	justify-content: flex-end;
-	gap: 8px;
-	margin: 0 42px 14px;
+	gap: 10px;
+	margin: 0 42px 18px;
+}
+
+.recruiter-application-search,
+.recruiter-application-filter {
+	display: flex;
+	align-items: center;
+	flex: 0 1 190px;
+	min-height: 52px;
+	padding: 10px 14px;
+	border: 1px solid rgba(148, 163, 184, 0.2);
+	border-radius: 12px;
+	background: rgba(12, 17, 24, 0.9);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+	color: #aebbd0;
+}
+
+.recruiter-application-search {
+	flex-basis: 300px;
+	gap: 10px;
+}
+
+.recruiter-application-search svg {
+	width: 18px;
+	height: 18px;
+	flex: 0 0 auto;
+	fill: none;
+	stroke: #94a3b8;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	stroke-width: 1.8;
+}
+
+.recruiter-application-search input {
+	width: 100%;
+	border: 0;
+	outline: none;
+	background: transparent;
+	color: #edf4ff;
+	font-size: 0.96rem;
+	font-weight: 500;
+}
+
+.recruiter-application-search input::placeholder {
+	color: rgba(148, 163, 184, 0.8);
 }
 
 .recruiter-application-filter {
-	display: flex;
-	flex: 0 0 124px;
 	flex-direction: column;
+	align-items: stretch;
+	justify-content: center;
 	gap: 4px;
-	min-width: 0;
-	padding: 7px 10px 6px;
-	border: 1px solid #26313d;
-	border-radius: 6px;
-	background: #101720;
-	color: #aab6c8;
 }
 
 .recruiter-application-filter > span {
 	display: flex;
 	align-items: center;
 	gap: 6px;
-	font-size: 9px;
+	font-size: 10px;
+	font-weight: 600;
+	letter-spacing: 0.02em;
 	line-height: 1;
 }
 
@@ -1623,16 +1664,33 @@ body {
 	stroke-width: 1.2;
 }
 
+.recruiter-application-select-wrap {
+	position: relative;
+}
+
 .recruiter-application-filter select {
 	width: 100%;
-	padding: 0;
+	padding: 0 18px 0 0;
 	border: 0;
 	outline: 0;
 	background: transparent;
-	color: #e5eaf2;
-	font-size: 10px;
+	color: #edf4ff;
+	font-size: 12px;
 	font-weight: 600;
 	cursor: pointer;
+	appearance: none;
+}
+
+.recruiter-application-select-wrap .select-chevron {
+	position: absolute;
+	right: 0;
+	top: 50%;
+	width: 14px;
+	height: 14px;
+	transform: translateY(-50%);
+	pointer-events: none;
+	stroke: #cbd5e1;
+	stroke-width: 1.8;
 }
 
 .recruiter-application-filter option {
@@ -2303,8 +2361,17 @@ input {
 	}
 
 	.recruiter-application-filters {
+		justify-content: stretch;
 		margin-right: 16px;
 		margin-left: 16px;
+	}
+
+	.recruiter-application-search {
+		flex: 1 1 100%;
+	}
+
+	.recruiter-application-filter {
+		flex: 1 1 calc(50% - 5px);
 	}
 
 	.application-list {

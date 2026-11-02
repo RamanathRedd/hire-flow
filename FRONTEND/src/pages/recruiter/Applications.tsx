@@ -10,6 +10,10 @@ const Applications = () => {
   const [selectedJobApplications, setSelectedJobApplications] = useState<
     "all" | "needs_attention" | "this_week" | "interview_round" | "offer_stage"
   >("all");
+  const [nameFilter, setNameFilter] = useState<string | null>(null);
+  const [debouncedNameFilter, setDebouncedNameFilter] = useState<string | null>(
+    null,
+  );
   const [stageFilter, setStageFilter] = useState<string | null>(null);
   const [dateFilter, setDateFilter] = useState<number | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
@@ -17,6 +21,14 @@ const Applications = () => {
     useState<any | null>(null);
   const [isUpdateApplicationModalOpen, setIsUpdateApplicationModalOpen] =
     useState<boolean>(false);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedNameFilter(nameFilter);
+    }, 400);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [nameFilter]);
 
   const {
     data: jobs = [],
@@ -61,6 +73,7 @@ const Applications = () => {
     needs_attention: selectedJobApplications === "needs_attention",
     interview_round: selectedJobApplications === "interview_round",
     offer_stage: selectedJobApplications === "offer_stage",
+    name_filter: debouncedNameFilter || null,
     stage_filter: stageFilter || null,
     date_applied_filter: dateFilter || null,
   });
@@ -80,6 +93,7 @@ const Applications = () => {
 
   const showEmptyState =
     applicationRows.length === 0 &&
+    !nameFilter &&
     !stageFilter &&
     !dateFilter &&
     selectedJobApplications === "all" &&
@@ -116,6 +130,7 @@ const Applications = () => {
                 onChange={(event) => {
                   setSelectedJobId(Number(event.target.value));
                   setSelectedJobApplications("all");
+                  setNameFilter(null);
                   setStageFilter(null);
                   setDateFilter(null);
                 }}
@@ -278,6 +293,20 @@ const Applications = () => {
                   className="recruiter-application-filters"
                   aria-label="Filter applications"
                 >
+                  <label className="recruiter-application-search" aria-label="Search applications">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <circle cx="11" cy="11" r="5.5" />
+                      <path d="M16 16l5 5" />
+                    </svg>
+                    <input
+                      type="search"
+                      placeholder="Search"
+                      value={nameFilter ?? ""}
+                      onChange={(event) =>
+                        setNameFilter(event.target.value || null)
+                      }
+                    />
+                  </label>
                   <label className="recruiter-application-filter">
                     <span>
                       <svg viewBox="0 0 16 16" aria-hidden="true">
@@ -288,21 +317,26 @@ const Applications = () => {
                       </svg>
                       Stage
                     </span>
-                    <select
-                      value={stageFilter ?? ""}
-                      onChange={(event) =>
-                        setStageFilter(event.target.value || null)
-                      }
-                    >
-                      <option value="">All stages</option>
-                      <option value="Applied">Applied</option>
-                      <option value="Screened">Screened</option>
-                      <option value="Interview_R1">Interview R1</option>
-                      <option value="Interview_R2">Interview R2</option>
-                      <option value="HR_Round">HR Round</option>
-                      <option value="Offer">Offer</option>
-                      <option value="Rejected">Rejected</option>
-                    </select>
+                    <div className="recruiter-application-select-wrap">
+                      <select
+                        value={stageFilter ?? ""}
+                        onChange={(event) =>
+                          setStageFilter(event.target.value || null)
+                        }
+                      >
+                        <option value="">All stages</option>
+                        <option value="Applied">Applied</option>
+                        <option value="Screened">Screened</option>
+                        <option value="Interview_R1">Interview R1</option>
+                        <option value="Interview_R2">Interview R2</option>
+                        <option value="HR_Round">HR Round</option>
+                        <option value="Offer">Offer</option>
+                        <option value="Rejected">Rejected</option>
+                      </select>
+                      <svg className="select-chevron" viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M5 7.5 10 12.5 15 7.5" />
+                      </svg>
+                    </div>
                   </label>
                   <label className="recruiter-application-filter">
                     <span>
@@ -312,18 +346,23 @@ const Applications = () => {
                       </svg>
                       Date applied
                     </span>
-                    <select
-                      value={dateFilter ?? ""}
-                      onChange={(event) =>
-                        setDateFilter(Number(event.target.value) || null)
-                      }
-                    >
-                      <option value="">Any time</option>
-                      <option value="1">Today</option>
-                      <option value="7">Last 7 days</option>
-                      <option value="30">Last 30 days</option>
-                      <option value="90">Last 90 days</option>
-                    </select>
+                    <div className="recruiter-application-select-wrap">
+                      <select
+                        value={dateFilter ?? ""}
+                        onChange={(event) =>
+                          setDateFilter(Number(event.target.value) || null)
+                        }
+                      >
+                        <option value="">Any time</option>
+                        <option value="1">Today</option>
+                        <option value="7">Last 7 days</option>
+                        <option value="30">Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                      </select>
+                      <svg className="select-chevron" viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M5 7.5 10 12.5 15 7.5" />
+                      </svg>
+                    </div>
                   </label>
                 </section>
                 <section className="recruiter-application-table-wrap">

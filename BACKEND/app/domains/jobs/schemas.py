@@ -33,5 +33,6 @@ class JobApplicationFilters(BaseModel):
     needs_attention: bool = Field(default=False)
     interview_round: bool = Field(default=False)
     offer_stage: bool = Field(default=False)
+    name_filter: str | None = None
     stage_filter: STAGE_LITERAL | None = None
     date_applied_filter: int | None = None
