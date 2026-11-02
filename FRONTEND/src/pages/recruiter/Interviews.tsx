@@ -73,6 +73,8 @@ const Interviews = () => {
     ? allInterviewsError
     : upcomingInterviewsError;
 
+  const interview_badge_total = allInterviewsData.interviews.length;
+
   useEffect(() => {
     if (openInterviewMenu === null) return;
 
@@ -269,11 +271,6 @@ const Interviews = () => {
     setIsModalOpen(false);
   };
 
-  const button = {
-    text: "+ Schedule interview",
-    navigation: "/interviewScheduleForm",
-  };
-
   const showEmptyState =
     interviews.length === 0 &&
     allJobs &&
@@ -301,15 +298,18 @@ const Interviews = () => {
     >
       <Navbar
         leftTitle="Interviews"
-        rightText={button}
-        classString="nav-action-button"
+        rightText={`${interview_badge_total} total`}
+        classString="interview-count-badge"
       />
       {showEmptyState ? (
         <EmptyPage
           icon="M8 3v3m8-3v3M5 7h14M6.5 5h11A1.5 1.5 0 0 1 19 6.5v11a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 17.5v-11A1.5 1.5 0 0 1 6.5 5ZM8 11h2v2H8z"
           title="No interviews scheduled"
           subTitle="Schedule a round who has passed screening."
-          button={button}
+          button={{
+            text: "Applications",
+            navigation: "/applications",
+          }}
         />
       ) : (
         <>
