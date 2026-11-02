@@ -289,18 +289,6 @@ body {
 	background: #b83434;
 }
 
-/* .candidate-profile{
-	background: #0e9f8f;
-}
-
-.candidate-profile:hover {
-	background: #31867c;
-}
-
-.candidate-profile:hover {
-	background: #0e9f8f;
-} */
-
 @keyframes modal-enter {
 	from {
 		opacity: 0;
@@ -2435,14 +2423,6 @@ input {
 	border-color: #354bd0;
 	background: #1d2545;
 	color: #4261ee;
-}
-
-.candidate-profile{
-	background: #0e9f8f;
-}
-
-.candidate-profile:hover{
-	background: #31867c;
 }
 
 .auth-field {
