@@ -1,52 +1,64 @@
-const UpdateApplicationStageModal = (props: any) => {
-  const { applicationDetails, job_department, job_location } = props;
+interface UpdateApplicationStageModalProps {
+  stage: string;
+  candidateName?: string;
+  onCancel: () => void;
+  onConfirm: (stage: string) => void;
+}
+
+const UpdateApplicationStageModal = ({
+  stage,
+  candidateName,
+  onCancel,
+  onConfirm,
+}: UpdateApplicationStageModalProps) => {
+  const formattedStage = stage.replace(/_/g, " ");
+
   return (
-    <>
-      <h1>Update Application stage</h1>
-      <p>
-        Change the current stage and add relevant details for this candidate
-      </p>
-      <button>&times;</button>
-      <div>
-        <div>
-          <span>
-            {applicationDetails.candidate_name
-              ?.trim()
-              ?.charAt(0)
-              ?.toUpperCase() || "?"}
-          </span>
-          <div>
-            <h3>{applicationDetails.candidate_name}</h3>
-            <p>
-              {job_department || "Department not provided"}
-              <span aria-hidden="true"> · </span>
-              {job_location || "Location not provided"}
-            </p>
-            <span>
-              APP-
-              {String(applicationDetails.id ?? "").padStart(3, "0")}
-            </span>
-          </div>
+    <div className="modal-backdrop">
+      <section
+        className="save-modal update-application-stage-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="update-application-stage-title"
+        aria-describedby="update-application-stage-description"
+      >
+        <button
+          className="modal-close"
+          type="button"
+          onClick={onCancel}
+          aria-label="Close stage update dialog"
+        >
+          <span aria-hidden="true">×</span> Close
+        </button>
+
+        <div className="save-modal-copy update-application-stage-copy">
+          <h2 id="update-application-stage-title">
+            Move {candidateName} to {formattedStage}?
+          </h2>
+
+          <p id="update-application-stage-description">
+            This will update the application stage for this candidate.
+          </p>
         </div>
-        <span>{applicationDetails.stage?.replace(/_/g, " ") ?? "Unknown"}</span>
-      </div>
-      <label>Change Stage to</label>
-      <select>
-        <option>Interview R1</option>
-      </select>
-      <label>Interview Type</label>
-      <select>
-        <option>Techincal</option>
-      </select>
-      <label>Date & time</label>
-      <input />
-      <label>Interviewer</label>
-      <select>
-        <option>Ram</option>
-      </select>
-      <button>Cancel</button>
-      <button>Update Stage</button>
-    </>
+
+        <div className="update-application-stage-actions">
+          <button
+            className="modal-button modal-button-secondary"
+            type="button"
+            onClick={onCancel}
+          >
+            No
+          </button>
+          <button
+            className="modal-button modal-button-primary"
+            type="button"
+            onClick={() => onConfirm(stage)}
+          >
+            Yes
+          </button>
+        </div>
+      </section>
+    </div>
   );
 };
 
