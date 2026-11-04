@@ -1999,6 +1999,7 @@ body {
 .candidate-application-content {
 	display: grid;
 	flex: 1 0 auto;
+	align-content: start;
 	gap: 16px;
 	padding-top: 16px;
 }
@@ -2227,6 +2228,9 @@ body {
 }
 
 .candidate-application-actions button {
+	width: 100%;
+	max-width: 210px;
+	justify-self: center;
 	min-height: 34px;
 	border-radius: 6px;
 	font: inherit;
