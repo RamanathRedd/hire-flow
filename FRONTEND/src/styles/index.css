@@ -331,6 +331,102 @@ body {
 	}
 }
 
+.reject-application-modal {
+	width: min(100%, 480px);
+	padding: 22px;
+	border-radius: 12px;
+	background: #191c21;
+}
+
+.reject-application-modal .modal-close {
+	top: 20px;
+	right: 16px;
+}
+
+.reject-application-copy h2 {
+	font-size: 1rem;
+}
+
+.reject-application-copy p {
+	margin-top: 2px;
+	font-size: 0.8rem;
+}
+
+.reject-application-field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin-top: 12px;
+}
+
+.reject-application-field label {
+	color: #9aa4b2;
+	font-size: 0.8rem;
+}
+
+.reject-application-field textarea {
+	display: block;
+	width: 100%;
+	min-height: 69px;
+	padding: 10px 12px;
+	resize: vertical;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	background: #f8fafc;
+	color: #18202b;
+	font: inherit;
+	font-size: 0.9rem;
+	line-height: 1.4;
+}
+
+.reject-application-field textarea::placeholder {
+	color: #8993a2;
+	opacity: 1;
+}
+
+.reject-application-field textarea:focus-visible {
+	outline: 2px solid #6f87ff;
+	outline-offset: 2px;
+}
+
+.reject-application-warning {
+	margin: 14px 0 12px;
+	color: #8993a2;
+	font-size: 0.75rem;
+	line-height: 1.3;
+}
+
+.reject-application-actions {
+	display: flex;
+	gap: 10px;
+}
+
+.reject-application-actions .modal-button {
+	flex: 1;
+	min-height: 42px;
+	padding: 9px 12px;
+	border-radius: 9px;
+}
+
+.reject-application-actions .reject-application-confirm {
+	background: #ef4146;
+	box-shadow: none;
+}
+
+.reject-application-actions .reject-application-confirm:hover {
+	background: #dc353a;
+}
+
+@media (max-width: 480px) {
+	.reject-application-actions {
+		flex-direction: row;
+	}
+
+	.reject-application-actions .modal-button {
+		width: auto;
+	}
+}
+
 .app-shell {
 	display: flex;
 	flex: 1;

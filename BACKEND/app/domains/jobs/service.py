@@ -291,6 +291,7 @@ def get_job_filtered_applications(
     for application, candidate in results:
         app_data = {
             "id": application.id,
+            "job": target_job.title,
             "candidate_id": application.candidate_id,
             "applied_at": application.applied_at,
             "stage_updated_at": application.stage_updated_at,
