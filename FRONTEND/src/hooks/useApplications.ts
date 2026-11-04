@@ -5,6 +5,7 @@ import {
   getCandidateApplications,
   getLiveApplications,
   rejectApplication,
+  updateApplicationStage,
 } from "../api/applications";
 
 export const useApplyJob = () =>
@@ -39,4 +40,15 @@ export const useRejectApplication = () =>
       applicationId: number;
       rejection_reason: string;
     }) => rejectApplication(applicationId, rejection_reason),
+  });
+
+export const useUpdateApplicationStage = () =>
+  useMutation({
+    mutationFn: ({
+      applicationId,
+      stage,
+    }: {
+      applicationId: number;
+      stage: string;
+    }) => updateApplicationStage(applicationId, stage),
   });

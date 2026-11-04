@@ -6,7 +6,10 @@ import type { Job } from "../../types/job";
 import EmptyPage from "../../components/layout/EmptyPage";
 import UpdateApplicationStageModal from "../../components/layout/UpdateApplicationStageModal";
 import RejectApplication from "../../components/layout/RejectApplication";
-import { useRejectApplication } from "../../hooks/useApplications";
+import {
+  useRejectApplication,
+  useUpdateApplicationStage,
+} from "../../hooks/useApplications";
 
 const Applications = () => {
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
@@ -25,8 +28,9 @@ const Applications = () => {
   const [isUpdateApplicationModalOpen, setIsUpdateApplicationModalOpen] =
     useState<boolean>(false);
   const [isRejectModalOpen, setIsRejectModalOpen] = useState<boolean>(false);
-  const rejectApplicationMutation = useRejectApplication();
   const queryClient = useQueryClient();
+  const rejectApplicationMutation = useRejectApplication();
+  const updateApplicationStageMutation = useUpdateApplicationStage();
 
   const onConfirm = (rejection_reason: string) => {
     if (!selectedCandidateApplication) return;
@@ -46,8 +50,22 @@ const Applications = () => {
     );
   };
 
-  const onCancel = () => {
-    setIsRejectModalOpen(false);
+  const onUpdate = (stage: string) => {
+    if (!selectedCandidateApplication) return;
+
+    updateApplicationStageMutation.mutate(
+      { applicationId: selectedCandidateApplication.id, stage },
+      {
+        onSuccess: async () => {
+          await queryClient.invalidateQueries({
+            queryKey: ["jobApplications"],
+          });
+          setIsUpdateApplicationModalOpen(false);
+          setSelectedCandidateApplication(null);
+          setIsDrawerOpen(false);
+        },
+      },
+    );
   };
 
   useEffect(() => {
@@ -676,35 +694,58 @@ const Applications = () => {
             </div>
           </section> */}
         </div>
-        {selectedCandidateApplication?.stage != "Applied" && (
-          <div className="candidate-application-actions">
-            <button
-              type="button"
-              className="candidate-application-reject"
-              onClick={() => setIsRejectModalOpen(true)}
-            >
-              Reject
-            </button>
-            <button
-              type="button"
-              className="candidate-application-update-stage"
-              onClick={() => setIsUpdateApplicationModalOpen(true)}
-            >
-              Update Stage
-            </button>
-          </div>
-        )}
+        {selectedCandidateApplication &&
+          selectedCandidateApplication.stage !== "Applied" && (
+            <div className="candidate-application-actions">
+              <button
+                type="button"
+                className="candidate-application-reject"
+                onClick={() => setIsRejectModalOpen(true)}
+              >
+                Reject
+              </button>
+              <button
+                type="button"
+                className="candidate-application-update-stage"
+                onClick={() => setIsUpdateApplicationModalOpen(true)}
+              >
+                Move to{" "}
+                {selectedCandidateApplication &&
+                selectedCandidateApplication.stage === "Applied"
+                  ? "Screened"
+                  : selectedCandidateApplication.stage === "Screened"
+                    ? "Interview_R1"
+                    : selectedCandidateApplication.stage === "Interview_R1"
+                      ? "Interview_R2"
+                      : selectedCandidateApplication.stage === "Interview_R2"
+                        ? "HR_Round"
+                        : "Offer"}
+              </button>
+            </div>
+          )}
       </div>
 
-      {isUpdateApplicationModalOpen && (
+      {isUpdateApplicationModalOpen && selectedCandidateApplication && (
         <UpdateApplicationStageModal
-          applicationDetails={selectedCandidateApplication}
-          job_department={jobApplications.job_department}
-          job_location={jobApplications.job_location}
+          stage={
+            selectedCandidateApplication &&
+            selectedCandidateApplication.stage === "Applied"
+              ? "Screened"
+              : selectedCandidateApplication.stage === "Screened"
+                ? "Interview_R1"
+                : selectedCandidateApplication.stage === "Interview_R1"
+                  ? "Interview_R2"
+                  : selectedCandidateApplication.stage === "Interview_R2"
+                    ? "HR_Round"
+                    : "Offer"
+          }
+          candidateName={selectedCandidateApplication.candidate_name}
+          onCancel={() => setIsUpdateApplicationModalOpen(false)}
+          onConfirm={onUpdate}
         />
       )}
 
-      {isRejectModalOpen && (
+      {isRejectModalOpen && selectedCandidateApplication && (
         <RejectApplication
           application={{
             candidate_name: selectedCandidateApplication.candidate_name,
@@ -713,7 +754,7 @@ const Applications = () => {
             stage: selectedCandidateApplication.stage,
           }}
           onReject={onConfirm}
-          onCancel={onCancel}
+          onCancel={() => setIsRejectModalOpen(false)}
         />
       )}
     </>

@@ -417,6 +417,41 @@ body {
 	background: #dc353a;
 }
 
+.update-application-stage-modal {
+	width: min(100%, 380px);
+	padding: 22px;
+	border-radius: 12px;
+	background: #191c21;
+}
+
+.update-application-stage-modal .modal-close {
+	top: 20px;
+	right: 16px;
+}
+
+.update-application-stage-copy h2 {
+	padding-right: 88px;
+	font-size: 1rem;
+}
+
+.update-application-stage-copy p {
+	margin-top: 4px;
+	font-size: 0.8rem;
+}
+
+.update-application-stage-actions {
+	display: flex;
+	gap: 10px;
+	margin-top: 12px;
+}
+
+.update-application-stage-actions .modal-button {
+	flex: 1;
+	min-height: 42px;
+	padding: 9px 12px;
+	border-radius: 9px;
+}
+
 @media (max-width: 480px) {
 	.reject-application-actions {
 		flex-direction: row;

@@ -88,3 +88,25 @@ export const rejectApplication = async (
     // throw new Error(getErrorMessage(error));
   }
 };
+
+export const updateApplicationStage = async (
+  applicationId: number,
+  new_stage: string,
+) => {
+  const token = sessionStorage.getItem("access_token");
+
+  try {
+    const response = await axios.patch(
+      `${API_BASE_URL}/applications/${applicationId}/stage`,
+      { new_stage },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    // throw new Error(getErrorMessage(error));
+  }
+};
