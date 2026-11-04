@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import Navbar from "../../components/layout/Navbar";
 import { useGetJobApplications, useGetJobs } from "../../hooks/useJobs";
 import type { Job } from "../../types/job";
 import EmptyPage from "../../components/layout/EmptyPage";
 import UpdateApplicationStageModal from "../../components/layout/UpdateApplicationStageModal";
+import RejectApplication from "../../components/layout/RejectApplication";
+import { useRejectApplication } from "../../hooks/useApplications";
 
 const Applications = () => {
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
@@ -21,6 +24,31 @@ const Applications = () => {
     useState<any | null>(null);
   const [isUpdateApplicationModalOpen, setIsUpdateApplicationModalOpen] =
     useState<boolean>(false);
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState<boolean>(false);
+  const rejectApplicationMutation = useRejectApplication();
+  const queryClient = useQueryClient();
+
+  const onConfirm = (rejection_reason: string) => {
+    if (!selectedCandidateApplication) return;
+
+    rejectApplicationMutation.mutate(
+      { applicationId: selectedCandidateApplication.id, rejection_reason },
+      {
+        onSuccess: async () => {
+          await queryClient.invalidateQueries({
+            queryKey: ["jobApplications"],
+          });
+          setIsRejectModalOpen(false);
+          setSelectedCandidateApplication(null);
+          setIsDrawerOpen(false);
+        },
+      },
+    );
+  };
+
+  const onCancel = () => {
+    setIsRejectModalOpen(false);
+  };
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -293,7 +321,10 @@ const Applications = () => {
                   className="recruiter-application-filters"
                   aria-label="Filter applications"
                 >
-                  <label className="recruiter-application-search" aria-label="Search applications">
+                  <label
+                    className="recruiter-application-search"
+                    aria-label="Search applications"
+                  >
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                       <circle cx="11" cy="11" r="5.5" />
                       <path d="M16 16l5 5" />
@@ -333,7 +364,11 @@ const Applications = () => {
                         <option value="Offer">Offer</option>
                         <option value="Rejected">Rejected</option>
                       </select>
-                      <svg className="select-chevron" viewBox="0 0 20 20" aria-hidden="true">
+                      <svg
+                        className="select-chevron"
+                        viewBox="0 0 20 20"
+                        aria-hidden="true"
+                      >
                         <path d="M5 7.5 10 12.5 15 7.5" />
                       </svg>
                     </div>
@@ -359,7 +394,11 @@ const Applications = () => {
                         <option value="30">Last 30 days</option>
                         <option value="90">Last 90 days</option>
                       </select>
-                      <svg className="select-chevron" viewBox="0 0 20 20" aria-hidden="true">
+                      <svg
+                        className="select-chevron"
+                        viewBox="0 0 20 20"
+                        aria-hidden="true"
+                      >
                         <path d="M5 7.5 10 12.5 15 7.5" />
                       </svg>
                     </div>
@@ -622,7 +661,7 @@ const Applications = () => {
             </dl>
           </section>
 
-          <section className="candidate-application-notes">
+          {/* <section className="candidate-application-notes">
             <h3>Recruiter notes</h3>
             <div className="candidate-application-notes-field">
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -635,11 +674,15 @@ const Applications = () => {
                 aria-label="Recruiter notes"
               />
             </div>
-          </section>
+          </section> */}
         </div>
         {selectedCandidateApplication?.stage != "Applied" && (
           <div className="candidate-application-actions">
-            <button type="button" className="candidate-application-reject">
+            <button
+              type="button"
+              className="candidate-application-reject"
+              onClick={() => setIsRejectModalOpen(true)}
+            >
               Reject
             </button>
             <button
@@ -658,6 +701,19 @@ const Applications = () => {
           applicationDetails={selectedCandidateApplication}
           job_department={jobApplications.job_department}
           job_location={jobApplications.job_location}
+        />
+      )}
+
+      {isRejectModalOpen && (
+        <RejectApplication
+          application={{
+            candidate_name: selectedCandidateApplication.candidate_name,
+            job: selectedCandidateApplication.job,
+            id: selectedCandidateApplication.id,
+            stage: selectedCandidateApplication.stage,
+          }}
+          onReject={onConfirm}
+          onCancel={onCancel}
         />
       )}
     </>

@@ -4,6 +4,7 @@ import {
   getApplicationCounts,
   getCandidateApplications,
   getLiveApplications,
+  rejectApplication,
 } from "../api/applications";
 
 export const useApplyJob = () =>
@@ -27,4 +28,15 @@ export const useCandidateApplications = (status: string | null) =>
   useQuery({
     queryKey: ["applications", status ?? null],
     queryFn: () => getCandidateApplications(status),
+  });
+
+export const useRejectApplication = () =>
+  useMutation({
+    mutationFn: ({
+      applicationId,
+      rejection_reason,
+    }: {
+      applicationId: number;
+      rejection_reason: string;
+    }) => rejectApplication(applicationId, rejection_reason),
   });

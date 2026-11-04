@@ -192,6 +192,7 @@ const BrowseJobs = () => {
           message={`Are you sure you want to submit your application for "${applyingJob?.title}"`}
           cancelText="Cancel"
           confirmText="Apply Job"
+          confirmClassString=""
           icon={
             <path
               stroke="currentColor"

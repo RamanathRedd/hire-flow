@@ -277,6 +277,7 @@ const Interviews = () => {
     !selectedStatus &&
     !selectedRoundType &&
     !selectedJob;
+
   const showNoUpcomingInterviews =
     interviews.length === 0 &&
     !allJobs &&
@@ -287,6 +288,21 @@ const Interviews = () => {
   const showNoFilteredInterviews =
     interviews.length === 0 &&
     (selectedStatus || selectedRoundType || selectedJob);
+
+  const scheduledAtTime = new Date(editInterview?.scheduled_at ?? "").getTime();
+
+  const hasRescheduleChanges =
+    editInterview?.interviewer_id !== editInterview?.original_interviewer_id ||
+    (toDateTimeLocal(editInterview?.scheduled_at) !==
+      toDateTimeLocal(editInterview?.original_scheduled_at) &&
+      scheduledAtTime > Date.now());
+
+  const sumitFeedbackChanges = reason && rating != 0;
+
+  const hasJobChanges =
+    (sideBarTitle === "Reschedule Interview" && hasRescheduleChanges) ||
+    sideBarTitle === "Cancel Interview" ||
+    (sideBarTitle === "Submit Feedback" && sumitFeedbackChanges);
 
   return (
     <div
@@ -480,7 +496,13 @@ const Interviews = () => {
                                       aria-controls="side-bar-navigation"
                                       aria-expanded={isDrawerOpen}
                                       onClick={() => {
-                                        setEditInterview(interview);
+                                        setEditInterview({
+                                          ...interview,
+                                          original_scheduled_at:
+                                            interview.scheduled_at,
+                                          original_interviewer_id:
+                                            interview.interviewer_id,
+                                        });
                                         setMode("Rescheduled");
                                         //   setOriginalEditJob(job);
                                         setSideBarTitle("Reschedule Interview");
@@ -634,7 +656,13 @@ const Interviews = () => {
             x
           </button>
         </div>
-        <div className="interview-edit-form">
+        <form
+          className="interview-edit-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            updateInterview();
+          }}
+        >
           <div className="interview-edit-field">
             <label htmlFor="candidate-name">Candidate Name</label>
             <input
@@ -753,7 +781,9 @@ const Interviews = () => {
             <>
               {mode === "Completed" && (
                 <div className="interview-edit-field">
-                  <label>Rating</label>
+                  <label>
+                    Rating<span className="text-red-500"> *</span>
+                  </label>
                   <div className="flex gap-2 ">
                     {[1, 2, 3, 4, 5].map((option) => (
                       <button
@@ -774,6 +804,9 @@ const Interviews = () => {
               <div className="interview-edit-field">
                 <label htmlFor="cancel-feedback-reason">
                   {mode === "Cancelled" ? "Reason (optional)" : "Feedback"}
+                  {mode === "Completed" && sideBarTitle !== "View Feedback" && (
+                    <span className="text-red-500"> *</span>
+                  )}
                 </label>
                 <textarea
                   id="cancel-feedback-reason"
@@ -781,6 +814,7 @@ const Interviews = () => {
                   value={reason ?? ""}
                   onChange={(event) => setReason(event.target.value)}
                   rows={3}
+                  minLength={3}
                   placeholder={
                     mode === "Cancelled"
                       ? "e.g. Candidate unavailable, interviewer on leave…"
@@ -801,6 +835,7 @@ const Interviews = () => {
               onClick={() => {
                 setIsDrawerOpen(false);
                 setRating(0);
+                setIsDrawerOpen(false);
                 setReason(null);
               }}
             >
@@ -810,14 +845,13 @@ const Interviews = () => {
               <button
                 className="interview-edit-submit"
                 type="submit"
-                onClick={updateInterview}
-                // disabled={!hasJobChanges}
+                disabled={!hasJobChanges}
               >
                 {sideBarTitle}
               </button>
             )}
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

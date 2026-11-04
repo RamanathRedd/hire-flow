@@ -66,3 +66,25 @@ export const getApplicationCounts = async () => {
     // throw new Error(getErrorMessage(error));
   }
 };
+
+export const rejectApplication = async (
+  applicationId: number,
+  rejection_reason: string,
+) => {
+  const token = sessionStorage.getItem("access_token");
+
+  try {
+    const response = await axios.patch(
+      `${API_BASE_URL}/applications/${applicationId}/reject`,
+      { rejection_reason },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    // throw new Error(getErrorMessage(error));
+  }
+};
