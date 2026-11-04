@@ -125,6 +125,16 @@ const Applications = () => {
   });
 
   const selectedJob = jobs.find((job: Job) => job.id === selectedJobId);
+  const nextApplicationStage =
+    selectedCandidateApplication?.stage === "Applied"
+      ? "Screened"
+      : selectedCandidateApplication?.stage === "Screened"
+        ? "Interview_R1"
+        : selectedCandidateApplication?.stage === "Interview_R1"
+          ? "Interview_R2"
+          : selectedCandidateApplication?.stage === "Interview_R2"
+            ? "HR_Round"
+            : "Offer";
 
   const applicationRows = jobApplications.applications
     ? jobApplications.applications
@@ -678,21 +688,6 @@ const Applications = () => {
               </div>
             </dl>
           </section>
-
-          {/* <section className="candidate-application-notes">
-            <h3>Recruiter notes</h3>
-            <div className="candidate-application-notes-field">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h5" />
-              </svg>
-              <textarea
-                rows={3}
-                placeholder="Enter your notes here..."
-                required
-                aria-label="Recruiter notes"
-              />
-            </div>
-          </section> */}
         </div>
         {selectedCandidateApplication &&
           selectedCandidateApplication.stage !== "Applied" && (
@@ -709,17 +704,7 @@ const Applications = () => {
                 className="candidate-application-update-stage"
                 onClick={() => setIsUpdateApplicationModalOpen(true)}
               >
-                Move to{" "}
-                {selectedCandidateApplication &&
-                selectedCandidateApplication.stage === "Applied"
-                  ? "Screened"
-                  : selectedCandidateApplication.stage === "Screened"
-                    ? "Interview_R1"
-                    : selectedCandidateApplication.stage === "Interview_R1"
-                      ? "Interview_R2"
-                      : selectedCandidateApplication.stage === "Interview_R2"
-                        ? "HR_Round"
-                        : "Offer"}
+                Move to {nextApplicationStage.replace(/_/g, " ")}
               </button>
             </div>
           )}
@@ -727,18 +712,7 @@ const Applications = () => {
 
       {isUpdateApplicationModalOpen && selectedCandidateApplication && (
         <UpdateApplicationStageModal
-          stage={
-            selectedCandidateApplication &&
-            selectedCandidateApplication.stage === "Applied"
-              ? "Screened"
-              : selectedCandidateApplication.stage === "Screened"
-                ? "Interview_R1"
-                : selectedCandidateApplication.stage === "Interview_R1"
-                  ? "Interview_R2"
-                  : selectedCandidateApplication.stage === "Interview_R2"
-                    ? "HR_Round"
-                    : "Offer"
-          }
+          stage={nextApplicationStage}
           candidateName={selectedCandidateApplication.candidate_name}
           onCancel={() => setIsUpdateApplicationModalOpen(false)}
           onConfirm={onUpdate}
