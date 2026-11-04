@@ -753,8 +753,8 @@ const Applications = () => {
             id: selectedCandidateApplication.id,
             stage: selectedCandidateApplication.stage,
           }}
-          onReject={onConfirm}
           onCancel={() => setIsRejectModalOpen(false)}
+          onReject={onConfirm}
         />
       )}
     </>
