@@ -41,7 +41,27 @@ const RejectApplication = ({
           <span aria-hidden="true">×</span> Close
         </button>
         <div className="save-modal-copy reject-application-copy">
-          <h2 id="reject-application-title">
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "18px",
+              height: "18px",
+              borderRadius: "50%",
+              background: "#d32f2f",
+              color: "#fff",
+              fontSize: "12px",
+              fontWeight: 700,
+              lineHeight: 1,
+              marginRight: "8px",
+              verticalAlign: "middle",
+            }}
+            aria-hidden="true"
+          >
+            !
+          </div>
+          <h2 id="reject-application-title" style={{ display: "inline" }}>
             Reject {application.candidate_name}?
           </h2>
           <p id="reject-application-description">
