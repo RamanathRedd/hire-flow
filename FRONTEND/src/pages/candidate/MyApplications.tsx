@@ -4,6 +4,7 @@ import { useCandidateApplications } from "../../hooks/useApplications";
 import ApplicationTimeline from "../../components/layout/ApplicationTimeline";
 import { formatDate } from "../../hooks/useReferenceData";
 import EmptyPage from "../../components/layout/EmptyPage";
+import { APPLICATION_STAGES } from "../../common";
 
 const MyApplications = () => {
   const [allApplications, setAllApplications] = useState<boolean>(true);
@@ -110,7 +111,7 @@ const MyApplications = () => {
                       const stageStep = Math.min(application.stage_step, 7);
 
                       const stageLabel = isRejected
-                        ? "Closed"
+                        ? "Not selected"
                         : application.stage.replaceAll("_", " ");
                       const isExpanded =
                         expandedApplicationId === application.id;
@@ -151,15 +152,28 @@ const MyApplications = () => {
                                 aria-valuemax={7}
                                 aria-valuenow={stageStep}
                               >
-                                {Array.from({ length: 7 }, (_, index) => (
-                                  <span
-                                    key={index}
-                                    className={
-                                      index < stageStep
-                                        ? "application-progress-step is-complete"
-                                        : "application-progress-step"
-                                    }
-                                  />
+                                {APPLICATION_STAGES.map((stage, index) => (
+                                  <div
+                                    className="application-progress-stage"
+                                    key={stage}
+                                  >
+                                    <span
+                                      className={
+                                        index < stageStep
+                                          ? "application-progress-step is-complete"
+                                          : "application-progress-step"
+                                      }
+                                    />
+                                    <span
+                                      className={
+                                        index < stageStep
+                                          ? "application-progress-label is-complete"
+                                          : "application-progress-label"
+                                      }
+                                    >
+                                      {stage.replaceAll("_", " ")}
+                                    </span>
+                                  </div>
                                 ))}
                               </div>
                               <p className="application-step-label">
@@ -171,14 +185,56 @@ const MyApplications = () => {
                               Application closed
                             </p>
                           )}
-
-                          <p className="application-stage-message">
-                            {application.rejection_reason ||
-                              application.notes ||
-                              (isRejected
-                                ? "This application has been closed."
-                                : `Your application is currently at the ${stageLabel} stage.`)}
-                          </p>
+                          <div className="application-current-status">
+                            <div className="application-current-status-heading">
+                              <svg
+                                className={
+                                  isRejected ? "recruiter-feedback-icon" : ""
+                                }
+                                aria-hidden="true"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                              >
+                                {isRejected ? (
+                                  <path
+                                    d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"
+                                    stroke="currentColor"
+                                    strokeWidth="1.8"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                ) : (
+                                  <>
+                                    <circle
+                                      cx="12"
+                                      cy="12"
+                                      r="9"
+                                      stroke="currentColor"
+                                      strokeWidth="1.8"
+                                    />
+                                    <path
+                                      d="M12 11v5m0-8h.01"
+                                      stroke="currentColor"
+                                      strokeWidth="1.8"
+                                      strokeLinecap="round"
+                                    />
+                                  </>
+                                )}
+                              </svg>
+                              <strong>
+                                {isRejected
+                                  ? "Recruiter feedback"
+                                  : "Current status"}
+                              </strong>
+                            </div>
+                            <p className="application-stage-message">
+                              {application.rejection_reason ||
+                                application.notes ||
+                                (isRejected
+                                  ? "Your profile did not fully match the requirements for this position."
+                                  : `Your application is currently at the ${stageLabel} stage.`)}
+                            </p>
+                          </div>
 
                           <div className="application-card-footer">
                             <p>

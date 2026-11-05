@@ -2310,20 +2310,40 @@ body {
 }
 
 .application-progress {
-	display: flex;
+	display: grid;
+	grid-template-columns: repeat(7, minmax(0, 1fr));
 	gap: 5px;
 	margin-top: 10px;
 }
 
+.application-progress-stage {
+	display: flex;
+	min-width: 0;
+	flex-direction: column;
+	gap: 4px;
+}
+
 .application-progress-step {
 	height: 6px;
-	flex: 1;
 	border-radius: 999px;
 	background: #45474b;
 }
 
 .application-progress-step.is-complete {
 	background: #0fae9d;
+}
+
+.application-progress-label {
+	overflow: hidden;
+	color: #b7bbc2;
+	font-size: 10px;
+	line-height: 1.2;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.application-progress-label.is-complete{
+	color:#0fae9d;
 }
 
 .application-step-label {
@@ -2333,13 +2353,34 @@ body {
 	line-height: 1.3;
 }
 
-.application-stage-message {
-	margin: 0;
-	padding: 8px 10px;
-	border-radius: 8px;
-	background: #151618;
+.application-current-status {
+	margin-top: 16px;
+}
+
+.application-current-status-heading {
+	display: flex;
+	align-items: center;
+	gap: 8px;
 	color: #e2e5e9;
-	font-size: 13px;
+	font-size: 14px;
+	line-height: 1.4;
+}
+
+.application-current-status-heading svg {
+	width: 16px;
+	height: 16px;
+	flex: 0 0 auto;
+	color: #31a8ff;
+}
+
+.application-current-status-heading svg.recruiter-feedback-icon {
+	color: #d1d5db;
+}
+
+.application-stage-message {
+	margin: 8px 0 0;
+	color: #e2e5e9;
+	font-size: 14px;
 	line-height: 1.4;
 }
 

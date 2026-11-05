@@ -1,4 +1,5 @@
 import { formatDate } from "../../hooks/useReferenceData";
+import { APPLICATION_STAGES } from "../../common";
 
 type ApplicationTimelineProps = {
   currentStage: string;
@@ -10,16 +11,6 @@ type ApplicationTimelineProps = {
     days_in_stage: number;
   }[];
 };
-
-const APPLICATION_STAGES = [
-  "Applied",
-  "Screened",
-  "Interview_R1",
-  "Interview_R2",
-  "HR_Round",
-  "Offer",
-  "Hired",
-];
 
 const formatStage = (stage: string) => stage.replaceAll("_", " ");
 
@@ -47,12 +38,6 @@ const ApplicationTimeline = ({
           const stageHistoryEntry = orderedHistory.find(
             (history) => history.to_stage === stage,
           );
-          const previousStageHistoryEntry =
-            index > 0
-              ? orderedHistory.find(
-                  (history) => history.to_stage === stages[index - 1],
-                )
-              : undefined;
           const isCurrent = index === currentStageIndex;
           const isComplete =
             currentStageIndex >= 0 && index < currentStageIndex;
@@ -87,18 +72,10 @@ const ApplicationTimeline = ({
                 {stageHistoryEntry && (
                   <span className="application-timeline-date">
                     {isCurrent ? "Since " : ""}
-                    {formatDate(stageHistoryEntry.created_at)}
-                    {stage !== "Applied" &&
-                      previousStageHistoryEntry && (
-                      <>
-                        {" "}
-                        - {previousStageHistoryEntry.days_in_stage}{" "}
-                        {previousStageHistoryEntry.days_in_stage <= 1
-                          ? "day"
-                          : "days"}{" "}
-                        in {stages[index - 1]}
-                      </>
-                    )}
+                    {formatDate(stageHistoryEntry.created_at)} ·{" "}
+                    {stageHistoryEntry.days_in_stage}{" "}
+                    {stageHistoryEntry.days_in_stage <= 1 ? "day" : "days"} in
+                    this stage
                   </span>
                 )}
               </div>
