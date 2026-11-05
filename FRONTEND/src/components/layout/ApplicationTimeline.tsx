@@ -72,10 +72,14 @@ const ApplicationTimeline = ({
                 {stageHistoryEntry && (
                   <span className="application-timeline-date">
                     {isCurrent ? "Since " : ""}
-                    {formatDate(stageHistoryEntry.created_at)} ·{" "}
-                    {stageHistoryEntry.days_in_stage}{" "}
-                    {stageHistoryEntry.days_in_stage <= 1 ? "day" : "days"} in
-                    this stage
+                    {formatDate(stageHistoryEntry.created_at)}{" "}
+                    {!["Rejected", "Hired"].includes(stage) && (
+                      <>
+                        · {stageHistoryEntry.days_in_stage}{" "}
+                        {stageHistoryEntry.days_in_stage <= 1 ? "day" : "days"}{" "}
+                        in this stage
+                      </>
+                    )}
                   </span>
                 )}
               </div>
