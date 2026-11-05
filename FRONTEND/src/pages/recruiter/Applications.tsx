@@ -690,7 +690,8 @@ const Applications = () => {
           </section>
         </div>
         {selectedCandidateApplication &&
-          selectedCandidateApplication.stage !== "Applied" && (
+          selectedCandidateApplication.stage !== "Applied" &&
+          selectedCandidateApplication.stage !== "Rejected" && (
             <div className="candidate-application-actions">
               <button
                 type="button"
