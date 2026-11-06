@@ -35,9 +35,29 @@ const ApplicationTimeline = ({
       )
     : stages;
 
+  const round =
+    currentStage === "Interview_R1"
+      ? "Round 1 · "
+      : currentStage === "Interview_R2"
+        ? "Round 2 · "
+        : "";
+
+  const roundType = ["Interview_R1", "Interview_R2"].includes(currentStage)
+    ? "Technical"
+    : "HR Round";
+
   return (
     <section className="application-timeline" aria-label="Application timeline">
       <h3>Application timeline</h3>
+      {["Interview_R1", "Interview_R2", "HR_Round"].includes(currentStage) && (
+        <div className="application-upcoming-interview">
+          <h4>Upcoming interview</h4>
+          <p>
+            {round}
+            {roundType} · Jun 10, 10:00 AM · with Arjun
+          </p>
+        </div>
+      )}
       <ol className="application-timeline-track">
         {visibleStages.map((stage) => {
           const stageHistoryEntry = orderedHistory.find(
