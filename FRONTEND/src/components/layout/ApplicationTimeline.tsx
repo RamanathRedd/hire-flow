@@ -3,6 +3,7 @@ import { APPLICATION_STAGES } from "../../common";
 
 type ApplicationTimelineProps = {
   currentStage: string;
+  isRejected: boolean;
   stageHistory: {
     id: number;
     from_stage: string | null;
@@ -16,6 +17,7 @@ const formatStage = (stage: string) => stage.replaceAll("_", " ");
 
 const ApplicationTimeline = ({
   currentStage,
+  isRejected,
   stageHistory,
 }: ApplicationTimelineProps) => {
   const stages =
@@ -43,47 +45,51 @@ const ApplicationTimeline = ({
             currentStageIndex >= 0 && index < currentStageIndex;
 
           return (
-            <li
-              className={[
-                "application-timeline-stage",
-                isComplete && "is-complete",
-                isCurrent && "is-current",
-                stage === "Rejected" && "is-rejected",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              key={stage}
-              aria-current={isCurrent ? "step" : undefined}
-            >
-              <span
-                className="application-timeline-marker"
-                aria-hidden="true"
-              />
-              <div className="application-timeline-entry">
-                <span className="application-timeline-transition">
-                  {formatStage(stage)}
-                  {isCurrent && (
-                    <span className="application-timeline-current-label">
-                      {" "}
-                      · current stage
+            <>
+              {stageHistoryEntry && (
+                <li
+                  className={[
+                    "application-timeline-stage",
+                    isComplete && "is-complete",
+                    isCurrent && "is-current",
+                    stage === "Rejected" && "is-rejected",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  key={stage}
+                  aria-current={isCurrent ? "step" : undefined}
+                >
+                  <span
+                    className="application-timeline-marker"
+                    aria-hidden="true"
+                  />
+                  <div className="application-timeline-entry">
+                    <span className="application-timeline-transition">
+                      {formatStage(stage)}
+                      {isCurrent && stage !== "Rejected" && (
+                        <span className="application-timeline-current-label">
+                          {" "}
+                          · current stage
+                        </span>
+                      )}
                     </span>
-                  )}
-                </span>
-                {stageHistoryEntry && (
-                  <span className="application-timeline-date">
-                    {isCurrent ? "Since " : ""}
-                    {formatDate(stageHistoryEntry.created_at)}{" "}
-                    {!["Rejected", "Hired"].includes(stage) && (
-                      <>
-                        · {stageHistoryEntry.days_in_stage}{" "}
-                        {stageHistoryEntry.days_in_stage <= 1 ? "day" : "days"}{" "}
-                        in this stage
-                      </>
-                    )}
-                  </span>
-                )}
-              </div>
-            </li>
+                    <span className="application-timeline-date">
+                      {isCurrent && stage !== "Rejected" ? "Since " : ""}
+                      {formatDate(stageHistoryEntry.created_at)}{" "}
+                      {!["Rejected", "Hired"].includes(stage) && (
+                        <>
+                          · {stageHistoryEntry.days_in_stage}{" "}
+                          {stageHistoryEntry.days_in_stage <= 1
+                            ? "day"
+                            : "days"}{" "}
+                          in this stage
+                        </>
+                      )}
+                    </span>
+                  </div>
+                </li>
+              )}
+            </>
           );
         })}
       </ol>

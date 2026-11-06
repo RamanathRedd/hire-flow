@@ -46,7 +46,11 @@ const MyApplications = () => {
 
   return (
     <section className="candidate-applications-page">
-      <Navbar leftTitle="My applications" rightText="" />
+      <Navbar
+        leftTitle="My applications"
+        rightText={`${applicationsData.all_applications} total`}
+        classString="my-applications-count-badge"
+      />
       {applicationsData.applications.length === 0 &&
       !activeApplications &&
       !closedApplications ? (
@@ -255,6 +259,7 @@ const MyApplications = () => {
                           </div>
                           {isExpanded && (
                             <ApplicationTimeline
+                              isRejected={isRejected}
                               currentStage={application.stage}
                               stageHistory={application.stage_history}
                             />
