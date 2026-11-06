@@ -259,7 +259,6 @@ const MyApplications = () => {
                           </div>
                           {isExpanded && (
                             <ApplicationTimeline
-                              isRejected={isRejected}
                               currentStage={application.stage}
                               stageHistory={application.stage_history}
                             />
