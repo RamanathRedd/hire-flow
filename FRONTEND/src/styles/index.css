@@ -287,6 +287,16 @@ body {
 	background: #5a73f6;
 }
 
+.modal-button-primary:disabled,
+.modal-button-primary:disabled:hover {
+	border-color: #394b9e;
+	background: #354ed5;
+	color: #c8d0ff;
+	cursor: not-allowed;
+	opacity: 0.58;
+	box-shadow: none;
+}
+
 
 .job-update{
 	background: #4b67f5;
@@ -418,38 +428,141 @@ body {
 }
 
 .update-application-stage-modal {
-	width: min(100%, 380px);
-	padding: 22px;
-	border-radius: 12px;
+	width: min(100%, 440px);
+	padding: 26px;
+	border: 1px solid #2b3943;
+	border-radius: 16px;
 	background: #191c21;
+	box-shadow: 0 24px 70px rgba(0, 0, 0, 0.48);
 }
 
 .update-application-stage-modal .modal-close {
-	top: 20px;
-	right: 16px;
+	top: 18px;
+	right: 18px;
+}
+
+.update-application-stage-eyebrow {
+	display: block;
+	margin-bottom: 7px;
+	color: #8995a5;
+	font-size: 0.68rem;
+	font-weight: 700;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
 }
 
 .update-application-stage-copy h2 {
-	padding-right: 88px;
-	font-size: 1rem;
+	padding-right: 82px;
+	font-size: 1.12rem;
+	line-height: 1.35;
 }
 
-.update-application-stage-copy p {
-	margin-top: 4px;
+.update-application-stage-copy > p {
+	margin-top: 7px;
+	font-size: 0.84rem;
+	line-height: 1.5;
+}
+
+.update-application-interview-fields {
+	display: grid;
+	gap: 14px;
+	margin-top: 20px;
+	padding: 16px;
+	border: 1px solid #2b323d;
+	border-radius: 12px;
+	background: #15191f;
+}
+
+.update-application-interview-heading {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #2b323d;
+	color: #e6eaf0;
 	font-size: 0.8rem;
+	font-weight: 650;
+}
+
+.update-application-interview-heading span:last-child {
+	color: #8995a5;
+	font-size: 0.68rem;
+	font-weight: 500;
+}
+
+.update-application-interview-field {
+	display: grid;
+	gap: 7px;
+	min-width: 0;
+}
+
+.update-application-interview-field label {
+	color: #a9b2c0;
+	font-size: 0.75rem;
+	font-weight: 600;
+}
+
+.update-application-interview-field input,
+.update-application-interview-field select {
+	box-sizing: border-box;
+	width: 100%;
+	min-height: 42px;
+	padding: 0 12px;
+	border: 1px solid #343c48;
+	border-radius: 8px;
+	background: #1b2028;
+	color: #edf2f8;
+	font: inherit;
+	font-size: 0.84rem;
+	color-scheme: dark;
+}
+
+.update-application-interview-field select:disabled {
+	color: #8995a5;
+	cursor: wait;
+}
+
+.update-application-interview-field input:focus-visible,
+.update-application-interview-field select:focus-visible {
+	border-color: #6f87ff;
+	outline: 2px solid rgba(111, 135, 255, 0.22);
+	outline-offset: 1px;
+}
+
+.update-application-interview-field [role="alert"] {
+	color: #fca5a5;
+	font-size: 0.75rem;
+	line-height: 1.4;
 }
 
 .update-application-stage-actions {
 	display: flex;
 	gap: 10px;
-	margin-top: 12px;
+	margin-top: 20px;
 }
 
 .update-application-stage-actions .modal-button {
 	flex: 1;
-	min-height: 42px;
-	padding: 9px 12px;
-	border-radius: 9px;
+	min-height: 44px;
+	padding: 10px 12px;
+	border-radius: 10px;
+	font-size: 0.84rem;
+}
+
+.update-application-stage-actions .modal-button:focus-visible {
+	outline: 2px solid #91a5ff;
+	outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+	.update-application-stage-modal {
+		padding: 22px 18px;
+	}
+
+	.update-application-interview-fields {
+		padding: 13px;
+	}
 }
 
 @media (max-width: 480px) {

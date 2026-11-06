@@ -50,7 +50,11 @@ const Applications = () => {
     );
   };
 
-  const onUpdate = (stage: string) => {
+  const onUpdate = (
+    stage: string,
+    scheduledAt: string,
+    interviewer: number | null,
+  ) => {
     if (!selectedCandidateApplication) return;
 
     updateApplicationStageMutation.mutate(
