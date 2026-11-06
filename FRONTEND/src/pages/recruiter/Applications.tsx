@@ -10,6 +10,7 @@ import {
   useRejectApplication,
   useUpdateApplicationStage,
 } from "../../hooks/useApplications";
+import { useScheduleInterview } from "../../hooks/useInterviews";
 
 const Applications = () => {
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
@@ -31,6 +32,7 @@ const Applications = () => {
   const queryClient = useQueryClient();
   const rejectApplicationMutation = useRejectApplication();
   const updateApplicationStageMutation = useUpdateApplicationStage();
+  const scheduleInterviewMutation = useScheduleInterview();
 
   const onConfirm = (rejection_reason: string) => {
     if (!selectedCandidateApplication) return;
@@ -50,26 +52,41 @@ const Applications = () => {
     );
   };
 
-  const onUpdate = (
+  const onUpdate = async (
     stage: string,
     scheduledAt: string,
     interviewer: number | null,
   ) => {
     if (!selectedCandidateApplication) return;
 
-    updateApplicationStageMutation.mutate(
-      { applicationId: selectedCandidateApplication.id, stage },
-      {
-        onSuccess: async () => {
-          await queryClient.invalidateQueries({
-            queryKey: ["jobApplications"],
-          });
-          setIsUpdateApplicationModalOpen(false);
-          setSelectedCandidateApplication(null);
-          setIsDrawerOpen(false);
-        },
-      },
-    );
+    const interviewRound = {
+      Interview_R1: { round_number: 1, round_type: "Technical" },
+      Interview_R2: { round_number: 2, round_type: "Technical" },
+      HR_Round: { round_number: 1, round_type: "HR" },
+    }[stage];
+
+    try {
+      if (interviewRound) {
+        if (!scheduledAt || interviewer === null) return;
+
+        await scheduleInterviewMutation.mutateAsync({
+          application_id: selectedCandidateApplication.id,
+          ...interviewRound,
+          scheduled_at: scheduledAt,
+          interviewer_id: interviewer,
+        });
+      }
+
+      await updateApplicationStageMutation.mutateAsync({
+        applicationId: selectedCandidateApplication.id,
+        stage,
+      });
+
+      await queryClient.invalidateQueries({ queryKey: ["jobApplications"] });
+      setIsUpdateApplicationModalOpen(false);
+      setSelectedCandidateApplication(null);
+      setIsDrawerOpen(false);
+    } catch (error) {}
   };
 
   useEffect(() => {
