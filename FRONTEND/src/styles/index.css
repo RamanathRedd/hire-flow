@@ -2541,6 +2541,29 @@ body {
 	font-weight: 600;
 }
 
+.application-upcoming-interview {
+	margin-bottom: 14px;
+	padding: 13px 16px;
+	border: 1px solid #087c6e;
+	border-radius: 11px;
+	background: #181b20;
+}
+
+.application-upcoming-interview h4 {
+	margin: 0 0 3px;
+	color: #0fae9d;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.2;
+}
+
+.application-upcoming-interview p {
+	margin: 0;
+	color: #9aa4b2;
+	font-size: 12px;
+	line-height: 1.3;
+}
+
 .application-timeline-track {
 	position: relative;
 	display: grid;
