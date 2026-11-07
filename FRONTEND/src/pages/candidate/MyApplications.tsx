@@ -2,7 +2,7 @@ import { useState } from "react";
 import Navbar from "../../components/layout/Navbar";
 import { useCandidateApplications } from "../../hooks/useApplications";
 import ApplicationTimeline from "../../components/layout/ApplicationTimeline";
-import { formatDate } from "../../hooks/useReferenceData";
+import { formatDateDayMonth } from "../../hooks/useReferenceData";
 import EmptyPage from "../../components/layout/EmptyPage";
 import { APPLICATION_STAGES } from "../../common";
 
@@ -15,18 +15,21 @@ const MyApplications = () => {
   >(null);
 
   const getAllApplications = () => {
+    setExpandedApplicationId(null);
     setAllApplications(true);
     setActiveApplications(false);
     setClosedApplications(false);
   };
 
   const getActiveApplications = () => {
+    setExpandedApplicationId(null);
     setAllApplications(false);
     setActiveApplications(true);
     setClosedApplications(false);
   };
 
   const getClosedApplications = () => {
+    setExpandedApplicationId(null);
     setAllApplications(false);
     setActiveApplications(false);
     setClosedApplications(true);
@@ -242,8 +245,10 @@ const MyApplications = () => {
 
                           <div className="application-card-footer">
                             <p>
-                              Applied {formatDate(application.applied_at)} ·
-                              Updated {formatDate(application.stage_updated_at)}
+                              Applied{" "}
+                              {formatDateDayMonth(application.applied_at)} ·
+                              Updated{" "}
+                              {formatDateDayMonth(application.stage_updated_at)}
                             </p>
                             <button
                               type="button"
@@ -259,6 +264,9 @@ const MyApplications = () => {
                           </div>
                           {isExpanded && (
                             <ApplicationTimeline
+                              interviewer_name={application.interviewer_name}
+                              scheduledAt={application.interview_scheduled_at}
+                              roundType={application.interview_round_type}
                               currentStage={application.stage}
                               stageHistory={application.stage_history}
                             />

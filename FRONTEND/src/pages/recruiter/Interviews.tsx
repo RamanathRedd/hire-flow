@@ -12,7 +12,10 @@ import { useGetInterviewers } from "../../hooks/useRecruiters";
 import Modal from "../../components/ui/Modal";
 import { useQueryClient } from "@tanstack/react-query";
 import EmptyPage from "../../components/layout/EmptyPage";
-import { formatDate } from "../../hooks/useReferenceData";
+import {
+  formatDateDayMonth,
+  formatDateDayMonthTime,
+} from "../../hooks/useReferenceData";
 
 const Interviews = () => {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
@@ -113,15 +116,6 @@ const Interviews = () => {
     setSelectedStatus(null);
     setSelectedRoundType(null);
     setSelectedJob(null);
-  };
-
-  const convertTime = (time: string) => {
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    }).format(new Date(time));
   };
 
   const toDateTimeLocal = (time: string | null | undefined) => {
@@ -405,7 +399,7 @@ const Interviews = () => {
             <EmptyPage
               icon="M8 3v3m8-3v3M5 7h14M6.5 5h11A1.5 1.5 0 0 1 19 6.5v11a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 17.5v-11A1.5 1.5 0 0 1 6.5 5ZM4 4l16 16"
               title="Nothing in the next 7 days"
-              subTitle={`Your next interview is on ${formatDate(upcomingInterviewsData.first_upcoming_interview_date)}.`}
+              subTitle={`Your next interview is on ${formatDateDayMonth(upcomingInterviewsData.first_upcoming_interview_date)}.`}
               button={{
                 text: "Show all interviews",
                 onClick: () => setAllJobs(true),
@@ -448,7 +442,9 @@ const Interviews = () => {
                         <td>{interview.job_title}</td>
                         <td>R{interview.round_number}</td>
                         <td>{interview.round_type}</td>
-                        <td>{convertTime(interview.scheduled_at)}</td>
+                        <td>
+                          {formatDateDayMonthTime(interview.scheduled_at)}
+                        </td>
                         <td>{interview.interviewer_name}</td>
                         <td>
                           <span

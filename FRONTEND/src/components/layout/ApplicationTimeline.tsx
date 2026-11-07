@@ -1,8 +1,14 @@
-import { formatDate } from "../../hooks/useReferenceData";
+import {
+  formatDateDayMonth,
+  formatDateDayMonthTime,
+} from "../../hooks/useReferenceData";
 import { APPLICATION_STAGES } from "../../common";
 
 type ApplicationTimelineProps = {
   currentStage: string;
+  interviewer_name?: string | null;
+  scheduledAt?: string | null;
+  roundType?: string | null;
   stageHistory: {
     id: number;
     from_stage: string | null;
@@ -17,6 +23,9 @@ const formatStage = (stage: string) => stage.replaceAll("_", " ");
 const ApplicationTimeline = ({
   currentStage,
   stageHistory,
+  interviewer_name,
+  roundType,
+  scheduledAt,
 }: ApplicationTimelineProps) => {
   const isRejected = currentStage === "Rejected";
   const stages = isRejected
@@ -42,22 +51,20 @@ const ApplicationTimeline = ({
         ? "Round 2 · "
         : "";
 
-  const roundType = ["Interview_R1", "Interview_R2"].includes(currentStage)
-    ? "Technical"
-    : "HR Round";
-
   return (
     <section className="application-timeline" aria-label="Application timeline">
       <h3>Application timeline</h3>
-      {["Interview_R1", "Interview_R2", "HR_Round"].includes(currentStage) && (
-        <div className="application-upcoming-interview">
-          <h4>Upcoming interview</h4>
-          <p>
-            {round}
-            {roundType} · Jun 10, 10:00 AM · with Arjun
-          </p>
-        </div>
-      )}
+      {["Interview_R1", "Interview_R2", "HR_Round"].includes(currentStage) &&
+        scheduledAt && (
+          <div className="application-upcoming-interview">
+            <h4>Upcoming interview</h4>
+            <p>
+              {round}
+              {roundType} · {formatDateDayMonthTime(scheduledAt)}
+              {interviewer_name && ` · with ${interviewer_name}`}
+            </p>
+          </div>
+        )}
       <ol className="application-timeline-track">
         {visibleStages.map((stage) => {
           const stageHistoryEntry = orderedHistory.find(
@@ -98,7 +105,7 @@ const ApplicationTimeline = ({
                 {stageHistoryEntry ? (
                   <span className="application-timeline-date">
                     {isCurrent && stage !== "Rejected" ? "Since " : ""}
-                    {formatDate(stageHistoryEntry.created_at)}{" "}
+                    {formatDateDayMonth(stageHistoryEntry.created_at)}{" "}
                     {!["Rejected", "Hired"].includes(stage) && (
                       <>
                         · {stageHistoryEntry.days_in_stage}{" "}

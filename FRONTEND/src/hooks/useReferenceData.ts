@@ -13,8 +13,16 @@ export const useLocations = () =>
     queryFn: getLocations,
   });
 
-export const formatDate = (date: string) =>
+export const formatDateDayMonth = (date: string) =>
   new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
   }).format(new Date(date));
+
+export const formatDateDayMonthTime = (scheduledAt: string) =>
+  new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(scheduledAt));
