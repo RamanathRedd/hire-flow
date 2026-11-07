@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+from domains.interviews.model import Interview
 from core.constants import STAGES
 from core.exceptions import (
     ApplicationAlreadyExistsError,
@@ -35,6 +36,13 @@ def _serialize_model(instance) -> dict:
         column.name: getattr(instance, column.name)
         for column in instance.__table__.columns
     }
+
+
+def _days_between(start: datetime, end: datetime) -> int:
+    start = start.astimezone(timezone.utc)
+    end = end.astimezone(timezone.utc)
+
+    return max(0, (end - start).days)
 
 
 def create_application(
@@ -111,10 +119,16 @@ def get_candidate_applications(
             StageHistory.from_stage,
             StageHistory.to_stage,
             StageHistory.created_at,
+            Interview.scheduled_at.label("interview_scheduled_at"),
+            Interview.round_type.label("interview_round_type"),
+            Interview.status.label("interview_status"),
+            Recruiter.name.label("interviewer_name"),
         )
         .join(Candidate, Application.candidate_id == Candidate.id)
         .join(Job, Application.job_id == Job.id)
         .outerjoin(StageHistory, StageHistory.application_id == Application.id)
+        .outerjoin(Interview, Interview.application_id == Application.id)
+        .outerjoin(Recruiter, Recruiter.id == Interview.interviewer_id)
     )
 
     query = query.where(Application.candidate_id == current_user["id"])
@@ -128,6 +142,7 @@ def get_candidate_applications(
     result = db.execute(query.order_by(Application.stage_updated_at.desc())).all()
 
     applications_by_id = {}
+    stage_history_ids_by_application: dict[int, set[int]] = {}
     for res in result:
         application = res.Application
         if application.id not in applications_by_id:
@@ -135,6 +150,15 @@ def get_candidate_applications(
                 "id": application.id,
                 "job_id": application.job_id,
                 "candidate_id": application.candidate_id,
+                "interview_scheduled_at": res.interview_scheduled_at
+                if res.interview_status in ("Scheduled", "Rescheduled")
+                else None,
+                "interviewer_name": res.interviewer_name
+                if res.interview_status in ("Scheduled", "Rescheduled")
+                else None,
+                "interview_round_type": res.interview_round_type
+                if res.interview_status in ("Scheduled", "Rescheduled")
+                else None,
                 "stage": application.stage,
                 "stage_updated_at": application.stage_updated_at,
                 "applied_at": application.applied_at,
@@ -150,15 +174,33 @@ def get_candidate_applications(
                 "stage_history": [],
             }
 
-        if res.history_id is not None:
+        history_ids = stage_history_ids_by_application.setdefault(application.id, set())
+        if res.history_id is not None and res.history_id not in history_ids:
+            history_ids.add(res.history_id)
             applications_by_id[application.id]["stage_history"].append(
                 {
                     "id": res.history_id,
                     "from_stage": res.from_stage,
                     "to_stage": res.to_stage,
                     "created_at": res.created_at,
-                    "days_in_stage": (res.created_at - application.applied_at).days,
+                    "days_in_stage": 0,
                 }
+            )
+
+    now_utc = datetime.now(timezone.utc).replace(microsecond=0)
+    for application in applications_by_id.values():
+        stage_history = application["stage_history"]
+        stage_history.sort(key=lambda entry: (entry["created_at"], entry["id"]))
+        for index, history_entry in enumerate(stage_history):
+            if index + 1 < len(stage_history):
+                stage_end = stage_history[index + 1]["created_at"]
+            elif application["stage"] not in ("Hired", "Rejected"):
+                stage_end = now_utc
+            else:
+                stage_end = application["stage_updated_at"]
+
+            history_entry["days_in_stage"] = _days_between(
+                history_entry["created_at"], stage_end
             )
 
     all_applications_list = list(applications_by_id.values())
