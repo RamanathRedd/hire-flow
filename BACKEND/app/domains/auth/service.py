@@ -45,6 +45,8 @@ def login(
     if isAdmin:
         query = select(Recruiter).where(Recruiter.email == email)
         user = db.scalar(query)
+        if not user:
+            raise InvalidCredentials
         role = "Admin"
     else:
         query = select(Candidate).where(Candidate.email == email)
@@ -84,10 +86,12 @@ def get_current_user(db: Session, token: str) -> dict:
 
     if payload["role"] == "Admin":
         user = get_recruiter_details(
-            db, user_id, {"id": user_id, "role": payload["role"]}
+            db, {"id": user_id, "role": payload["role"]}
         )
     else:
-        user = get_candidate_details(db, user_id)
+        user = get_candidate_details(
+            db, {"id": user_id, "role": payload["role"]}
+        )
 
     if not user:
         raise InvalidCredentials

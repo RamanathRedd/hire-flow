@@ -193,6 +193,7 @@ def list_upcoming_interviews(
     result = db.execute(query).all()
 
     upcoming_interviews = []
+    first_upcoming_interview_date = None
     for res in result:
         interview = res.Interview
         upcoming_interviews.append(

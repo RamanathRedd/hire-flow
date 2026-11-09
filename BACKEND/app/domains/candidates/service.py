@@ -56,7 +56,7 @@ def get_candidates(
     if (
         candidate_filters.min_experience is not None
         and candidate_filters.max_experience is not None
-        and candidate_filters.min_experience > candidate_filters.min_experience
+        and candidate_filters.min_experience > candidate_filters.max_experience
     ):
         raise MinGreaterThanMax
     if candidate_filters.min_experience is not None:
@@ -146,9 +146,9 @@ def get_candidate_details(db: Session, current_user: dict) -> dict | None:
             }
         )
 
-        if application.stage == "rejected":
+        if application.stage == "Rejected":
             rejected_count += 1
-        elif application.stage == "hired":
+        elif application.stage == "Hired":
             hired_count += 1
 
     total_applications = len(applications)
