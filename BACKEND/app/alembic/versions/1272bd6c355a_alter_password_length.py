@@ -20,40 +20,34 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # Alter recruiter password length from 100 to 60
-    op.alter_column(
-        "recruiters",
-        "password",
-        existing_type=sa.String(length=100),
-        type_=sa.String(length=60),
-        existing_nullable=False,
-    )
-
-    # Alter candidate password length from 100 to 60
-    op.alter_column(
-        "candidates",
-        "password",
-        existing_type=sa.String(length=100),
-        type_=sa.String(length=60),
-        existing_nullable=False,
-    )
+    _ensure_password_length("recruiters")
+    _ensure_password_length("candidates")
 
 
 def downgrade() -> None:
-    # Revert recruiter password length back to 100
-    op.alter_column(
-        "recruiters",
-        "password",
-        existing_type=sa.String(length=60),
-        type_=sa.String(length=100),
-        existing_nullable=False,
-    )
+    _ensure_password_length("recruiters")
+    _ensure_password_length("candidates")
 
-    # Revert candidate password length back to 100
-    op.alter_column(
-        "candidates",
-        "password",
-        existing_type=sa.String(length=60),
-        type_=sa.String(length=100),
-        existing_nullable=False,
+
+def _ensure_password_length(table_name: str) -> None:
+    bind = op.get_bind()
+    password_column = next(
+        (
+            column
+            for column in sa.inspect(bind).get_columns(table_name)
+            if column["name"] == "password"
+        ),
+        None,
     )
+    if password_column is None:
+        raise RuntimeError(f"{table_name}.password does not exist")
+
+    existing_type = password_column["type"]
+    if getattr(existing_type, "length", None) != 100:
+        op.alter_column(
+            table_name,
+            "password",
+            existing_type=existing_type,
+            type_=sa.String(length=100),
+            existing_nullable=password_column["nullable"],
+        )

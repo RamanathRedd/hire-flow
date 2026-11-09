@@ -26,11 +26,13 @@ From the repository root, install the backend dependencies:
 cd BACKEND
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install fastapi uvicorn sqlalchemy psycopg2-binary alembic PyJWT "pwdlib[argon2]" python-multipart python-dotenv
+python -m pip install fastapi uvicorn sqlalchemy psycopg2-binary alembic PyJWT "pwdlib[argon2]" python-multipart python-dotenv pytest pytest-cov
 Copy-Item .env.example .env
 ```
 
 Edit `.env` with your PostgreSQL connection string and a long, random `SECRET_KEY`. `APP_TITLE` is optional and defaults to `HireFlow Application`. Keep `.env` private; it is excluded from Git. The database tables are created when the application starts.
+
+Alembic migrations assume an existing database schema. The baseline revision only marks the existing schema; it does not create or drop application tables.
 
 ## Run
 
@@ -42,6 +44,17 @@ python -m uvicorn main:app --reload
 ```
 
 The API is available at <http://127.0.0.1:8000>. Interactive API documentation is at <http://127.0.0.1:8000/docs>; the OpenAPI schema is at <http://127.0.0.1:8000/openapi.json>.
+
+## Tests
+
+Run the backend unit tests from the `app` directory. They use mocked database sessions and do not require a running PostgreSQL server:
+
+```powershell
+cd app
+python -m pytest --cov=main --cov=core --cov=domains --cov-branch --cov-report=term-missing
+```
+
+The analytics handlers are placeholders and currently have no implemented behavior to test.
 
 ## API Areas
 

@@ -21,7 +21,15 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Upgrade schema."""
-    op.add_column("candidates", sa.Column("password", sa.String()))
+    bind = op.get_bind()
+    candidate_columns = {
+        column["name"] for column in sa.inspect(bind).get_columns("candidates")
+    }
+    if "password" not in candidate_columns:
+        op.add_column(
+            "candidates",
+            sa.Column("password", sa.String(length=100), nullable=True),
+        )
 
 
 def downgrade() -> None:
