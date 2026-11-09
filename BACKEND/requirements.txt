@@ -1,0 +1,15 @@
+alembic
+fastapi
+psycopg2-binary
+PyJWT
+pytest
+pytest-cov
+python-dotenv
+python-multipart
+pwdlib[argon2]
+sqlalchemy
+uvicorn
+pydantic-settings
+passlib
+bcrypt
+email-validator

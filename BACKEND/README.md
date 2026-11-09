@@ -26,7 +26,7 @@ From the repository root, install the backend dependencies:
 cd BACKEND
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install fastapi uvicorn sqlalchemy psycopg2-binary alembic PyJWT "pwdlib[argon2]" python-multipart python-dotenv pytest pytest-cov
+python -m pip install -r requirements.txt
 Copy-Item .env.example .env
 ```
 
