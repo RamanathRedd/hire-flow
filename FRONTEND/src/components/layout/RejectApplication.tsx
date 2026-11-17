@@ -18,7 +18,7 @@ const RejectApplication = ({
 }: RejectApplicationProps) => {
   const [reason, setReason] = useState("");
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     onReject(reason);
   };
