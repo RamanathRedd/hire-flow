@@ -19,6 +19,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title=settings.APP_TITLE)
 
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS_LIST.split(","),
