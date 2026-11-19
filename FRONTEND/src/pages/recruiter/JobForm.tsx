@@ -110,6 +110,7 @@ const JobForm = () => {
               name="jobTitle"
               value={jobTitle}
               minLength={5}
+              maxLength={50}
               onChange={onJobTitleChange}
               placeholder="e.g. Backend Engineer"
               required
@@ -214,6 +215,7 @@ const JobForm = () => {
               value={requirements}
               onChange={onRequirementsChange}
               minLength={5}
+              maxLength={1000}
               rows={3}
               placeholder="Describe the requirements for this role"
               required
@@ -229,6 +231,7 @@ const JobForm = () => {
               value={description}
               onChange={onDescriptionChange}
               minLength={5}
+              maxLength={500}
               rows={3}
               placeholder="Describe the role and responsibilities"
               required

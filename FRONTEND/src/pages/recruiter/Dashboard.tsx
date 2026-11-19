@@ -59,8 +59,10 @@ const Dashboard = () => {
     editJob.openings_count > 0 &&
     editJob.description &&
     editJob.description.length >= 5 &&
+    editJob.description.length <= 500 &&
     editJob.requirements &&
-    editJob.requirements.length >= 5;
+    editJob.requirements.length >= 5 &&
+    editJob.requirements.length <= 1000;
 
   const [openJobMenu, setOpenJobMenu] = useState<{
     id: number;
@@ -581,6 +583,8 @@ const Dashboard = () => {
                     : currentJob,
                 )
               }
+              minLength={5}
+              maxLength={500}
               rows={3}
               placeholder="Describe the role and responsibilities"
               required
@@ -601,6 +605,8 @@ const Dashboard = () => {
                     : currentJob,
                 )
               }
+              minLength={5}
+              maxLength={1000}
               rows={3}
               placeholder="Describe the requirements for this role"
               required
