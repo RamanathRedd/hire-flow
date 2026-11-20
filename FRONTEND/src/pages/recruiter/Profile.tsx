@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Navbar from "../../components/layout/Navbar";
 import ProfileForm from "../../components/profile/ProfileForm";
 import Modal from "../../components/ui/Modal";
@@ -15,6 +15,8 @@ const inputFieldDetails = [
     type: "text",
     placeHolder: "Enter Your name",
     name: "Full name",
+    minLength: 3,
+    maxLength: 100,
     key: "name",
     required: true,
   },
@@ -49,6 +51,7 @@ interface UserDetails {
 }
 
 const Profile = () => {
+  const profileFormRef = useRef<HTMLFormElement>(null);
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [recruiterDraft, setRecruiterDraft] = useState<RecruiterUpdate>({});
@@ -57,6 +60,9 @@ const Profile = () => {
 
   const onClickEditButton = () => {
     if (isEditable) {
+      if (!profileFormRef.current?.reportValidity()) {
+        return;
+      }
       setIsModalOpen(true);
       return;
     }
@@ -78,7 +84,11 @@ const Profile = () => {
     useGetRecruiterDetails();
 
   const onConfirm = () => {
-    if (!userData.id || updateRecruiterDetailsMutation.isPending) {
+    if (
+      !profileFormRef.current?.reportValidity() ||
+      !userData.id ||
+      updateRecruiterDetailsMutation.isPending
+    ) {
       return;
     }
 
@@ -130,6 +140,7 @@ const Profile = () => {
           inputFields={profileInputFields}
           userData={userData}
           isEditable={isEditable}
+          formRef={profileFormRef}
           onDetailsChange={setRecruiterDraft}
         />
       )}
