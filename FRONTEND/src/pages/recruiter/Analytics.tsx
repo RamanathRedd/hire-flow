@@ -19,7 +19,11 @@ const Analytics = () => {
 
   return (
     <section className="analytics-card" aria-label="Overall funnel">
-      <Navbar leftTitle="Overall funnel" rightText="" classString="" />
+      <Navbar
+        leftTitle="Overall funnel(dummy data)"
+        rightText=""
+        classString=""
+      />
       <div className="analytics-summary">
         {summaryMetrics.map((metric) => (
           <div className="analytics-metric" key={metric.label}>
