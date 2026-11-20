@@ -625,7 +625,7 @@ const Interviews = () => {
 
       <div
         id="side-bar-navigation"
-        className={`fixed top-0 right-0 z-40 h-screen w-85 overflow-y-auto border-s border-default bg-[#11161d] p-4 transition-transform ${
+        className={`interview-edit-drawer fixed top-0 right-0 z-40 h-screen w-85 overflow-y-auto border-s border-default bg-[#11161d] p-4 transition-transform ${
           isDrawerOpen ? "translate-x-0" : "translate-x-full"
         }`}
         tabIndex={-1}

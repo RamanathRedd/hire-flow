@@ -3034,3 +3034,342 @@ input {
 		grid-template-columns: 1fr;
 	}
 }
+
+@media (min-width: 641px) and (max-width: 1100px) {
+	.sidebar {
+		flex-basis: 176px;
+		width: 176px;
+	}
+
+	.interview-toolbar {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		width: auto;
+		margin-right: 20px;
+		margin-left: 20px;
+	}
+
+	.filter-toolbar:not(.interview-toolbar) {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		width: auto;
+		margin-right: 20px;
+		margin-left: 20px;
+	}
+
+	.content-panel {
+		padding-right: 20px;
+		padding-left: 20px;
+		overflow-x: auto;
+	}
+
+	.interviews-results,
+	.responsive-table-wrap {
+		overflow-x: auto;
+	}
+
+	.interviews-results > .jobs-table {
+		min-width: 760px;
+	}
+
+	.recruiter-applications-job-bar,
+	.recruiter-application-filters,
+	.recruiter-application-stats,
+	.recruiter-application-table-wrap,
+	.application-list {
+		margin-right: 20px;
+		margin-left: 20px;
+	}
+}
+
+@media (max-width: 640px) {
+	body {
+		overflow-x: hidden;
+	}
+
+	#root {
+		display: flex;
+		width: 100%;
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.app-shell {
+		min-height: 100vh;
+		flex-direction: column;
+	}
+
+	.sidebar,
+	.sidebar.is-collapsed {
+		position: sticky;
+		z-index: 30;
+		top: 0;
+		width: 100%;
+		height: auto;
+		flex: 0 0 auto;
+		padding: 8px 10px;
+	}
+
+	.sidebar-brand,
+	.sidebar-toggle {
+		display: none;
+	}
+
+	.sidebar-nav {
+		flex-direction: row;
+		gap: 4px;
+		overflow-x: auto;
+		margin: 0;
+		padding-bottom: 2px;
+		scrollbar-width: none;
+	}
+
+	.sidebar.is-collapsed .sidebar-nav {
+		display: flex;
+	}
+
+	.sidebar-nav::-webkit-scrollbar {
+		display: none;
+	}
+
+	.sidebar-link,
+	.sidebar-link.is-active {
+		width: auto;
+		flex: 0 0 auto;
+		margin: 0;
+		padding: 10px 12px;
+		font-size: 0.85rem;
+		white-space: nowrap;
+	}
+
+	.app-main {
+		width: 100%;
+		min-height: 0;
+	}
+
+	.nav-header {
+		min-height: 56px;
+		gap: 10px;
+		padding: 12px 16px;
+	}
+
+	.nav-header.profile-page-header {
+		padding-left: 16px;
+	}
+
+	.nav-title {
+		min-width: 0;
+		font-size: clamp(1.1rem, 5vw, 1.35rem);
+		letter-spacing: -0.03em;
+	}
+
+	.nav-action-button {
+		flex: 0 0 auto;
+		padding: 9px 12px;
+		font-size: 0.88rem;
+		white-space: nowrap;
+	}
+
+	.jobs-dashboard,
+	.candidate-browse-page,
+	.candidate-applications-page,
+	.recruiter-applications-page,
+	.recruiter-interviews-page.is-empty,
+	.recruiter-interviews-page.is-no-upcoming,
+	.recruiter-interviews-page.is-no-filtered {
+		height: auto;
+		min-height: calc(100vh - 52px);
+	}
+
+	.main-header {
+		flex-wrap: wrap;
+		gap: 12px;
+		padding: 16px;
+	}
+
+	.main-header h1 {
+		font-size: 1.6rem;
+	}
+
+	.content-panel {
+		padding: 16px;
+		overflow-x: auto;
+	}
+
+	.filter-toolbar,
+	.filter-toolbar.interview-toolbar,
+	.filter-toolbar.browser-job-toolbar,
+	.filter-toolbar.application-toolbar {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 8px;
+		width: auto;
+		margin: 12px 16px;
+	}
+
+	.filter-toolbar > [role="alert"] {
+		grid-column: 1 / -1;
+	}
+
+	.filter-button {
+		min-height: 42px;
+	}
+
+	.content-panel > .jobs-table {
+		min-width: 680px;
+	}
+
+	.interviews-results {
+		min-width: 0;
+		overflow-x: auto;
+		margin: 0 16px 16px;
+	}
+
+	.interviews-results > .jobs-table {
+		min-width: 760px;
+	}
+
+	.responsive-table-wrap {
+		min-width: 0;
+		overflow-x: auto;
+		margin: 0 16px 16px;
+	}
+
+	.responsive-table-wrap > .jobs-table {
+		min-width: 620px;
+	}
+
+	.jobs-table th,
+	.jobs-table td {
+		padding: 11px 9px;
+		font-size: 0.85rem;
+		white-space: nowrap;
+	}
+
+	.empty-page {
+		min-height: 260px;
+		margin: 16px;
+		padding: 24px 16px;
+	}
+
+	.recruiter-interviews-page.is-no-upcoming > .empty-page,
+	.interviews-results.is-empty > .empty-page {
+		margin: 0 16px 16px;
+	}
+
+	.profile-form-grid {
+		gap: 14px;
+		padding: 16px;
+	}
+
+	.recruiter-application-table-wrap {
+		overflow-x: auto;
+	}
+
+	.recruiter-application-table {
+		min-width: 620px;
+	}
+
+	.recruiter-applications-job-bar,
+	.recruiter-application-filters,
+	.recruiter-application-stats,
+	.application-list {
+		max-width: 100%;
+	}
+
+	.job-edit-drawer,
+	.interview-edit-drawer {
+		width: 100vw;
+	}
+
+	.candidate-application-drawer {
+		width: 100%;
+		padding-right: 14px;
+		padding-left: 14px;
+	}
+
+	.candidate-application-overview {
+		grid-template-columns: 1fr;
+	}
+
+	.candidate-application-summary {
+		flex-wrap: wrap;
+	}
+
+	.candidate-application-actions button {
+		max-width: none;
+		min-height: 42px;
+		font-size: 0.78rem;
+	}
+
+	.application-progress {
+		gap: 3px;
+	}
+
+	.application-card-header {
+		gap: 10px;
+	}
+
+	.application-stage-badge {
+		max-width: 42%;
+		overflow-wrap: anywhere;
+		text-align: center;
+	}
+
+	.job-form-page,
+	.schedule-form-page {
+		min-height: 100vh;
+		align-items: flex-start;
+		padding: 16px;
+	}
+
+	.job-form-card,
+	.schedule-form-card {
+		width: 100%;
+		padding: 20px 16px;
+	}
+
+	.job-form-fields,
+	.schedule-form-fields {
+		grid-template-columns: 1fr;
+	}
+
+	.job-form-field-wide,
+	.schedule-form-field-wide {
+		grid-column: auto;
+	}
+
+	.modal-backdrop {
+		align-items: center;
+		padding: 12px;
+	}
+
+	.save-modal {
+		max-height: calc(100vh - 24px);
+		overflow-y: auto;
+		padding: 20px;
+	}
+}
+
+@media (min-width: 641px) and (max-width: 850px) {
+	.auth-page {
+		grid-template-columns: 1fr;
+		width: min(480px, 100%);
+		min-height: 0;
+	}
+
+	.auth-brand-panel {
+		min-height: 180px;
+		padding: 28px;
+	}
+
+	.auth-brand-copyright {
+		margin-top: 24px;
+	}
+
+	.auth-panel {
+		min-height: 360px;
+		padding: 36px 28px;
+	}
+
+	.register-fields {
+		grid-template-columns: 1fr;
+	}
+}

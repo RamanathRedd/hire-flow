@@ -139,49 +139,51 @@ const BrowseJobs = () => {
               button={{ text: "Clear filters", onClick: clearFilters }}
             />
           ) : (
-            <table className="jobs-table interviews-table">
-              <thead>
-                <tr>
-                  <th scope="col">
-                    <button
-                      className="table-sort-button"
-                      type="button"
-                      // onClick={"sortDirection"}
-                    >
-                      Title{" "}
-                      <span aria-hidden="true">
-                        {"ascending" === "ascending" ? "↑" : "↓"}
-                      </span>
-                    </button>
-                  </th>
-                  <th scope="col">Department</th>
-                  <th scope="col">Location</th>
-                  <th scope="col">Type</th>
-                  <th scope="col" aria-label="Actions"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {jobs.length > 0
-                  ? jobs.map((job: Job) => (
-                      <tr key={job.id}>
-                        <td>{job.title}</td>
-                        <td>{job.department}</td>
-                        <td>{job.location}</td>
-                        <td>{job.job_type}</td>
-                        <td>
-                          <button
-                            className="apply-button"
-                            type="button"
-                            onClick={() => applyJob(job.id, job.title)}
-                          >
-                            Apply
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  : "No jobs found"}
-              </tbody>
-            </table>
+            <div className="responsive-table-wrap">
+              <table className="jobs-table interviews-table">
+                <thead>
+                  <tr>
+                    <th scope="col">
+                      <button
+                        className="table-sort-button"
+                        type="button"
+                        // onClick={"sortDirection"}
+                      >
+                        Title{" "}
+                        <span aria-hidden="true">
+                          {"ascending" === "ascending" ? "↑" : "↓"}
+                        </span>
+                      </button>
+                    </th>
+                    <th scope="col">Department</th>
+                    <th scope="col">Location</th>
+                    <th scope="col">Type</th>
+                    <th scope="col" aria-label="Actions"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {jobs.length > 0
+                    ? jobs.map((job: Job) => (
+                        <tr key={job.id}>
+                          <td>{job.title}</td>
+                          <td>{job.department}</td>
+                          <td>{job.location}</td>
+                          <td>{job.job_type}</td>
+                          <td>
+                            <button
+                              className="apply-button"
+                              type="button"
+                              onClick={() => applyJob(job.id, job.title)}
+                            >
+                              Apply
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    : "No jobs found"}
+                </tbody>
+              </table>
+            </div>
           )}
         </>
       )}
