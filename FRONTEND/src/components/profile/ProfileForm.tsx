@@ -10,6 +10,11 @@ interface inputField {
   required: boolean;
   options?: string[];
   disabled?: boolean;
+  minLength?: number;
+  maxLength?: number;
+  min?: string;
+  max?: string;
+  step?: string | number;
   error?: string;
 }
 
@@ -30,6 +35,7 @@ interface BaseProfileFormProps {
   inputFields: inputField[];
   userData: UserDetails;
   isEditable: boolean;
+  formRef: React.RefObject<HTMLFormElement | null>;
 }
 
 type ProfileFormProps = BaseProfileFormProps &
@@ -45,8 +51,14 @@ type ProfileFormProps = BaseProfileFormProps &
   );
 
 const ProfileForm = (props: ProfileFormProps) => {
-  const { inputFields, userData, isEditable, profileType, onDetailsChange } =
-    props;
+  const {
+    inputFields,
+    userData,
+    isEditable,
+    formRef,
+    profileType,
+    onDetailsChange,
+  } = props;
   const [skill, setSkill] = useState<string>("");
   const [draftUserDetails, setDraftUserDetails] =
     useState<UserDetails>(userData);
@@ -113,8 +125,12 @@ const ProfileForm = (props: ProfileFormProps) => {
     notifyDetailsChange(updatedDetails);
   };
 
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+  };
+
   return (
-    <div className="profile-form-grid">
+    <form ref={formRef} className="profile-form-grid" onSubmit={onSubmit}>
       {inputFields.map((inputField) => {
         if (inputField.type === "skills") {
           const skills = draftUserDetails.skills ?? [];
@@ -219,6 +235,11 @@ const ProfileForm = (props: ProfileFormProps) => {
                 id={fieldId}
                 type={inputField.type}
                 name={inputField.key}
+                minLength={inputField.minLength ?? undefined}
+                maxLength={inputField.maxLength ?? undefined}
+                min={inputField.min ?? undefined}
+                max={inputField.max ?? undefined}
+                step={inputField.step}
                 placeholder={inputField.placeHolder}
                 value={isEditable ? value : value || " — "}
                 onChange={onFieldChange}
@@ -229,7 +250,7 @@ const ProfileForm = (props: ProfileFormProps) => {
           </div>
         );
       })}
-    </div>
+    </form>
   );
 };
 

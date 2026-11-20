@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Navbar from "../../components/layout/Navbar";
 import ProfileForm from "../../components/profile/ProfileForm";
 import Modal from "../../components/ui/Modal";
@@ -14,6 +14,8 @@ const inputFieldDetails = [
     type: "text",
     placeHolder: "Enter you Name",
     name: "Full name",
+    minLength: 3,
+    maxLength: 100,
     key: "name",
     required: true,
   },
@@ -35,6 +37,9 @@ const inputFieldDetails = [
     type: "number",
     placeHolder: "Enter your Experience",
     name: "Experience (in years)",
+    min: "0.1",
+    max: "30",
+    step: "any",
     key: "experience_years",
     required: true,
   },
@@ -42,6 +47,8 @@ const inputFieldDetails = [
     type: "text",
     placeHolder: "Enter your current Title",
     name: "Current title",
+    minLength: 1,
+    maxLength: 100,
     key: "current_title",
     required: true,
   },
@@ -49,6 +56,8 @@ const inputFieldDetails = [
     type: "text",
     placeHolder: "Enter your Current Company",
     name: "Current company",
+    minLength: 1,
+    maxLength: 100,
     key: "current_company",
     required: true,
   },
@@ -88,6 +97,7 @@ interface UserDetails {
 }
 
 const Profile = () => {
+  const profileFormRef = useRef<HTMLFormElement>(null);
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [candidateDraft, setCandidateDraft] = useState<CandidateUpdate>({});
@@ -102,7 +112,11 @@ const Profile = () => {
     useGetCandidateDetails();
 
   const onConfirm = () => {
-    if (!userData.id || updateCandidateDetailsMutation.isPending) {
+    if (
+      !profileFormRef.current?.reportValidity() ||
+      !userData.id ||
+      updateCandidateDetailsMutation.isPending
+    ) {
       return;
     }
 
@@ -123,6 +137,9 @@ const Profile = () => {
 
   const onClickEditButton = () => {
     if (isEditable) {
+      if (!profileFormRef.current?.reportValidity()) {
+        return;
+      }
       setIsModalOpen(true);
       return;
     }
@@ -149,6 +166,7 @@ const Profile = () => {
           inputFields={inputFieldDetails}
           userData={userData}
           isEditable={isEditable}
+          formRef={profileFormRef}
           onDetailsChange={setCandidateDraft}
         />
       )}
