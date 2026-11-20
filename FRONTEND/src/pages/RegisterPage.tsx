@@ -402,7 +402,8 @@ const RegisterPage = () => {
           <button
             className={`auth-submit ${isAdmin ? `recruiter-account` : `candidate-account`}`}
             type="submit"
-            disabled={registerMutation.isPending}
+            // disabled={registerMutation.isPending}
+            disabled={true}
           >
             {registerMutation.isPending
               ? "Creating account..."
