@@ -34,10 +34,11 @@ export const getJobs = async (jobFilters: JobFilter) => {
       Authorization: `Bearer ${token}`,
     },
     params: {
-      department: jobFilters.department || null,
-      status: jobFilters.status || null,
-      location: jobFilters.location || null,
+      departments: jobFilters.departments || null,
+      statuses: jobFilters.statuses || null,
+      locations: jobFilters.locations || null,
     },
+    paramsSerializer: { indexes: null },
   });
 
   return response.data;

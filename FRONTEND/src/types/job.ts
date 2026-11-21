@@ -1,7 +1,7 @@
 export interface JobFilter {
-  department: string | null;
-  status: string | null;
-  location: string | null;
+  departments: string[] | null;
+  statuses: string[] | null;
+  locations: string[] | null;
 }
 
 export interface Job {

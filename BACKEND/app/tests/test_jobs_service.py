@@ -88,6 +88,20 @@ def test_get_jobs_returns_filtered_results(db):
     assert result == jobs
 
 
+def test_get_jobs_filters_by_multiple_departments(db):
+    db.scalars.return_value.all.return_value = []
+
+    service.get_jobs(
+        db,
+        JobFilters(departments=["Engineering", "Marketing"]),
+        {"id": 4, "role": "Admin"},
+    )
+
+    statement = db.scalars.call_args.args[0]
+    sql = str(statement.compile(compile_kwargs={"literal_binds": True}))
+    assert "jobs.department IN ('Engineering', 'Marketing')" in sql
+
+
 def test_get_jobs_for_candidate_only_selects_open_unapplied_jobs(db):
     db.scalars.return_value.all.return_value = []
 

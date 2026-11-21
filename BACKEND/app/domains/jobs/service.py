@@ -43,14 +43,14 @@ def get_jobs(db: Session, job_filters: JobFilters, current_user: dict) -> list[J
             not_(Job.applications.any(Application.candidate_id == current_user["id"])),
         )
 
-    if job_filters.department:
-        query = query.where(Job.department == job_filters.department)
+    if job_filters.departments:
+        query = query.where(Job.department.in_(job_filters.departments))
 
-    if job_filters.status:
-        query = query.where(Job.status == job_filters.status)
+    if job_filters.statuses:
+        query = query.where(Job.status.in_(job_filters.statuses))
 
-    if job_filters.location:
-        query = query.where(Job.location == job_filters.location)
+    if job_filters.locations:
+        query = query.where(Job.location.in_(job_filters.locations))
 
     return db.scalars(query).all()
 

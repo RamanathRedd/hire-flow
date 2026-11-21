@@ -23,9 +23,9 @@ export const useGetJobs = (jobFilters: JobFilter) =>
   useQuery({
     queryKey: [
       "jobs",
-      jobFilters.department ?? null,
-      jobFilters.status ?? null,
-      jobFilters.location ?? null,
+      jobFilters.departments ?? null,
+      jobFilters.statuses ?? null,
+      jobFilters.locations ?? null,
     ],
     queryFn: () => getJobs(jobFilters),
   });

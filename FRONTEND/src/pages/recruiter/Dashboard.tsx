@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Navbar from "../../components/layout/Navbar";
 import {
   useDeleteJob,
@@ -26,18 +26,19 @@ const Dashboard = () => {
     iconColor: string;
   } | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
-  const [selectedDepartment, setSelectedDepartment] = useState<string | null>(
-    null,
-  );
-  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
+  const departmentFilterRef = useRef<HTMLDetailsElement>(null);
+  const statusFilterRef = useRef<HTMLDetailsElement>(null);
+  const locationFilterRef = useRef<HTMLDetailsElement>(null);
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [editJob, setEditJob] = useState<Job | null>(null);
   const [originalEditJob, setOriginalEditJob] = useState<Job | null>(null);
 
   const { data: jobs = [] } = useGetJobs({
-    department: selectedDepartment,
-    status: selectedStatus,
-    location: selectedLocation,
+    departments: selectedDepartments,
+    statuses: selectedStatuses,
+    locations: selectedLocations,
   });
 
   const deleteJobMutation = useDeleteJob();
@@ -85,6 +86,25 @@ const Dashboard = () => {
     return () =>
       document.removeEventListener("mousedown", closeMenuOnOutsideClick);
   }, [openJobMenu]);
+
+  useEffect(() => {
+    const closeFiltersOnOutsideClick = (event: PointerEvent) => {
+      [departmentFilterRef, statusFilterRef, locationFilterRef].forEach(
+        (filterRef) => {
+          if (
+            event.target instanceof Node &&
+            !filterRef.current?.contains(event.target)
+          ) {
+            filterRef.current?.removeAttribute("open");
+          }
+        },
+      );
+    };
+
+    document.addEventListener("pointerdown", closeFiltersOnOutsideClick);
+    return () =>
+      document.removeEventListener("pointerdown", closeFiltersOnOutsideClick);
+  }, []);
 
   const deleteJob = () => {
     if (!openJobMenu) return;
@@ -190,9 +210,9 @@ const Dashboard = () => {
   } = useLocations();
 
   const clearFilters = () => {
-    setSelectedDepartment(null);
-    setSelectedLocation(null);
-    setSelectedStatus(null);
+    setSelectedDepartments([]);
+    setSelectedLocations([]);
+    setSelectedStatuses([]);
   };
 
   const updateJob = () => {
@@ -218,9 +238,9 @@ const Dashboard = () => {
           classString="nav-action-button"
         />
         {jobs.length === 0 &&
-        !selectedDepartment &&
-        !selectedLocation &&
-        !selectedStatus ? (
+        selectedDepartments.length === 0 &&
+        selectedLocations.length === 0 &&
+        selectedStatuses.length === 0 ? (
           <EmptyPage
             icon="M9 6V4.75A1.75 1.75 0 0 1 10.75 3h2.5A1.75 1.75 0 0 1 15 4.75V6M4 8.5A2.5 2.5 0 0 1 6.5 6h11A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5zM4 11h16M10 11v2h4v-2"
             title="No jobs yet"
@@ -230,57 +250,123 @@ const Dashboard = () => {
         ) : (
           <>
             <div className="filter-toolbar">
-              <select
-                className="filter-select"
-                value={selectedDepartment ?? "department-placeholder"}
-                onChange={(event) => setSelectedDepartment(event.target.value)}
-                disabled={departmentsLoading || departmentsError}
-              >
-                <option value="department-placeholder" disabled hidden>
-                  Department
-                </option>
-                {departments &&
-                  departments.map((department) => (
-                    <option key={department.id} value={department.name}>
+              <details className="department-filter" ref={departmentFilterRef}>
+                <summary
+                  className="filter-select filter-trigger"
+                  aria-label={
+                    selectedDepartments.length
+                      ? `Departments: ${selectedDepartments.join(", ")}`
+                      : "Filter by department"
+                  }
+                  onClick={(event) => {
+                    if (departmentsLoading || departmentsError) {
+                      event.preventDefault();
+                    }
+                  }}
+                >
+                  {selectedDepartments.length === 0
+                    ? "Department"
+                    : `${selectedDepartments.length} selected`}
+                </summary>
+                <div className="department-filter-options">
+                  {departments.map((department) => (
+                    <label key={department.id}>
+                      <input
+                        type="checkbox"
+                        checked={selectedDepartments.includes(department.name)}
+                        onChange={(event) => {
+                          setSelectedDepartments((current) =>
+                            event.target.checked
+                              ? [...current, department.name]
+                              : current.filter(
+                                  (name) => name !== department.name,
+                                ),
+                          );
+                        }}
+                        disabled={departmentsLoading || departmentsError}
+                      />
                       {department.name}
-                    </option>
+                    </label>
                   ))}
-              </select>
+                </div>
+              </details>
               {departmentsError && (
                 <span id="department-load-error" role="alert">
                   Failed to load departments. Please try again.
                 </span>
               )}
-              <select
-                className="filter-select"
-                value={selectedStatus ?? "status-placeholder"}
-                onChange={(event) => setSelectedStatus(event.target.value)}
-              >
-                <option value="status-placeholder" disabled hidden>
-                  Status
-                </option>
-                {status.map((item) => (
-                  <option key={item.id} value={item.name}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
-              <select
-                className="filter-select"
-                value={selectedLocation ?? "location-placeholder"}
-                onChange={(event) => setSelectedLocation(event.target.value)}
-                disabled={locationsLoading || locationsError}
-              >
-                <option value="location-placeholder" disabled hidden>
-                  Location
-                </option>
-                {locations &&
-                  locations.map((location: { id: number; name: string }) => (
-                    <option key={location.id} value={location.name}>
-                      {location.name}
-                    </option>
+              <details className="department-filter" ref={statusFilterRef}>
+                <summary
+                  className="filter-select filter-trigger"
+                  aria-label={
+                    selectedStatuses.length
+                      ? `Statuses: ${selectedStatuses.join(", ")}`
+                      : "Filter by status"
+                  }
+                >
+                  {selectedStatuses.length === 0
+                    ? "Status"
+                    : `${selectedStatuses.length} selected`}
+                </summary>
+                <div className="department-filter-options">
+                  {status.map((item) => (
+                    <label key={item.id}>
+                      <input
+                        type="checkbox"
+                        checked={selectedStatuses.includes(item.name)}
+                        onChange={(event) => {
+                          setSelectedStatuses((current) =>
+                            event.target.checked
+                              ? [...current, item.name]
+                              : current.filter((name) => name !== item.name),
+                          );
+                        }}
+                      />
+                      {item.name}
+                    </label>
                   ))}
-              </select>
+                </div>
+              </details>
+              <details className="department-filter" ref={locationFilterRef}>
+                <summary
+                  className="filter-select filter-trigger"
+                  aria-label={
+                    selectedLocations.length
+                      ? `Locations: ${selectedLocations.join(", ")}`
+                      : "Filter by location"
+                  }
+                  onClick={(event) => {
+                    if (locationsLoading || locationsError) {
+                      event.preventDefault();
+                    }
+                  }}
+                >
+                  {selectedLocations.length === 0
+                    ? "Location"
+                    : `${selectedLocations.length} selected`}
+                </summary>
+                <div className="department-filter-options">
+                  {locations?.map((location) => (
+                    <label key={location.id}>
+                      <input
+                        type="checkbox"
+                        checked={selectedLocations.includes(location.name)}
+                        onChange={(event) => {
+                          setSelectedLocations((current) =>
+                            event.target.checked
+                              ? [...current, location.name]
+                              : current.filter(
+                                  (name) => name !== location.name,
+                                ),
+                          );
+                        }}
+                        disabled={locationsLoading || locationsError}
+                      />
+                      {location.name}
+                    </label>
+                  ))}
+                </div>
+              </details>
               {locationsError && (
                 <span id="location-load-error" role="alert">
                   Failed to load locations. Please try again.

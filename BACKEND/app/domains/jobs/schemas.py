@@ -15,9 +15,9 @@ class JobCreate(BaseModel):
 
 
 class JobFilters(BaseModel):
-    department: str | None = Field(default=None, min_length=3, max_length=50)
-    status: STATUS | None = None
-    location: LOCATIONS_LITERAL | None = None
+    departments: list[str] | None = None
+    statuses: list[STATUS] | None = None
+    locations: list[LOCATIONS_LITERAL] | None = None
 
 
 class JobUpdate(BaseModel):
