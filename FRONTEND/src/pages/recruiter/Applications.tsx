@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import Navbar from "../../components/layout/Navbar";
 import { useGetJobApplications, useGetJobs } from "../../hooks/useJobs";
@@ -21,7 +21,8 @@ const Applications = () => {
   const [debouncedNameFilter, setDebouncedNameFilter] = useState<string | null>(
     null,
   );
-  const [stageFilter, setStageFilter] = useState<string | null>(null);
+  const [stageFilters, setStageFilters] = useState<string[]>([]);
+  const stageFilterRef = useRef<HTMLDetailsElement>(null);
   const [dateFilter, setDateFilter] = useState<number | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [selectedCandidateApplication, setSelectedCandidateApplication] =
@@ -97,11 +98,29 @@ const Applications = () => {
     return () => window.clearTimeout(timeoutId);
   }, [nameFilter]);
 
+  useEffect(() => {
+    const closeStageFilterOnOutsideClick = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !stageFilterRef.current?.contains(event.target)
+      ) {
+        stageFilterRef.current?.removeAttribute("open");
+      }
+    };
+
+    document.addEventListener("pointerdown", closeStageFilterOnOutsideClick);
+    return () =>
+      document.removeEventListener(
+        "pointerdown",
+        closeStageFilterOnOutsideClick,
+      );
+  }, []);
+
   const {
     data: jobs = [],
     isPending: jobsLoading,
     isError: jobsError,
-  } = useGetJobs({ department: null, status: null, location: null });
+  } = useGetJobs({ departments: null, statuses: null, locations: null });
 
   useEffect(() => {
     if (jobs.length === 0) {
@@ -141,7 +160,7 @@ const Applications = () => {
     interview_round: selectedJobApplications === "interview_round",
     offer_stage: selectedJobApplications === "offer_stage",
     name_filter: debouncedNameFilter || null,
-    stage_filter: stageFilter || null,
+    stage_filters: stageFilters,
     date_applied_filter: dateFilter || null,
   });
 
@@ -171,7 +190,7 @@ const Applications = () => {
   const showEmptyState =
     applicationRows.length === 0 &&
     !nameFilter &&
-    !stageFilter &&
+    stageFilters.length === 0 &&
     !dateFilter &&
     selectedJobApplications === "all" &&
     selectedJobId == jobs[0]?.id;
@@ -208,7 +227,7 @@ const Applications = () => {
                   setSelectedJobId(Number(event.target.value));
                   setSelectedJobApplications("all");
                   setNameFilter(null);
-                  setStageFilter(null);
+                  setStageFilters([]);
                   setDateFilter(null);
                 }}
                 disabled={jobsLoading || jobsError || jobs.length === 0}
@@ -397,30 +416,56 @@ const Applications = () => {
                       </svg>
                       Stage
                     </span>
-                    <div className="recruiter-application-select-wrap">
-                      <select
-                        value={stageFilter ?? ""}
-                        onChange={(event) =>
-                          setStageFilter(event.target.value || null)
+                    <details
+                      className="department-filter application-stage-filter"
+                      ref={stageFilterRef}
+                    >
+                      <summary
+                        className="filter-select filter-trigger"
+                        aria-label={
+                          stageFilters.length
+                            ? `Stages: ${stageFilters.join(", ")}`
+                            : "Filter by stage"
                         }
                       >
-                        <option value="">All stages</option>
-                        <option value="Applied">Applied</option>
-                        <option value="Screened">Screened</option>
-                        <option value="Interview_R1">Interview R1</option>
-                        <option value="Interview_R2">Interview R2</option>
-                        <option value="HR_Round">HR Round</option>
-                        <option value="Offer">Offer</option>
-                        <option value="Rejected">Rejected</option>
-                      </select>
-                      <svg
-                        className="select-chevron"
-                        viewBox="0 0 20 20"
-                        aria-hidden="true"
-                      >
-                        <path d="M5 7.5 10 12.5 15 7.5" />
-                      </svg>
-                    </div>
+                        {stageFilters.length === 0
+                          ? "All stages"
+                          : `${stageFilters.length} selected`}
+                        <svg
+                          className="application-stage-chevron"
+                          viewBox="0 0 20 20"
+                          aria-hidden="true"
+                        >
+                          <path d="M5 7.5 10 12.5 15 7.5" />
+                        </svg>
+                      </summary>
+                      <div className="department-filter-options">
+                        {[
+                          ["Applied", "Applied"],
+                          ["Screened", "Screened"],
+                          ["Interview_R1", "Interview R1"],
+                          ["Interview_R2", "Interview R2"],
+                          ["HR_Round", "HR Round"],
+                          ["Offer", "Offer"],
+                          ["Rejected", "Rejected"],
+                        ].map(([value, label]) => (
+                          <label key={value}>
+                            <input
+                              type="checkbox"
+                              checked={stageFilters.includes(value)}
+                              onChange={(event) => {
+                                setStageFilters((current) =>
+                                  event.target.checked
+                                    ? [...current, value]
+                                    : current.filter((item) => item !== value),
+                                );
+                              }}
+                            />
+                            {label}
+                          </label>
+                        ))}
+                      </div>
+                    </details>
                   </label>
                   <label className="recruiter-application-filter">
                     <span>

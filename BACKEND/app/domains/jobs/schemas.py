@@ -34,5 +34,5 @@ class JobApplicationFilters(BaseModel):
     interview_round: bool = Field(default=False)
     offer_stage: bool = Field(default=False)
     name_filter: str | None = None
-    stage_filter: STAGE_LITERAL | None = None
+    stage_filters: list[STAGE_LITERAL] | None = None
     date_applied_filter: int | None = None

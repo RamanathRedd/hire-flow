@@ -116,6 +116,7 @@ export const getJobApplications = async (
           Authorization: `Bearer ${token}`,
         },
         params: application_filters,
+        paramsSerializer: { indexes: null },
       },
     );
     return response.data;

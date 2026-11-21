@@ -275,8 +275,8 @@ def get_job_filtered_applications(
             Candidate.name.ilike(f"%{applications_filters.name_filter}%")
         )
 
-    if applications_filters.stage_filter:
-        query = query.where(Application.stage == applications_filters.stage_filter)
+    if applications_filters.stage_filters:
+        query = query.where(Application.stage.in_(applications_filters.stage_filters))
 
     if applications_filters.date_applied_filter is not None:
         query = query.where(

@@ -2014,6 +2014,42 @@ body {
 	color: #e5eaf2;
 }
 
+.application-stage-filter .filter-select {
+	position: relative;
+	height: 22px;
+	padding: 0 18px 0 0;
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+	color: #edf4ff;
+	font-size: 12px;
+	background-image: none;
+}
+
+.application-stage-filter .filter-select::after {
+	content: none;
+}
+
+.application-stage-filter .application-stage-chevron {
+	position: absolute;
+	right: 0;
+	top: 50%;
+	width: 14px;
+	height: 14px;
+	transform: translateY(-50%);
+	pointer-events: none;
+	fill: none;
+	stroke: #cbd5e1;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	stroke-width: 1.8;
+}
+
+.application-stage-filter[open] .filter-select {
+	border: 0;
+	box-shadow: none;
+}
+
 .recruiter-application-stats {
 	display: grid;
 	grid-template-columns: repeat(5, minmax(0, 1fr));

@@ -43,6 +43,6 @@ export interface JobApplicationFilters {
   interview_round: boolean;
   offer_stage: boolean;
   name_filter: string | null;
-  stage_filter: string | null;
+  stage_filters: string[] | null;
   date_applied_filter: number | null;
 }
