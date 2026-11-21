@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Navbar from "../../components/layout/Navbar";
 import { useGetJobs } from "../../hooks/useJobs";
 import {
@@ -18,10 +18,10 @@ import {
 } from "../../hooks/useReferenceData";
 
 const Interviews = () => {
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
-  const [selectedRoundType, setSelectedRoundType] = useState<string | null>(
-    null,
-  );
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+  const [selectedRoundTypes, setSelectedRoundTypes] = useState<string[]>([]);
+  const statusFilterRef = useRef<HTMLDetailsElement>(null);
+  const roundTypeFilterRef = useRef<HTMLDetailsElement>(null);
   const [selectedJob, setSelectedJob] = useState<number | null>(null);
   const [allJobs, setAllJobs] = useState<boolean>(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
@@ -49,8 +49,8 @@ const Interviews = () => {
   } | null>(null);
 
   const interviewFilters = {
-    status: selectedStatus,
-    round_type: selectedRoundType,
+    statuses: selectedStatuses,
+    round_types: selectedRoundTypes,
     job_id: selectedJob,
   };
   const allInterviewsQuery = useGetInterviews(interviewFilters, allJobs);
@@ -95,14 +95,31 @@ const Interviews = () => {
       document.removeEventListener("mousedown", closeMenuOnOutsideClick);
   }, [openInterviewMenu]);
 
+  useEffect(() => {
+    const closeFiltersOnOutsideClick = (event: PointerEvent) => {
+      [statusFilterRef, roundTypeFilterRef].forEach((filterRef) => {
+        if (
+          event.target instanceof Node &&
+          !filterRef.current?.contains(event.target)
+        ) {
+          filterRef.current?.removeAttribute("open");
+        }
+      });
+    };
+
+    document.addEventListener("pointerdown", closeFiltersOnOutsideClick);
+    return () =>
+      document.removeEventListener("pointerdown", closeFiltersOnOutsideClick);
+  }, []);
+
   const {
     data: jobs = [],
     isPending: jobsLoading,
     isError: jobsError,
   } = useGetJobs({
-    department: null,
-    status: null,
-    location: null,
+    departments: null,
+    statuses: null,
+    locations: null,
   });
 
   const {
@@ -113,8 +130,8 @@ const Interviews = () => {
 
   const clearFilters = () => {
     setAllJobs(true);
-    setSelectedStatus(null);
-    setSelectedRoundType(null);
+    setSelectedStatuses([]);
+    setSelectedRoundTypes([]);
     setSelectedJob(null);
   };
 
@@ -268,20 +285,22 @@ const Interviews = () => {
   const showEmptyState =
     interviews.length === 0 &&
     allJobs &&
-    !selectedStatus &&
-    !selectedRoundType &&
+    selectedStatuses.length === 0 &&
+    selectedRoundTypes.length === 0 &&
     !selectedJob;
 
   const showNoUpcomingInterviews =
     interviews.length === 0 &&
     !allJobs &&
     !selectedJob &&
-    !selectedStatus &&
-    !selectedRoundType;
+    selectedStatuses.length === 0 &&
+    selectedRoundTypes.length === 0;
 
   const showNoFilteredInterviews =
     interviews.length === 0 &&
-    (selectedStatus || selectedRoundType || selectedJob);
+    (selectedStatuses.length > 0 ||
+      selectedRoundTypes.length > 0 ||
+      selectedJob);
 
   const scheduledAtTime = new Date(editInterview?.scheduled_at ?? "").getTime();
 
@@ -340,32 +359,77 @@ const Interviews = () => {
             >
               Next 7 Days: {allInterviewsData.upcoming_interviews}
             </button>
-            <select
-              className="filter-select"
-              value={selectedStatus ?? "status-placeholder"}
-              onChange={(event) => setSelectedStatus(event.target.value)}
-            >
-              <option value="status-placeholder" disabled hidden>
-                Status
-              </option>
-              <option value="Scheduled">Scheduled</option>
-              <option value="Completed">Completed</option>
-              <option value="Cancelled">Cancelled</option>
-              <option value="Rescheduled">Rescheduled</option>
-            </select>
-            <select
-              className="filter-select"
-              value={selectedRoundType ?? "round-type-placeholder"}
-              onChange={(event) => setSelectedRoundType(event.target.value)}
-            >
-              <option value="round-type-placeholder" disabled hidden>
-                Round Type
-              </option>
-              <option value="Technical">Technical</option>
-              <option value="HR">HR</option>
-              <option value="System_Design">System Design</option>
-              <option value="Assignment">Assignment</option>
-            </select>
+            <details className="department-filter" ref={statusFilterRef}>
+              <summary
+                className="filter-select filter-trigger"
+                aria-label={
+                  selectedStatuses.length
+                    ? `Statuses: ${selectedStatuses.join(", ")}`
+                    : "Filter by status"
+                }
+              >
+                {selectedStatuses.length === 0
+                  ? "Status"
+                  : `${selectedStatuses.length} selected`}
+              </summary>
+              <div className="department-filter-options">
+                {["Scheduled", "Completed", "Cancelled", "Rescheduled"].map(
+                  (status) => (
+                    <label key={status}>
+                      <input
+                        type="checkbox"
+                        checked={selectedStatuses.includes(status)}
+                        onChange={(event) => {
+                          setSelectedStatuses((current) =>
+                            event.target.checked
+                              ? [...current, status]
+                              : current.filter((item) => item !== status),
+                          );
+                        }}
+                      />
+                      {status}
+                    </label>
+                  ),
+                )}
+              </div>
+            </details>
+            <details className="department-filter" ref={roundTypeFilterRef}>
+              <summary
+                className="filter-select filter-trigger"
+                aria-label={
+                  selectedRoundTypes.length
+                    ? `Round types: ${selectedRoundTypes.join(", ")}`
+                    : "Filter by round type"
+                }
+              >
+                {selectedRoundTypes.length === 0
+                  ? "Round Type"
+                  : `${selectedRoundTypes.length} selected`}
+              </summary>
+              <div className="department-filter-options">
+                {[
+                  ["Technical", "Technical"],
+                  ["HR", "HR"],
+                  ["System_Design", "System Design"],
+                  ["Assignment", "Assignment"],
+                ].map(([value, label]) => (
+                  <label key={value}>
+                    <input
+                      type="checkbox"
+                      checked={selectedRoundTypes.includes(value)}
+                      onChange={(event) => {
+                        setSelectedRoundTypes((current) =>
+                          event.target.checked
+                            ? [...current, value]
+                            : current.filter((item) => item !== value),
+                        );
+                      }}
+                    />
+                    {label}
+                  </label>
+                ))}
+              </div>
+            </details>
             <select
               className="filter-select"
               value={selectedJob?.toString() ?? "interview-job-placeholder"}

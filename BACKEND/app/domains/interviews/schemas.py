@@ -17,8 +17,8 @@ class InterviewCreate(BaseModel):
 
 class InterviewFilters(BaseModel):
     job_id: int | None = None
-    status: INTERVIEW_STATUS | None = Field(default=None, min_length=8, max_length=15)
-    round_type: ROUND_TYPE | None = Field(default=None, min_length=2, max_length=20)
+    statuses: list[INTERVIEW_STATUS] | None = None
+    round_types: list[ROUND_TYPE] | None = None
 
 
 class UpdateInterview(BaseModel):

@@ -22,8 +22,8 @@ export const useGetInterviews = (
   useQuery({
     queryKey: [
       "interviews",
-      interviewFilters.round_type ?? null,
-      interviewFilters.status ?? null,
+      interviewFilters.round_types ?? null,
+      interviewFilters.statuses ?? null,
       interviewFilters.job_id ?? null,
     ],
     queryFn: () => getInterviews(interviewFilters),
@@ -37,8 +37,8 @@ export const useUpcomingInterviews = (
   useQuery({
     queryKey: [
       "upcomingInterviews",
-      interviewFilters.round_type ?? null,
-      interviewFilters.status ?? null,
+      interviewFilters.round_types ?? null,
+      interviewFilters.statuses ?? null,
       interviewFilters.job_id ?? null,
     ],
     queryFn: () => getUpcomingInterviews(interviewFilters),
@@ -53,8 +53,7 @@ export const useReScheduleInterview = () =>
     }: {
       interview_id: number;
       interview_details: { interviewer_id: number; scheduled_at: string };
-    }) =>
-      reScheduleInterview(interview_id, interview_details),
+    }) => reScheduleInterview(interview_id, interview_details),
   });
 
 export const useCancelInterview = () =>

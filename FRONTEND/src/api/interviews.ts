@@ -37,6 +37,7 @@ export const getInterviews = async (interviewFilter: InterviewFilters) => {
         Authorization: `Bearer ${token}`,
       },
       params: interviewFilter,
+      paramsSerializer: { indexes: null },
     });
     return response.data;
   } catch (error) {
@@ -58,6 +59,7 @@ export const getUpcomingInterviews = async (
         Authorization: `Bearer ${token}`,
       },
       params: interviewFilters,
+      paramsSerializer: { indexes: null },
     });
     return response.data;
   } catch (error) {}

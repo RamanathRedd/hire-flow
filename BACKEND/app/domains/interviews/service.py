@@ -121,11 +121,10 @@ def get_interviews(
     if interview_filters.job_id:
         query = query.where(Application.job_id == interview_filters.job_id)
 
-    if interview_filters.status:
-        query = query.where(Interview.status == interview_filters.status)
-
-    if interview_filters.round_type:
-        query = query.where(Interview.round_type == interview_filters.round_type)
+    if interview_filters.statuses:
+        query = query.where(Interview.status.in_(interview_filters.statuses))
+    if interview_filters.round_types:
+        query = query.where(Interview.round_type.in_(interview_filters.round_types))
 
     result = db.execute(query).all()
     response = []
@@ -184,11 +183,10 @@ def list_upcoming_interviews(
     if interview_filters.job_id:
         query = query.where(Application.job_id == interview_filters.job_id)
 
-    if interview_filters.status:
-        query = query.where(Interview.status == interview_filters.status)
-
-    if interview_filters.round_type:
-        query = query.where(Interview.round_type == interview_filters.round_type)
+    if interview_filters.statuses:
+        query = query.where(Interview.status.in_(interview_filters.statuses))
+    if interview_filters.round_types:
+        query = query.where(Interview.round_type.in_(interview_filters.round_types))
 
     result = db.execute(query).all()
 

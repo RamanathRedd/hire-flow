@@ -1,6 +1,6 @@
 export interface InterviewFilters {
-  round_type: string | null;
-  status: string | null;
+  round_types: string[] | null;
+  statuses: string[] | null;
   job_id: number | null;
 }
 
