@@ -28,6 +28,7 @@ const RegisterPage = () => {
   const navigate = useNavigate();
 
   const onRoleChange = (e: MouseEvent<HTMLButtonElement>) => {
+    registerMutation.reset();
     setIsAdmin(e.currentTarget.name === "recruiter");
     resetForm();
   };
@@ -129,6 +130,7 @@ const RegisterPage = () => {
         skills,
         current_title: currentTitle,
         current_company: companyName,
+        confirm_password: confirmPassword,
       },
       {
         onSuccess: () => {
@@ -402,8 +404,7 @@ const RegisterPage = () => {
           <button
             className={`auth-submit ${isAdmin ? `recruiter-account` : `candidate-account`}`}
             type="submit"
-            // disabled={registerMutation.isPending}
-            disabled={true}
+            disabled={registerMutation.isPending}
           >
             {registerMutation.isPending
               ? "Creating account..."
