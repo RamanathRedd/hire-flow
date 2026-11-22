@@ -1277,6 +1277,127 @@ body {
 	overflow: hidden;
 }
 
+.recruiter-applications-loading {
+	display: flex;
+	flex: 1;
+	min-height: 0;
+	flex-direction: column;
+}
+
+.recruiter-application-loading-job {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	min-height: 64px;
+	padding: 16px 42px 12px;
+}
+
+.recruiter-loading-job-label {
+	width: 62px;
+	height: 14px;
+}
+
+.recruiter-loading-job-select {
+	width: 200px;
+	height: 42px;
+}
+
+.recruiter-loading-job-meta {
+	width: 320px;
+	height: 24px;
+}
+
+.recruiter-application-loading-stats {
+	display: grid;
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+	gap: 12px;
+	margin: 0 42px 16px;
+}
+
+.recruiter-application-loading-stat {
+	display: grid;
+	align-content: center;
+	gap: 8px;
+	height: 82px;
+	padding: 12px 14px;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 12px;
+	background: rgba(255, 255, 255, 0.018);
+}
+
+.recruiter-loading-stat-value {
+	width: 32px;
+	height: 20px;
+}
+
+.recruiter-loading-stat-label {
+	width: 72%;
+	height: 12px;
+}
+
+.recruiter-application-loading-filters {
+	display: flex;
+	gap: 12px;
+	margin: 0 42px 16px;
+}
+
+.recruiter-loading-search {
+	width: 240px;
+	height: 40px;
+}
+
+.recruiter-loading-filter {
+	width: 160px;
+	height: 40px;
+}
+
+.recruiter-application-loading-table {
+	margin: 0 42px 24px;
+	border: 1px solid rgba(133, 151, 190, 0.2);
+	border-radius: 12px;
+	background: rgba(12, 18, 29, 0.9);
+	overflow: hidden;
+}
+
+.recruiter-application-loading-table-header,
+.recruiter-application-loading-table-row {
+	display: grid;
+	grid-template-columns: 34% 18% 22% 15% 11%;
+	align-items: center;
+	gap: 16px;
+	padding: 12px 18px;
+}
+
+.recruiter-application-loading-table-header {
+	min-height: 44px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.recruiter-application-loading-table-row {
+	min-height: 58px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.recruiter-application-loading-table-row:last-child {
+	border-bottom: 0;
+}
+
+.recruiter-loading-table-heading {
+	width: 70%;
+	height: 10px;
+}
+
+.recruiter-loading-table-cell {
+	width: 68%;
+	height: 13px;
+}
+
+.recruiter-loading-stage {
+	width: 72px;
+	height: 24px;
+	border-radius: 999px;
+}
+
 .recruiter-application-table {
 	width: 100%;
 	table-layout: fixed;
@@ -3034,6 +3155,49 @@ input {
 	.recruiter-applications-job-bar select {
 		flex: 0 0 auto;
 		width: 100%;
+	}
+
+	.recruiter-application-loading-job {
+		align-items: flex-start;
+		flex-direction: column;
+		gap: 10px;
+		padding: 16px 16px 12px;
+	}
+
+	.recruiter-loading-job-select,
+	.recruiter-loading-job-meta {
+		width: 100%;
+		max-width: 260px;
+	}
+
+	.recruiter-application-loading-stats {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		margin-right: 16px;
+		margin-left: 16px;
+	}
+
+	.recruiter-application-loading-filters {
+		flex-wrap: wrap;
+		margin-right: 16px;
+		margin-left: 16px;
+	}
+
+	.recruiter-loading-search,
+	.recruiter-loading-filter {
+		flex: 1 1 140px;
+		width: auto;
+	}
+
+	.recruiter-application-loading-table {
+		margin-right: 16px;
+		margin-left: 16px;
+		overflow-x: auto;
+	}
+
+	.recruiter-application-loading-table-header,
+	.recruiter-application-loading-table-row {
+		min-width: 620px;
+		grid-template-columns: 34% 18% 22% 15% 11%;
 	}
 
 	.recruiter-applications-job-meta {

@@ -208,391 +208,472 @@ const Applications = () => {
         className={`recruiter-applications-page${showEmptyState ? " is-empty" : ""}${showNoApplicants && !showEmptyState ? " is-no-applicants" : ""}`}
       >
         <Navbar leftTitle="Applications" rightText="" />
-        {showEmptyState ? (
-          <EmptyPage
-            icon="M9 4.75h-2A1.75 1.75 0 0 0 5.25 6.5v12A1.75 1.75 0 0 0 7 20.25h10a1.75 1.75 0 0 0 1.75-1.75v-12A1.75 1.75 0 0 0 17 4.75h-2M9 4.75A1.75 1.75 0 0 1 10.75 3h2.5A1.75 1.75 0 0 1 15 4.75v1.5H9zM9 11h6M9 14.5h6M9 18h3"
-            title="No open jobs to show applicants for"
-            subTitle="Publish a job first. Applicants appear here as soon as candidates apply."
-            button={{ text: "Go to Jobs", navigation: "/jobs" }}
-          />
+        {jobApplicationsLoading && showEmptyState ? (
+          <div
+            className="recruiter-applications-loading"
+            role="status"
+            aria-live="polite"
+            aria-label="Loading applications"
+          >
+            <div
+              className="recruiter-application-loading-job"
+              aria-hidden="true"
+            >
+              <span className="loading-skeleton recruiter-loading-job-label" />
+              <span className="loading-skeleton recruiter-loading-job-select" />
+              <span className="loading-skeleton recruiter-loading-job-meta" />
+            </div>
+            <div
+              className="recruiter-application-loading-stats"
+              aria-hidden="true"
+            >
+              {[0, 1, 2, 3, 4].map((stat) => (
+                <div className="recruiter-application-loading-stat" key={stat}>
+                  <span className="loading-skeleton recruiter-loading-stat-value" />
+                  <span className="loading-skeleton recruiter-loading-stat-label" />
+                </div>
+              ))}
+            </div>
+            <div
+              className="recruiter-application-loading-filters"
+              aria-hidden="true"
+            >
+              <span className="loading-skeleton recruiter-loading-search" />
+              <span className="loading-skeleton recruiter-loading-filter" />
+              <span className="loading-skeleton recruiter-loading-filter" />
+            </div>
+            <div
+              className="recruiter-application-loading-table"
+              aria-hidden="true"
+            >
+              <div className="recruiter-application-loading-table-header">
+                {[0, 1, 2, 3, 4].map((column) => (
+                  <span
+                    className="loading-skeleton recruiter-loading-table-heading"
+                    key={column}
+                  />
+                ))}
+              </div>
+              {[0, 1, 2, 3].map((row) => (
+                <div
+                  className="recruiter-application-loading-table-row"
+                  key={row}
+                >
+                  {[0, 1, 2, 3, 4].map((column) => (
+                    <span
+                      className={`loading-skeleton recruiter-loading-table-cell ${
+                        column === 1 ? "recruiter-loading-stage" : ""
+                      }`}
+                      key={column}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
         ) : (
           <>
-            <section
-              className="recruiter-applications-job-bar"
-              aria-label="Selected job"
-            >
-              <label htmlFor="applications-job-select">Select Job</label>
-              <select
-                id="applications-job-select"
-                value={selectedJobId ?? ""}
-                onChange={(event) => {
-                  setSelectedJobId(Number(event.target.value));
-                  setSelectedJobApplications("all");
-                  setNameFilter(null);
-                  setStageFilters([]);
-                  setDateFilter(null);
-                }}
-                disabled={jobsLoading || jobsError || jobs.length === 0}
-              >
-                {jobs.map((job: Job) => (
-                  <option key={job.id} value={job.id}>
-                    {job.title}
-                  </option>
-                ))}
-              </select>
-              {selectedJob && (
-                <div className="recruiter-applications-job-meta">
-                  <span>
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M4 20V8l8-4 8 4v12M8 20v-5h8v5M8 9h.01M12 9h.01M16 9h.01" />
-                    </svg>
-                    {selectedJob.department}
-                  </span>
-                  <span>
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
-                      <circle cx="12" cy="10" r="2.5" />
-                    </svg>
-                    {selectedJob.location}
-                  </span>
-                  <span>
-                    <svg viewBox="0 0 24 24" aria-hidden="true" stroke="none">
-                      <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-3.2 0-8 1.6-8 4v2h16v-2c0-2.4-4.8-4-8-4Zm7-2a3.5 3.5 0 1 0-2.1-6.3 5.9 5.9 0 0 1 0 5.6A3.5 3.5 0 0 0 19 12Zm0 2c-.6 0-1.3.1-2 .2 1.3.8 2 1.8 2 2.8v2h4v-2c0-1.8-2-3-4-3Z" />
-                    </svg>
-                    {selectedJob.applicant_count}{" "}
-                    {selectedJob.applicant_count > 1
-                      ? "applications"
-                      : "application"}
-                  </span>
-                </div>
-              )}
-              {jobsError && (
-                <span id="jobs-load-error" role="alert">
-                  Failed to load jobs. Please try again.
-                </span>
-              )}
-            </section>
-            <section
-              className="recruiter-application-stats"
-              aria-label="Application summary"
-            >
-              <article
-                onClick={() => setSelectedJobApplications("all")}
-                className="recruiter-application-stat stat-total"
-              >
-                <div>
-                  <p className="recruiter-application-stat-value">
-                    {jobApplications.total_active}
-                  </p>
-                  <p className="recruiter-application-stat-label">
-                    Total applications
-                  </p>
-                </div>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
-                </svg>
-              </article>
-              <article
-                onClick={() => setSelectedJobApplications("needs_attention")}
-                className="recruiter-application-stat stat-attention"
-              >
-                <div>
-                  <p className="recruiter-application-stat-value">
-                    {jobApplications.needs_attention}
-                  </p>
-                  <p className="recruiter-application-stat-label">
-                    Needs attention
-                  </p>
-                </div>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path
-                    d="M12 2.25c.7 0 1.35.37 1.7.98l9.1 15.75c.76 1.31-.19 2.95-1.7 2.95H2.9c-1.51 0-2.46-1.64-1.7-2.95l9.1-15.75c.35-.61 1-.98 1.7-.98Z"
-                    stroke="none"
-                  />
-                  <path
-                    d="M11 8h2v6h-2zM11 16h2v2h-2z"
-                    fill="#2b171d"
-                    stroke="none"
-                  />
-                </svg>
-              </article>
-              <article
-                onClick={() => setSelectedJobApplications("this_week")}
-                className="recruiter-application-stat stat-new"
-              >
-                <div>
-                  <p className="recruiter-application-stat-value">
-                    {jobApplications.this_week}
-                  </p>
-                  <p className="recruiter-application-stat-label">
-                    New this week
-                  </p>
-                </div>
-                <span className="recruiter-application-stat-tag">NEW</span>
-              </article>
-              <article
-                onClick={() => setSelectedJobApplications("interview_round")}
-                className="recruiter-application-stat stat-interviewing"
-              >
-                <div>
-                  <p className="recruiter-application-stat-value">
-                    {jobApplications.interview_count}
-                  </p>
-                  <p className="recruiter-application-stat-label">
-                    Interviewing
-                  </p>
-                </div>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
-                </svg>
-              </article>
-              <article
-                onClick={() => setSelectedJobApplications("offer_stage")}
-                className="recruiter-application-stat stat-offers"
-              >
-                <div onClick={() => setSelectedJobApplications("offer_stage")}>
-                  <p className="recruiter-application-stat-value">
-                    {jobApplications.offers_pending}
-                  </p>
-                  <p className="recruiter-application-stat-label">
-                    Offers pending
-                  </p>
-                </div>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M8 12h8v1.5H8zm0 4h6v1.5H8z" />
-                  <path
-                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                    stroke="none"
-                  />
-                  <path d="M14 2v6h6" fill="#2b171d" stroke="none" />
-                  <path
-                    d="M8 12h8v1.5H8zm0 4h6v1.5H8z"
-                    fill="#2b171d"
-                    stroke="none"
-                  />
-                </svg>
-              </article>
-              {jobApplicationsError && (
-                <span id="job-applications-load-error" role="alert">
-                  Failed to load job applications. Please try again.
-                </span>
-              )}
-            </section>
-            {jobApplicationsLoading ? (
-              <LoadingPage page="Job Applications" />
+            {showEmptyState ? (
+              <EmptyPage
+                icon="M9 4.75h-2A1.75 1.75 0 0 0 5.25 6.5v12A1.75 1.75 0 0 0 7 20.25h10a1.75 1.75 0 0 0 1.75-1.75v-12A1.75 1.75 0 0 0 17 4.75h-2M9 4.75A1.75 1.75 0 0 1 10.75 3h2.5A1.75 1.75 0 0 1 15 4.75v1.5H9zM9 11h6M9 14.5h6M9 18h3"
+                title="No open jobs to show applicants for"
+                subTitle="Publish a job first. Applicants appear here as soon as candidates apply."
+                button={{ text: "Go to Jobs", navigation: "/jobs" }}
+              />
             ) : (
               <>
-                {showNoApplicants ? (
-                  <EmptyPage
-                    icon="M9 4.75h-2A1.75 1.75 0 0 0 5.25 6.5v12A1.75 1.75 0 0 0 7 20.25h10a1.75 1.75 0 0 0 1.75-1.75v-12A1.75 1.75 0 0 0 17 4.75h-2M9 4.75A1.75 1.75 0 0 1 10.75 3h2.5A1.75 1.75 0 0 1 15 4.75v1.5H9zM9 11h6M9 14.5h6M9 18h3"
-                    title="No applicants yet"
-                    subTitle="Applicants will appear here as soon as candidates apply."
-                    button={{ text: "Go to Jobs", navigation: "/jobs" }}
-                  />
+                <section
+                  className="recruiter-applications-job-bar"
+                  aria-label="Selected job"
+                >
+                  <label htmlFor="applications-job-select">Select Job</label>
+                  <select
+                    id="applications-job-select"
+                    value={selectedJobId ?? ""}
+                    onChange={(event) => {
+                      setSelectedJobId(Number(event.target.value));
+                      setSelectedJobApplications("all");
+                      setNameFilter(null);
+                      setStageFilters([]);
+                      setDateFilter(null);
+                    }}
+                    disabled={jobsLoading || jobsError || jobs.length === 0}
+                  >
+                    {jobs.map((job: Job) => (
+                      <option key={job.id} value={job.id}>
+                        {job.title}
+                      </option>
+                    ))}
+                  </select>
+                  {selectedJob && (
+                    <div className="recruiter-applications-job-meta">
+                      <span>
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M4 20V8l8-4 8 4v12M8 20v-5h8v5M8 9h.01M12 9h.01M16 9h.01" />
+                        </svg>
+                        {selectedJob.department}
+                      </span>
+                      <span>
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
+                          <circle cx="12" cy="10" r="2.5" />
+                        </svg>
+                        {selectedJob.location}
+                      </span>
+                      <span>
+                        <svg
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                          stroke="none"
+                        >
+                          <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-3.2 0-8 1.6-8 4v2h16v-2c0-2.4-4.8-4-8-4Zm7-2a3.5 3.5 0 1 0-2.1-6.3 5.9 5.9 0 0 1 0 5.6A3.5 3.5 0 0 0 19 12Zm0 2c-.6 0-1.3.1-2 .2 1.3.8 2 1.8 2 2.8v2h4v-2c0-1.8-2-3-4-3Z" />
+                        </svg>
+                        {selectedJob.applicant_count}{" "}
+                        {selectedJob.applicant_count > 1
+                          ? "applications"
+                          : "application"}
+                      </span>
+                    </div>
+                  )}
+                  {jobsError && (
+                    <span id="jobs-load-error" role="alert">
+                      Failed to load jobs. Please try again.
+                    </span>
+                  )}
+                </section>
+                <section
+                  className="recruiter-application-stats"
+                  aria-label="Application summary"
+                >
+                  <article
+                    onClick={() => setSelectedJobApplications("all")}
+                    className="recruiter-application-stat stat-total"
+                  >
+                    <div>
+                      <p className="recruiter-application-stat-value">
+                        {jobApplications.total_active}
+                      </p>
+                      <p className="recruiter-application-stat-label">
+                        Total applications
+                      </p>
+                    </div>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+                    </svg>
+                  </article>
+                  <article
+                    onClick={() =>
+                      setSelectedJobApplications("needs_attention")
+                    }
+                    className="recruiter-application-stat stat-attention"
+                  >
+                    <div>
+                      <p className="recruiter-application-stat-value">
+                        {jobApplications.needs_attention}
+                      </p>
+                      <p className="recruiter-application-stat-label">
+                        Needs attention
+                      </p>
+                    </div>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M12 2.25c.7 0 1.35.37 1.7.98l9.1 15.75c.76 1.31-.19 2.95-1.7 2.95H2.9c-1.51 0-2.46-1.64-1.7-2.95l9.1-15.75c.35-.61 1-.98 1.7-.98Z"
+                        stroke="none"
+                      />
+                      <path
+                        d="M11 8h2v6h-2zM11 16h2v2h-2z"
+                        fill="#2b171d"
+                        stroke="none"
+                      />
+                    </svg>
+                  </article>
+                  <article
+                    onClick={() => setSelectedJobApplications("this_week")}
+                    className="recruiter-application-stat stat-new"
+                  >
+                    <div>
+                      <p className="recruiter-application-stat-value">
+                        {jobApplications.this_week}
+                      </p>
+                      <p className="recruiter-application-stat-label">
+                        New this week
+                      </p>
+                    </div>
+                    <span className="recruiter-application-stat-tag">NEW</span>
+                  </article>
+                  <article
+                    onClick={() =>
+                      setSelectedJobApplications("interview_round")
+                    }
+                    className="recruiter-application-stat stat-interviewing"
+                  >
+                    <div>
+                      <p className="recruiter-application-stat-value">
+                        {jobApplications.interview_count}
+                      </p>
+                      <p className="recruiter-application-stat-label">
+                        Interviewing
+                      </p>
+                    </div>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+                    </svg>
+                  </article>
+                  <article
+                    onClick={() => setSelectedJobApplications("offer_stage")}
+                    className="recruiter-application-stat stat-offers"
+                  >
+                    <div
+                      onClick={() => setSelectedJobApplications("offer_stage")}
+                    >
+                      <p className="recruiter-application-stat-value">
+                        {jobApplications.offers_pending}
+                      </p>
+                      <p className="recruiter-application-stat-label">
+                        Offers pending
+                      </p>
+                    </div>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M8 12h8v1.5H8zm0 4h6v1.5H8z" />
+                      <path
+                        d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                        stroke="none"
+                      />
+                      <path d="M14 2v6h6" fill="#2b171d" stroke="none" />
+                      <path
+                        d="M8 12h8v1.5H8zm0 4h6v1.5H8z"
+                        fill="#2b171d"
+                        stroke="none"
+                      />
+                    </svg>
+                  </article>
+                  {jobApplicationsError && (
+                    <span id="job-applications-load-error" role="alert">
+                      Failed to load job applications. Please try again.
+                    </span>
+                  )}
+                </section>
+                {jobApplicationsLoading ? (
+                  <LoadingPage page="Job Applications" />
                 ) : (
                   <>
-                    <section
-                      className="recruiter-application-filters"
-                      aria-label="Filter applications"
-                    >
-                      <label
-                        className="recruiter-application-search"
-                        aria-label="Search applications"
-                      >
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                          <circle cx="11" cy="11" r="5.5" />
-                          <path d="M16 16l5 5" />
-                        </svg>
-                        <input
-                          type="search"
-                          placeholder="Search"
-                          value={nameFilter ?? ""}
-                          onChange={(event) =>
-                            setNameFilter(event.target.value || null)
-                          }
-                        />
-                      </label>
-                      <label className="recruiter-application-filter">
-                        <span>
-                          <svg viewBox="0 0 16 16" aria-hidden="true">
-                            <path d="M3 3.5h10M3 8h10M3 12.5h10" />
-                            <circle cx="6" cy="3.5" r="1.25" />
-                            <circle cx="10" cy="8" r="1.25" />
-                            <circle cx="7" cy="12.5" r="1.25" />
-                          </svg>
-                          Stage
-                        </span>
-                        <details
-                          className="department-filter application-stage-filter"
-                          ref={stageFilterRef}
+                    {showNoApplicants ? (
+                      <EmptyPage
+                        icon="M9 4.75h-2A1.75 1.75 0 0 0 5.25 6.5v12A1.75 1.75 0 0 0 7 20.25h10a1.75 1.75 0 0 0 1.75-1.75v-12A1.75 1.75 0 0 0 17 4.75h-2M9 4.75A1.75 1.75 0 0 1 10.75 3h2.5A1.75 1.75 0 0 1 15 4.75v1.5H9zM9 11h6M9 14.5h6M9 18h3"
+                        title="No applicants yet"
+                        subTitle="Applicants will appear here as soon as candidates apply."
+                        button={{ text: "Go to Jobs", navigation: "/jobs" }}
+                      />
+                    ) : (
+                      <>
+                        <section
+                          className="recruiter-application-filters"
+                          aria-label="Filter applications"
                         >
-                          <summary
-                            className="filter-select filter-trigger"
-                            aria-label={
-                              stageFilters.length
-                                ? `Stages: ${stageFilters.join(", ")}`
-                                : "Filter by stage"
-                            }
+                          <label
+                            className="recruiter-application-search"
+                            aria-label="Search applications"
                           >
-                            {stageFilters.length === 0
-                              ? "All stages"
-                              : `${stageFilters.length} selected`}
-                            <svg
-                              className="application-stage-chevron"
-                              viewBox="0 0 20 20"
-                              aria-hidden="true"
-                            >
-                              <path d="M5 7.5 10 12.5 15 7.5" />
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                              <circle cx="11" cy="11" r="5.5" />
+                              <path d="M16 16l5 5" />
                             </svg>
-                          </summary>
-                          <div className="department-filter-options">
-                            {[
-                              ["Applied", "Applied"],
-                              ["Screened", "Screened"],
-                              ["Interview_R1", "Interview R1"],
-                              ["Interview_R2", "Interview R2"],
-                              ["HR_Round", "HR Round"],
-                              ["Offer", "Offer"],
-                              ["Rejected", "Rejected"],
-                            ].map(([value, label]) => (
-                              <label key={value}>
-                                <input
-                                  type="checkbox"
-                                  checked={stageFilters.includes(value)}
-                                  onChange={(event) => {
-                                    setStageFilters((current) =>
-                                      event.target.checked
-                                        ? [...current, value]
-                                        : current.filter(
-                                            (item) => item !== value,
-                                          ),
-                                    );
-                                  }}
-                                />
-                                {label}
-                              </label>
-                            ))}
-                          </div>
-                        </details>
-                      </label>
-                      <label className="recruiter-application-filter">
-                        <span>
-                          <svg viewBox="0 0 16 16" aria-hidden="true">
-                            <rect
-                              x="2.5"
-                              y="3.5"
-                              width="11"
-                              height="10"
-                              rx="1.5"
+                            <input
+                              type="search"
+                              placeholder="Search"
+                              value={nameFilter ?? ""}
+                              onChange={(event) =>
+                                setNameFilter(event.target.value || null)
+                              }
                             />
-                            <path d="M5 2v3M11 2v3M2.5 6.5h11" />
-                          </svg>
-                          Date applied
-                        </span>
-                        <div className="recruiter-application-select-wrap">
-                          <select
-                            value={dateFilter ?? ""}
-                            onChange={(event) =>
-                              setDateFilter(Number(event.target.value) || null)
-                            }
-                          >
-                            <option value="">Any time</option>
-                            <option value="1">Today</option>
-                            <option value="7">Last 7 days</option>
-                            <option value="30">Last 30 days</option>
-                            <option value="90">Last 90 days</option>
-                          </select>
-                          <svg
-                            className="select-chevron"
-                            viewBox="0 0 20 20"
-                            aria-hidden="true"
-                          >
-                            <path d="M5 7.5 10 12.5 15 7.5" />
-                          </svg>
-                        </div>
-                      </label>
-                    </section>
-                    <section className="recruiter-application-table-wrap">
-                      <table className="recruiter-application-table">
-                        <colgroup>
-                          <col className="application-column-candidate" />
-                          <col className="application-column-stage" />
-                          <col className="application-column-applied" />
-                          <col className="application-column-duration" />
-                          <col className="application-column-action" />
-                        </colgroup>
-                        <thead>
-                          <tr>
-                            <th>Candidate</th>
-                            <th className="application-column-centered">
+                          </label>
+                          <label className="recruiter-application-filter">
+                            <span>
+                              <svg viewBox="0 0 16 16" aria-hidden="true">
+                                <path d="M3 3.5h10M3 8h10M3 12.5h10" />
+                                <circle cx="6" cy="3.5" r="1.25" />
+                                <circle cx="10" cy="8" r="1.25" />
+                                <circle cx="7" cy="12.5" r="1.25" />
+                              </svg>
                               Stage
-                            </th>
-                            <th>Applied on</th>
-                            <th className="application-column-centered">
-                              In stage
-                            </th>
-                            <th className="application-column-centered">
-                              Action
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {applicationRows.length > 0 ? (
-                            applicationRows.map((application: any) => (
-                              <tr key={application.id}>
-                                <td>
-                                  <strong className="candidate-name">
-                                    {application.candidate_name}
-                                  </strong>
-                                </td>
-                                <td className="application-column-centered">
-                                  <span
-                                    className={`stage-badge stage-${application.stage
-                                      .toLowerCase()
-                                      .replace(/_/g, "-")}`}
-                                  >
-                                    {application.stage.replace(/_/g, " ")}
-                                  </span>
-                                </td>
-                                <td>{convertTime(application.applied_at)}</td>
-                                <td className="application-column-centered">
-                                  {application.in_stage} d
-                                </td>
-                                <td className="application-column-centered">
-                                  <button
-                                    type="button"
-                                    className="application-view-button"
-                                    aria-label="View application"
-                                    onClick={() => onViewClick(application)}
-                                  >
-                                    <svg
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      stroke="currentColor"
-                                      strokeWidth="1.8"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      aria-hidden="true"
-                                    >
-                                      <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-                                    </svg>
-                                  </button>
-                                </td>
-                              </tr>
-                            ))
-                          ) : (
-                            <tr>
-                              <td
-                                colSpan={5}
-                                className="application-empty-state"
+                            </span>
+                            <details
+                              className="department-filter application-stage-filter"
+                              ref={stageFilterRef}
+                            >
+                              <summary
+                                className="filter-select filter-trigger"
+                                aria-label={
+                                  stageFilters.length
+                                    ? `Stages: ${stageFilters.join(", ")}`
+                                    : "Filter by stage"
+                                }
                               >
-                                No job applications found for this job.
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </section>
+                                {stageFilters.length === 0
+                                  ? "All stages"
+                                  : `${stageFilters.length} selected`}
+                                <svg
+                                  className="application-stage-chevron"
+                                  viewBox="0 0 20 20"
+                                  aria-hidden="true"
+                                >
+                                  <path d="M5 7.5 10 12.5 15 7.5" />
+                                </svg>
+                              </summary>
+                              <div className="department-filter-options">
+                                {[
+                                  ["Applied", "Applied"],
+                                  ["Screened", "Screened"],
+                                  ["Interview_R1", "Interview R1"],
+                                  ["Interview_R2", "Interview R2"],
+                                  ["HR_Round", "HR Round"],
+                                  ["Offer", "Offer"],
+                                  ["Rejected", "Rejected"],
+                                ].map(([value, label]) => (
+                                  <label key={value}>
+                                    <input
+                                      type="checkbox"
+                                      checked={stageFilters.includes(value)}
+                                      onChange={(event) => {
+                                        setStageFilters((current) =>
+                                          event.target.checked
+                                            ? [...current, value]
+                                            : current.filter(
+                                                (item) => item !== value,
+                                              ),
+                                        );
+                                      }}
+                                    />
+                                    {label}
+                                  </label>
+                                ))}
+                              </div>
+                            </details>
+                          </label>
+                          <label className="recruiter-application-filter">
+                            <span>
+                              <svg viewBox="0 0 16 16" aria-hidden="true">
+                                <rect
+                                  x="2.5"
+                                  y="3.5"
+                                  width="11"
+                                  height="10"
+                                  rx="1.5"
+                                />
+                                <path d="M5 2v3M11 2v3M2.5 6.5h11" />
+                              </svg>
+                              Date applied
+                            </span>
+                            <div className="recruiter-application-select-wrap">
+                              <select
+                                value={dateFilter ?? ""}
+                                onChange={(event) =>
+                                  setDateFilter(
+                                    Number(event.target.value) || null,
+                                  )
+                                }
+                              >
+                                <option value="">Any time</option>
+                                <option value="1">Today</option>
+                                <option value="7">Last 7 days</option>
+                                <option value="30">Last 30 days</option>
+                                <option value="90">Last 90 days</option>
+                              </select>
+                              <svg
+                                className="select-chevron"
+                                viewBox="0 0 20 20"
+                                aria-hidden="true"
+                              >
+                                <path d="M5 7.5 10 12.5 15 7.5" />
+                              </svg>
+                            </div>
+                          </label>
+                        </section>
+                        <section className="recruiter-application-table-wrap">
+                          <table className="recruiter-application-table">
+                            <colgroup>
+                              <col className="application-column-candidate" />
+                              <col className="application-column-stage" />
+                              <col className="application-column-applied" />
+                              <col className="application-column-duration" />
+                              <col className="application-column-action" />
+                            </colgroup>
+                            <thead>
+                              <tr>
+                                <th>Candidate</th>
+                                <th className="application-column-centered">
+                                  Stage
+                                </th>
+                                <th>Applied on</th>
+                                <th className="application-column-centered">
+                                  In stage
+                                </th>
+                                <th className="application-column-centered">
+                                  Action
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {applicationRows.length > 0 ? (
+                                applicationRows.map((application: any) => (
+                                  <tr key={application.id}>
+                                    <td>
+                                      <strong className="candidate-name">
+                                        {application.candidate_name}
+                                      </strong>
+                                    </td>
+                                    <td className="application-column-centered">
+                                      <span
+                                        className={`stage-badge stage-${application.stage
+                                          .toLowerCase()
+                                          .replace(/_/g, "-")}`}
+                                      >
+                                        {application.stage.replace(/_/g, " ")}
+                                      </span>
+                                    </td>
+                                    <td>
+                                      {convertTime(application.applied_at)}
+                                    </td>
+                                    <td className="application-column-centered">
+                                      {application.in_stage} d
+                                    </td>
+                                    <td className="application-column-centered">
+                                      <button
+                                        type="button"
+                                        className="application-view-button"
+                                        aria-label="View application"
+                                        onClick={() => onViewClick(application)}
+                                      >
+                                        <svg
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          strokeWidth="1.8"
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          aria-hidden="true"
+                                        >
+                                          <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                                        </svg>
+                                      </button>
+                                    </td>
+                                  </tr>
+                                ))
+                              ) : (
+                                <tr>
+                                  <td
+                                    colSpan={5}
+                                    className="application-empty-state"
+                                  >
+                                    No job applications found for this job.
+                                  </td>
+                                </tr>
+                              )}
+                            </tbody>
+                          </table>
+                        </section>
+                      </>
+                    )}
                   </>
                 )}
               </>
