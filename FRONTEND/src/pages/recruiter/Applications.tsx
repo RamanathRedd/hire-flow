@@ -11,6 +11,7 @@ import {
   useUpdateApplicationStage,
 } from "../../hooks/useApplications";
 import { useScheduleInterview } from "../../hooks/useInterviews";
+import LoadingPage from "../../components/layout/LoadingPage";
 
 const Applications = () => {
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
@@ -153,6 +154,7 @@ const Applications = () => {
       job_department: "",
       applications: [],
     },
+    isPending: jobApplicationsLoading,
     isError: jobApplicationsError,
   } = useGetJobApplications(selectedJobId, {
     this_week: selectedJobApplications === "this_week",
@@ -376,202 +378,223 @@ const Applications = () => {
                 </span>
               )}
             </section>
-            {showNoApplicants ? (
-              <EmptyPage
-                icon="M9 4.75h-2A1.75 1.75 0 0 0 5.25 6.5v12A1.75 1.75 0 0 0 7 20.25h10a1.75 1.75 0 0 0 1.75-1.75v-12A1.75 1.75 0 0 0 17 4.75h-2M9 4.75A1.75 1.75 0 0 1 10.75 3h2.5A1.75 1.75 0 0 1 15 4.75v1.5H9zM9 11h6M9 14.5h6M9 18h3"
-                title="No applicants yet"
-                subTitle="Applicants will appear here as soon as candidates apply."
-                button={{ text: "Go to Jobs", navigation: "/jobs" }}
-              />
+            {jobApplicationsLoading ? (
+              <LoadingPage page="Job Applications" />
             ) : (
               <>
-                <section
-                  className="recruiter-application-filters"
-                  aria-label="Filter applications"
-                >
-                  <label
-                    className="recruiter-application-search"
-                    aria-label="Search applications"
-                  >
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <circle cx="11" cy="11" r="5.5" />
-                      <path d="M16 16l5 5" />
-                    </svg>
-                    <input
-                      type="search"
-                      placeholder="Search"
-                      value={nameFilter ?? ""}
-                      onChange={(event) =>
-                        setNameFilter(event.target.value || null)
-                      }
-                    />
-                  </label>
-                  <label className="recruiter-application-filter">
-                    <span>
-                      <svg viewBox="0 0 16 16" aria-hidden="true">
-                        <path d="M3 3.5h10M3 8h10M3 12.5h10" />
-                        <circle cx="6" cy="3.5" r="1.25" />
-                        <circle cx="10" cy="8" r="1.25" />
-                        <circle cx="7" cy="12.5" r="1.25" />
-                      </svg>
-                      Stage
-                    </span>
-                    <details
-                      className="department-filter application-stage-filter"
-                      ref={stageFilterRef}
+                {showNoApplicants ? (
+                  <EmptyPage
+                    icon="M9 4.75h-2A1.75 1.75 0 0 0 5.25 6.5v12A1.75 1.75 0 0 0 7 20.25h10a1.75 1.75 0 0 0 1.75-1.75v-12A1.75 1.75 0 0 0 17 4.75h-2M9 4.75A1.75 1.75 0 0 1 10.75 3h2.5A1.75 1.75 0 0 1 15 4.75v1.5H9zM9 11h6M9 14.5h6M9 18h3"
+                    title="No applicants yet"
+                    subTitle="Applicants will appear here as soon as candidates apply."
+                    button={{ text: "Go to Jobs", navigation: "/jobs" }}
+                  />
+                ) : (
+                  <>
+                    <section
+                      className="recruiter-application-filters"
+                      aria-label="Filter applications"
                     >
-                      <summary
-                        className="filter-select filter-trigger"
-                        aria-label={
-                          stageFilters.length
-                            ? `Stages: ${stageFilters.join(", ")}`
-                            : "Filter by stage"
-                        }
+                      <label
+                        className="recruiter-application-search"
+                        aria-label="Search applications"
                       >
-                        {stageFilters.length === 0
-                          ? "All stages"
-                          : `${stageFilters.length} selected`}
-                        <svg
-                          className="application-stage-chevron"
-                          viewBox="0 0 20 20"
-                          aria-hidden="true"
-                        >
-                          <path d="M5 7.5 10 12.5 15 7.5" />
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <circle cx="11" cy="11" r="5.5" />
+                          <path d="M16 16l5 5" />
                         </svg>
-                      </summary>
-                      <div className="department-filter-options">
-                        {[
-                          ["Applied", "Applied"],
-                          ["Screened", "Screened"],
-                          ["Interview_R1", "Interview R1"],
-                          ["Interview_R2", "Interview R2"],
-                          ["HR_Round", "HR Round"],
-                          ["Offer", "Offer"],
-                          ["Rejected", "Rejected"],
-                        ].map(([value, label]) => (
-                          <label key={value}>
-                            <input
-                              type="checkbox"
-                              checked={stageFilters.includes(value)}
-                              onChange={(event) => {
-                                setStageFilters((current) =>
-                                  event.target.checked
-                                    ? [...current, value]
-                                    : current.filter((item) => item !== value),
-                                );
-                              }}
+                        <input
+                          type="search"
+                          placeholder="Search"
+                          value={nameFilter ?? ""}
+                          onChange={(event) =>
+                            setNameFilter(event.target.value || null)
+                          }
+                        />
+                      </label>
+                      <label className="recruiter-application-filter">
+                        <span>
+                          <svg viewBox="0 0 16 16" aria-hidden="true">
+                            <path d="M3 3.5h10M3 8h10M3 12.5h10" />
+                            <circle cx="6" cy="3.5" r="1.25" />
+                            <circle cx="10" cy="8" r="1.25" />
+                            <circle cx="7" cy="12.5" r="1.25" />
+                          </svg>
+                          Stage
+                        </span>
+                        <details
+                          className="department-filter application-stage-filter"
+                          ref={stageFilterRef}
+                        >
+                          <summary
+                            className="filter-select filter-trigger"
+                            aria-label={
+                              stageFilters.length
+                                ? `Stages: ${stageFilters.join(", ")}`
+                                : "Filter by stage"
+                            }
+                          >
+                            {stageFilters.length === 0
+                              ? "All stages"
+                              : `${stageFilters.length} selected`}
+                            <svg
+                              className="application-stage-chevron"
+                              viewBox="0 0 20 20"
+                              aria-hidden="true"
+                            >
+                              <path d="M5 7.5 10 12.5 15 7.5" />
+                            </svg>
+                          </summary>
+                          <div className="department-filter-options">
+                            {[
+                              ["Applied", "Applied"],
+                              ["Screened", "Screened"],
+                              ["Interview_R1", "Interview R1"],
+                              ["Interview_R2", "Interview R2"],
+                              ["HR_Round", "HR Round"],
+                              ["Offer", "Offer"],
+                              ["Rejected", "Rejected"],
+                            ].map(([value, label]) => (
+                              <label key={value}>
+                                <input
+                                  type="checkbox"
+                                  checked={stageFilters.includes(value)}
+                                  onChange={(event) => {
+                                    setStageFilters((current) =>
+                                      event.target.checked
+                                        ? [...current, value]
+                                        : current.filter(
+                                            (item) => item !== value,
+                                          ),
+                                    );
+                                  }}
+                                />
+                                {label}
+                              </label>
+                            ))}
+                          </div>
+                        </details>
+                      </label>
+                      <label className="recruiter-application-filter">
+                        <span>
+                          <svg viewBox="0 0 16 16" aria-hidden="true">
+                            <rect
+                              x="2.5"
+                              y="3.5"
+                              width="11"
+                              height="10"
+                              rx="1.5"
                             />
-                            {label}
-                          </label>
-                        ))}
-                      </div>
-                    </details>
-                  </label>
-                  <label className="recruiter-application-filter">
-                    <span>
-                      <svg viewBox="0 0 16 16" aria-hidden="true">
-                        <rect x="2.5" y="3.5" width="11" height="10" rx="1.5" />
-                        <path d="M5 2v3M11 2v3M2.5 6.5h11" />
-                      </svg>
-                      Date applied
-                    </span>
-                    <div className="recruiter-application-select-wrap">
-                      <select
-                        value={dateFilter ?? ""}
-                        onChange={(event) =>
-                          setDateFilter(Number(event.target.value) || null)
-                        }
-                      >
-                        <option value="">Any time</option>
-                        <option value="1">Today</option>
-                        <option value="7">Last 7 days</option>
-                        <option value="30">Last 30 days</option>
-                        <option value="90">Last 90 days</option>
-                      </select>
-                      <svg
-                        className="select-chevron"
-                        viewBox="0 0 20 20"
-                        aria-hidden="true"
-                      >
-                        <path d="M5 7.5 10 12.5 15 7.5" />
-                      </svg>
-                    </div>
-                  </label>
-                </section>
-                <section className="recruiter-application-table-wrap">
-                  <table className="recruiter-application-table">
-                    <colgroup>
-                      <col className="application-column-candidate" />
-                      <col className="application-column-stage" />
-                      <col className="application-column-applied" />
-                      <col className="application-column-duration" />
-                      <col className="application-column-action" />
-                    </colgroup>
-                    <thead>
-                      <tr>
-                        <th>Candidate</th>
-                        <th className="application-column-centered">Stage</th>
-                        <th>Applied on</th>
-                        <th className="application-column-centered">
-                          In stage
-                        </th>
-                        <th className="application-column-centered">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {applicationRows.length > 0 ? (
-                        applicationRows.map((application: any) => (
-                          <tr key={application.id}>
-                            <td>
-                              <strong className="candidate-name">
-                                {application.candidate_name}
-                              </strong>
-                            </td>
-                            <td className="application-column-centered">
-                              <span
-                                className={`stage-badge stage-${application.stage
-                                  .toLowerCase()
-                                  .replace(/_/g, "-")}`}
-                              >
-                                {application.stage.replace(/_/g, " ")}
-                              </span>
-                            </td>
-                            <td>{convertTime(application.applied_at)}</td>
-                            <td className="application-column-centered">
-                              {application.in_stage} d
-                            </td>
-                            <td className="application-column-centered">
-                              <button
-                                type="button"
-                                className="application-view-button"
-                                aria-label="View application"
-                                onClick={() => onViewClick(application)}
-                              >
-                                <svg
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="1.8"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  aria-hidden="true"
-                                >
-                                  <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-                                </svg>
-                              </button>
-                            </td>
+                            <path d="M5 2v3M11 2v3M2.5 6.5h11" />
+                          </svg>
+                          Date applied
+                        </span>
+                        <div className="recruiter-application-select-wrap">
+                          <select
+                            value={dateFilter ?? ""}
+                            onChange={(event) =>
+                              setDateFilter(Number(event.target.value) || null)
+                            }
+                          >
+                            <option value="">Any time</option>
+                            <option value="1">Today</option>
+                            <option value="7">Last 7 days</option>
+                            <option value="30">Last 30 days</option>
+                            <option value="90">Last 90 days</option>
+                          </select>
+                          <svg
+                            className="select-chevron"
+                            viewBox="0 0 20 20"
+                            aria-hidden="true"
+                          >
+                            <path d="M5 7.5 10 12.5 15 7.5" />
+                          </svg>
+                        </div>
+                      </label>
+                    </section>
+                    <section className="recruiter-application-table-wrap">
+                      <table className="recruiter-application-table">
+                        <colgroup>
+                          <col className="application-column-candidate" />
+                          <col className="application-column-stage" />
+                          <col className="application-column-applied" />
+                          <col className="application-column-duration" />
+                          <col className="application-column-action" />
+                        </colgroup>
+                        <thead>
+                          <tr>
+                            <th>Candidate</th>
+                            <th className="application-column-centered">
+                              Stage
+                            </th>
+                            <th>Applied on</th>
+                            <th className="application-column-centered">
+                              In stage
+                            </th>
+                            <th className="application-column-centered">
+                              Action
+                            </th>
                           </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={5} className="application-empty-state">
-                            No job applications found for this job.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </section>
+                        </thead>
+                        <tbody>
+                          {applicationRows.length > 0 ? (
+                            applicationRows.map((application: any) => (
+                              <tr key={application.id}>
+                                <td>
+                                  <strong className="candidate-name">
+                                    {application.candidate_name}
+                                  </strong>
+                                </td>
+                                <td className="application-column-centered">
+                                  <span
+                                    className={`stage-badge stage-${application.stage
+                                      .toLowerCase()
+                                      .replace(/_/g, "-")}`}
+                                  >
+                                    {application.stage.replace(/_/g, " ")}
+                                  </span>
+                                </td>
+                                <td>{convertTime(application.applied_at)}</td>
+                                <td className="application-column-centered">
+                                  {application.in_stage} d
+                                </td>
+                                <td className="application-column-centered">
+                                  <button
+                                    type="button"
+                                    className="application-view-button"
+                                    aria-label="View application"
+                                    onClick={() => onViewClick(application)}
+                                  >
+                                    <svg
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth="1.8"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      aria-hidden="true"
+                                    >
+                                      <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                                    </svg>
+                                  </button>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td
+                                colSpan={5}
+                                className="application-empty-state"
+                              >
+                                No job applications found for this job.
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </section>
+                  </>
+                )}
               </>
             )}
           </>
