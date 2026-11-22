@@ -80,8 +80,11 @@ const Profile = () => {
     onClickEditButton: onClickEditButton,
   };
 
-  const { data: userData = {} as UserDetails, isError: userDataError } =
-    useGetRecruiterDetails();
+  const {
+    data: userData = {} as UserDetails,
+    isError: userDataError,
+    isPending: userDataLoading,
+  } = useGetRecruiterDetails();
 
   const onConfirm = () => {
     if (
@@ -134,25 +137,43 @@ const Profile = () => {
         classString="nav-action-button"
         headerClassName="profile-page-header"
       />
-      {userData && (
-        <ProfileForm
-          profileType="recruiter"
-          inputFields={profileInputFields}
-          userData={userData}
-          isEditable={isEditable}
-          formRef={profileFormRef}
-          onDetailsChange={setRecruiterDraft}
-        />
-      )}
-      {userDataError && (
-        <span id="user-data-load-error" role="alert">
-          Failed to load user data. Please try again.
-        </span>
-      )}
-      {updateRecruiterDetailsMutation.isError && (
-        <span id="profile-update-error" role="alert">
-          {updateRecruiterDetailsMutation.error.message}
-        </span>
+      {userDataLoading ? (
+        <div
+          className="profile-loading-grid"
+          role="status"
+          aria-live="polite"
+          aria-label="Loading profile"
+        >
+          {[0, 1, 2, 3].map((field) => (
+            <div className="profile-loading-field" key={field} aria-hidden="true">
+              <span className="loading-skeleton profile-loading-label" />
+              <span className="loading-skeleton profile-loading-input" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <>
+          {userData && (
+            <ProfileForm
+              profileType="recruiter"
+              inputFields={profileInputFields}
+              userData={userData}
+              isEditable={isEditable}
+              formRef={profileFormRef}
+              onDetailsChange={setRecruiterDraft}
+            />
+          )}
+          {userDataError && (
+            <span id="user-data-load-error" role="alert">
+              Failed to load user data. Please try again.
+            </span>
+          )}
+          {updateRecruiterDetailsMutation.isError && (
+            <span id="profile-update-error" role="alert">
+              {updateRecruiterDetailsMutation.error.message}
+            </span>
+          )}
+        </>
       )}
 
       {isModalOpen && (

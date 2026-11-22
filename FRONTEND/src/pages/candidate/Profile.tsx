@@ -108,8 +108,11 @@ const Profile = () => {
     setIsModalOpen(false);
   };
 
-  const { data: userData = {} as UserDetails, isError: userDataError } =
-    useGetCandidateDetails();
+  const {
+    data: userData = {} as UserDetails,
+    isPending: userDataLoading,
+    isError: userDataError,
+  } = useGetCandidateDetails();
 
   const onConfirm = () => {
     if (
@@ -159,28 +162,49 @@ const Profile = () => {
         classString="nav-action-button"
         headerClassName="profile-page-header"
       />
+      {userDataLoading ? (
+        <div
+          className="profile-loading-grid"
+          role="status"
+          aria-live="polite"
+          aria-label="Loading profile"
+        >
+          {[0, 1, 2, 3, 4, 5].map((field) => (
+            <div
+              className="profile-loading-field"
+              key={field}
+              aria-hidden="true"
+            >
+              <span className="loading-skeleton profile-loading-label" />
+              <span className="loading-skeleton profile-loading-input" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <>
+          {userData && (
+            <ProfileForm
+              profileType="candidate"
+              inputFields={inputFieldDetails}
+              userData={userData}
+              isEditable={isEditable}
+              formRef={profileFormRef}
+              onDetailsChange={setCandidateDraft}
+            />
+          )}
 
-      {userData && (
-        <ProfileForm
-          profileType="candidate"
-          inputFields={inputFieldDetails}
-          userData={userData}
-          isEditable={isEditable}
-          formRef={profileFormRef}
-          onDetailsChange={setCandidateDraft}
-        />
-      )}
+          {userDataError && (
+            <span id="user-data-load-error" role="alert">
+              Failed to load user data. Please try again.
+            </span>
+          )}
 
-      {userDataError && (
-        <span id="user-data-load-error" role="alert">
-          Failed to load user data. Please try again.
-        </span>
-      )}
-
-      {updateCandidateDetailsMutation.isError && (
-        <span id="profile-update-error" role="alert">
-          {updateCandidateDetailsMutation.error.message}
-        </span>
+          {updateCandidateDetailsMutation.isError && (
+            <span id="profile-update-error" role="alert">
+              {updateCandidateDetailsMutation.error.message}
+            </span>
+          )}
+        </>
       )}
 
       {isModalOpen && (
