@@ -2603,6 +2603,132 @@ body {
 	background: #191a1c;
 }
 
+.application-loading {
+	display: flex;
+	flex: 1;
+	min-height: 0;
+	flex-direction: column;
+}
+
+.application-loading-toolbar {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(130px, 155px));
+	gap: 12px;
+	width: fit-content;
+	margin: 16px 0 12px 42px;
+}
+
+.application-loading-filter {
+	height: 38px;
+}
+
+.application-loading-list {
+	display: grid;
+	gap: 10px;
+	margin: 0 42px 28px;
+}
+
+.application-loading-card {
+	min-width: 0;
+	padding: 14px 16px 12px;
+	border: 1px solid #303238;
+	border-radius: 12px;
+	background: #191a1c;
+}
+
+.application-loading-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 16px;
+}
+
+.application-loading-title-group {
+	display: grid;
+	gap: 8px;
+	width: 60%;
+}
+
+.application-loading-title {
+	width: 52%;
+	max-width: 260px;
+	height: 16px;
+}
+
+.application-loading-meta {
+	width: 84%;
+	max-width: 380px;
+	height: 12px;
+}
+
+.application-loading-badge {
+	width: 92px;
+	height: 28px;
+	border-radius: 7px;
+}
+
+.application-loading-progress {
+	display: grid;
+	grid-template-columns: repeat(7, minmax(0, 1fr));
+	gap: 8px;
+	margin-top: 18px;
+}
+
+.application-loading-progress-step {
+	display: grid;
+	gap: 7px;
+}
+
+.application-loading-dot {
+	height: 4px;
+	border-radius: 999px;
+}
+
+.application-loading-step-label {
+	width: 70%;
+	height: 10px;
+}
+
+.application-loading-step {
+	width: 82px;
+	height: 11px;
+	margin-top: 8px;
+}
+
+.application-loading-status {
+	display: flex;
+	gap: 10px;
+	margin-top: 16px;
+}
+
+.application-loading-status-icon {
+	width: 16px;
+	height: 16px;
+	flex: 0 0 auto;
+	border-radius: 50%;
+}
+
+.application-loading-status-copy {
+	display: grid;
+	flex: 1;
+	gap: 7px;
+}
+
+.application-loading-status-title {
+	width: 132px;
+	height: 14px;
+}
+
+.application-loading-status-text {
+	width: 58%;
+	height: 12px;
+}
+
+.application-loading-status-meta {
+	width: 180px;
+	height: 11px;
+}
+
 .application-card-header {
 	display: flex;
 	align-items: flex-start;
@@ -3337,6 +3463,21 @@ input {
 		min-width: 680px;
 		padding-right: 12px;
 		padding-left: 12px;
+	}
+
+	.application-loading-toolbar {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 8px;
+		width: auto;
+		margin: 12px 16px;
+	}
+
+	.application-loading-list {
+		margin: 0 16px 18px;
+	}
+
+	.application-loading-progress {
+		overflow: hidden;
 	}
 
 	#root {
