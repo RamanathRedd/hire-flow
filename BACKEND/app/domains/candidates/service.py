@@ -5,6 +5,7 @@ from core.exceptions import (
     EmailAlreadyExistsError,
     LinkedInAlreadyExistsError,
     MinGreaterThanMax,
+    PasswordMismatchError,
     PhoneAlreadyExistsError,
     ResumeAlreadyExistsError,
     UnauthorizedError,
@@ -38,6 +39,9 @@ def create_candidate(db: Session, candidate: CandidateCreate) -> None:
 
     if candidate_exists:
         raise CandidateAlreadyExistsError
+
+    if candidate.password != candidate.confirm_password:
+        raise PasswordMismatchError
 
     candidate.password = hash_password(candidate.password)
 

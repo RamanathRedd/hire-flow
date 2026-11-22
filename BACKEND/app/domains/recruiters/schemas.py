@@ -9,6 +9,7 @@ class RecruiterCreate(BaseModel):
     phone: str = Field(min_length=10, max_length=15)
     department: str = Field(min_length=3, max_length=100)
     password: str = Field(min_length=6)
+    confirm_password: str = Field(min_length=6)
 
 
 class RecruiterUpdate(BaseModel):

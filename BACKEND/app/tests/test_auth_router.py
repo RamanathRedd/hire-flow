@@ -46,7 +46,8 @@ def test_register_rejects_invalid_payload_with_request_validation_error():
 
 
 @pytest.mark.parametrize(
-    "exception", [RecruiterAlreadyExistsError, CandidateAlreadyExistsError]
+    "exception",
+    [RecruiterAlreadyExistsError, CandidateAlreadyExistsError, PasswordMismatchError],
 )
 def test_register_translates_duplicate_account(monkeypatch, exception):
     def reject(*args):

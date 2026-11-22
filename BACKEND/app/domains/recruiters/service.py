@@ -1,7 +1,7 @@
 from core.security import hash_password
 from core.exceptions import (
     ActiveJobExistsError,
-    EmailAlreadyExistsError,
+    PasswordMismatchError,
     PhoneAlreadyExistsError,
     RecruiterAlreadyExistsError,
     RecruiterNotExistsError,
@@ -26,6 +26,9 @@ def create_recruiter(db: Session, recruiter_data: RecruiterCreate) -> None:
 
     if recruiter_exist:
         raise RecruiterAlreadyExistsError
+
+    if recruiter_data.password != recruiter_data.confirm_password:
+        raise PasswordMismatchError
 
     recruiter_data.password = hash_password(recruiter_data.password)
 

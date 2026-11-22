@@ -12,6 +12,7 @@ class CandidateCreate(BaseModel):
     skills: list[str] = Field(default_factory=list)
     current_title: str = Field(min_length=1, max_length=100)
     current_company: str = Field(min_length=1, max_length=100)
+    confirm_password: str = Field(min_length=6)
 
 
 class CandidateFilters(BaseModel):

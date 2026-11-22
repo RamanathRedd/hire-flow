@@ -38,6 +38,11 @@ def register(isAdmin: bool, data: dict, db: Session = Depends(get_db)):
 
     try:
         return service.register(db, isAdmin, validated_data)
+    except PasswordMismatchError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password Mismatch",
+        )
     except (
         RecruiterAlreadyExistsError,
         CandidateAlreadyExistsError,
