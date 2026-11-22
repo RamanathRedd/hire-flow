@@ -53,11 +53,15 @@ const MyApplications = () => {
     !activeApplications &&
     !closedApplications;
 
+  const my_applications_badge_total = applicationsDataLoading
+    ? "loading"
+    : applicationsData.all_applications + " total";
+
   return (
     <section className="candidate-applications-page">
       <Navbar
         leftTitle="My applications"
-        rightText={`${applicationsData.all_applications} total`}
+        rightText={my_applications_badge_total}
         classString="my-applications-count-badge"
       />
       {applicationsDataLoading ? (
@@ -87,7 +91,10 @@ const MyApplications = () => {
                 </div>
                 <div className="application-loading-progress">
                   {[0, 1, 2, 3, 4, 5, 6].map((step) => (
-                    <div className="application-loading-progress-step" key={step}>
+                    <div
+                      className="application-loading-progress-step"
+                      key={step}
+                    >
                       <span className="loading-skeleton application-loading-dot" />
                       <span className="loading-skeleton application-loading-step-label" />
                     </div>

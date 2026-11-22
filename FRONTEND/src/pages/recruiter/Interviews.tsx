@@ -79,8 +79,6 @@ const Interviews = () => {
     ? allInterviewsError
     : upcomingInterviewsError;
 
-  const interview_badge_total = allInterviewsData.interviews.length;
-
   useEffect(() => {
     if (openInterviewMenu === null) return;
 
@@ -294,6 +292,10 @@ const Interviews = () => {
 
   const loadingData = allInterviewsDataLoading && upcomingInterviewsDataLoading;
 
+  const interview_badge_total = loadingData
+    ? "loading"
+    : allInterviewsData.interviews.length + " total";
+
   const showNoUpcomingInterviews =
     interviews.length === 0 &&
     !allJobs &&
@@ -332,7 +334,7 @@ const Interviews = () => {
     >
       <Navbar
         leftTitle="Interviews"
-        rightText={`${interview_badge_total} total`}
+        rightText={interview_badge_total}
         classString="interview-count-badge"
       />
       {loadingData ? (
