@@ -152,6 +152,7 @@ def test_register_recruiter_delegates_to_recruiter_service(monkeypatch):
         "phone": "1234567890",
         "department": "Engineering",
         "password": "password123",
+        "confirm_password": "password123",
     }
 
     result = service.register(MagicMock(), True, data)
@@ -173,6 +174,7 @@ def test_register_candidate_delegates_to_candidate_service(monkeypatch):
         "current_title": "Engineer",
         "current_company": "Example",
         "password": "password123",
+        "confirm_password": "password123",
     }
 
     result = service.register(MagicMock(), False, data)

@@ -38,6 +38,7 @@ export const register = async (credentails: RegisterCredentials) => {
       skills,
       current_title,
       current_company,
+      confirm_password,
     } = credentails;
     const query = new URLSearchParams({ isAdmin: String(isAdmin) });
     const body = isAdmin
@@ -47,10 +48,12 @@ export const register = async (credentails: RegisterCredentials) => {
           phone,
           department,
           password,
+          confirm_password,
         }
       : {
           name,
           password,
+          confirm_password,
           email,
           phone,
           resume_url,

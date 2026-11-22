@@ -23,6 +23,9 @@ from sqlalchemy.orm import Session, defer
 
 
 def create_candidate(db: Session, candidate: CandidateCreate) -> None:
+    if candidate.password != candidate.confirm_password:
+        raise PasswordMismatchError
+
     candidate_exists = db.scalar(
         select(Candidate).where(
             or_(
@@ -40,12 +43,16 @@ def create_candidate(db: Session, candidate: CandidateCreate) -> None:
     if candidate_exists:
         raise CandidateAlreadyExistsError
 
-    if candidate.password != candidate.confirm_password:
-        raise PasswordMismatchError
-
     candidate.password = hash_password(candidate.password)
 
-    db.add(Candidate(**candidate.model_dump(mode="json")))
+    db.add(
+        Candidate(
+            **candidate.model_dump(
+                mode="json",
+                exclude={"confirm_password"},
+            )
+        )
+    )
     db.commit()
 
 

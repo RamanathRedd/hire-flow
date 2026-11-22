@@ -4,6 +4,7 @@ import pytest
 
 from core.exceptions import (
     ActiveJobExistsError,
+    PasswordMismatchError,
     PhoneAlreadyExistsError,
     RecruiterAlreadyExistsError,
     RecruiterNotExistsError,
@@ -27,6 +28,7 @@ def recruiter_data():
         phone="1234567890",
         department="Engineering",
         password="password123",
+        confirm_password="password123",
     )
 
 
@@ -39,7 +41,26 @@ def test_create_recruiter_hashes_password_and_saves(db, recruiter_data, monkeypa
     recruiter = db.add.call_args.args[0]
     assert isinstance(recruiter, Recruiter)
     assert recruiter.password == "hashed-password"
+    assert not hasattr(recruiter, "confirm_password")
     db.commit.assert_called_once_with()
+
+
+def test_create_recruiter_rejects_mismatched_confirmation(db):
+    recruiter_data = RecruiterCreate(
+        name="Riley Recruiter",
+        email="riley@example.com",
+        phone="1234567890",
+        department="Engineering",
+        password="password123",
+        confirm_password="different123",
+    )
+
+    with pytest.raises(PasswordMismatchError):
+        service.create_recruiter(db, recruiter_data)
+
+    db.scalar.assert_not_called()
+    db.add.assert_not_called()
+    db.commit.assert_not_called()
 
 
 def test_create_recruiter_rejects_duplicate(db, recruiter_data):

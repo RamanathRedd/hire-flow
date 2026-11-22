@@ -18,6 +18,9 @@ from sqlalchemy.orm import Session, defer
 
 
 def create_recruiter(db: Session, recruiter_data: RecruiterCreate) -> None:
+    if recruiter_data.password != recruiter_data.confirm_password:
+        raise PasswordMismatchError
+
     query = select(Recruiter).where(
         (Recruiter.email == recruiter_data.email)
         | (Recruiter.phone == recruiter_data.phone)
@@ -27,12 +30,9 @@ def create_recruiter(db: Session, recruiter_data: RecruiterCreate) -> None:
     if recruiter_exist:
         raise RecruiterAlreadyExistsError
 
-    if recruiter_data.password != recruiter_data.confirm_password:
-        raise PasswordMismatchError
-
     recruiter_data.password = hash_password(recruiter_data.password)
 
-    db.add(Recruiter(**recruiter_data.model_dump()))
+    db.add(Recruiter(**recruiter_data.model_dump(exclude={"confirm_password"})))
     db.commit()
 
 

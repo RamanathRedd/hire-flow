@@ -85,13 +85,9 @@ def get_current_user(db: Session, token: str) -> dict:
         raise InvalidOrExpiredTokenError
 
     if payload["role"] == "Admin":
-        user = get_recruiter_details(
-            db, {"id": user_id, "role": payload["role"]}
-        )
+        user = get_recruiter_details(db, {"id": user_id, "role": payload["role"]})
     else:
-        user = get_candidate_details(
-            db, {"id": user_id, "role": payload["role"]}
-        )
+        user = get_candidate_details(db, {"id": user_id, "role": payload["role"]})
 
     if not user:
         raise InvalidCredentials

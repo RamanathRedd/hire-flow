@@ -26,6 +26,7 @@ def candidate_registration_data():
         "experience_years": 0,
         "current_title": "Engineer",
         "current_company": "Example",
+        "confirm_password": "password123",
     }
 
 

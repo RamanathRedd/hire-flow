@@ -9,6 +9,7 @@ from core.exceptions import (
     CandidateNotExistsError,
     LinkedInAlreadyExistsError,
     MinGreaterThanMax,
+    PasswordMismatchError,
     PhoneAlreadyExistsError,
     ResumeAlreadyExistsError,
     UnauthorizedError,
@@ -31,6 +32,7 @@ def candidate_data():
         skills=["Python"],
         current_title="Engineer",
         current_company="Example",
+        confirm_password="password123",
     )
 
 
@@ -44,7 +46,29 @@ def test_create_candidate_hashes_password_and_saves(db, candidate_data, monkeypa
     assert isinstance(added_candidate, Candidate)
     assert added_candidate.password == "hashed-password"
     assert added_candidate.email == "casey@example.com"
+    assert not hasattr(added_candidate, "confirm_password")
     db.commit.assert_called_once_with()
+
+
+def test_create_candidate_rejects_mismatched_confirmation(db):
+    candidate = CandidateCreate(
+        name="Casey Candidate",
+        password="password123",
+        email="casey@example.com",
+        phone="1234567890",
+        resume_url="https://example.com/resume",
+        experience_years=5,
+        current_title="Engineer",
+        current_company="Example",
+        confirm_password="different123",
+    )
+
+    with pytest.raises(PasswordMismatchError):
+        service.create_candidate(db, candidate)
+
+    db.scalar.assert_not_called()
+    db.add.assert_not_called()
+    db.commit.assert_not_called()
 
 
 def test_create_candidate_rejects_duplicate(db, candidate_data):

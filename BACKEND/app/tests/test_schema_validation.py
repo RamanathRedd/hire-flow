@@ -63,6 +63,7 @@ def test_candidate_create_and_filters_validate_positive_and_negative_values():
         skills=[],
         current_title="Engineer",
         current_company="Example",
+        confirm_password="password123",
     )
     assert candidate.experience_years == 0
     assert CandidateFilters(min_experience=1, max_experience=5).max_experience == 5
@@ -78,6 +79,7 @@ def test_candidate_create_and_filters_validate_positive_and_negative_values():
             experience_years=-1,
             current_title="Engineer",
             current_company="Example",
+            confirm_password="password123",
         )
 
 
@@ -115,6 +117,7 @@ def test_recruiter_schemas_validate_fields():
         phone="1234567890",
         department="Engineering",
         password="password123",
+        confirm_password="password123",
     )
     assert recruiter.email == "riley@example.com"
     assert RecruiterUpdate(department="Product").department == "Product"
@@ -123,6 +126,16 @@ def test_recruiter_schemas_validate_fields():
         RecruiterCreate(
             name="Riley Recruiter",
             email="invalid",
+            phone="1234567890",
+            department="Engineering",
+            password="password123",
+            confirm_password="password123",
+        )
+
+    with pytest.raises(ValidationError):
+        RecruiterCreate(
+            name="Riley Recruiter",
+            email="riley@example.com",
             phone="1234567890",
             department="Engineering",
             password="password123",
