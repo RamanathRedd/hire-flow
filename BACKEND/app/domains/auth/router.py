@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.exceptions import RequestValidationError
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import ValidationError
 from starlette import status
 from core.security import get_authenticated_user, oauth2_scheme
 from core.exceptions import (
@@ -13,6 +15,8 @@ from core.exceptions import (
 from domains.auth import service
 from core.database import get_db
 from domains.auth.schemas import PasswordUpdate
+from domains.candidates.schemas import CandidateCreate
+from domains.recruiters.schemas import RecruiterCreate
 from sqlalchemy.orm import Session
 from typing import Annotated
 
@@ -22,8 +26,18 @@ auth_router = APIRouter()
 
 @auth_router.post("/register", status_code=status.HTTP_201_CREATED)
 def register(isAdmin: bool, data: dict, db: Session = Depends(get_db)):
+    register_schema = RecruiterCreate if isAdmin else CandidateCreate
     try:
-        return service.register(db, isAdmin, data)
+        validated_data = register_schema.model_validate(data).model_dump()
+    except ValidationError as error:
+        details = [
+            {**detail, "loc": ("body", *detail.get("loc", ()))}
+            for detail in error.errors()
+        ]
+        raise RequestValidationError(details) from error
+
+    try:
+        return service.register(db, isAdmin, validated_data)
     except (
         RecruiterAlreadyExistsError,
         CandidateAlreadyExistsError,

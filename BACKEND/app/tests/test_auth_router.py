@@ -16,11 +16,33 @@ from domains.auth import router
 from domains.auth.schemas import PasswordUpdate
 
 
+def candidate_registration_data():
+    return {
+        "name": "Casey Candidate",
+        "password": "password123",
+        "email": "casey@example.com",
+        "phone": "1234567890",
+        "resume_url": "https://example.com/resume",
+        "experience_years": 0,
+        "current_title": "Engineer",
+        "current_company": "Example",
+    }
+
+
 def test_register_returns_service_result(monkeypatch):
     result = {"message": "Candidate created successfully"}
     monkeypatch.setattr(router.service, "register", lambda *args: result)
 
-    assert router.register(False, {"name": "Casey Candidate"}, MagicMock()) == result
+    assert router.register(False, candidate_registration_data(), MagicMock()) == result
+
+
+def test_register_rejects_invalid_payload_with_request_validation_error():
+    from fastapi.exceptions import RequestValidationError
+
+    with pytest.raises(RequestValidationError) as error:
+        router.register(True, {}, MagicMock())
+
+    assert error.value.errors()[0]["loc"] == ("body", "name")
 
 
 @pytest.mark.parametrize(
@@ -33,7 +55,7 @@ def test_register_translates_duplicate_account(monkeypatch, exception):
     monkeypatch.setattr(router.service, "register", reject)
 
     with pytest.raises(HTTPException) as error:
-        router.register(False, {}, MagicMock())
+        router.register(False, candidate_registration_data(), MagicMock())
 
     assert error.value.status_code == 400
 

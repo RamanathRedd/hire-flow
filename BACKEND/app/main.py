@@ -43,20 +43,27 @@ async def handle_request_validation_error(
     )
 
 
-@app.exception_handler(Exception)
 async def handle_unexpected_error(
-    request: Request, error: Exception
+    request: Request, call_next
 ) -> JSONResponse:
-    logger.error(
-        "Unhandled API error for %s %s",
-        request.method,
-        request.url.path,
-        exc_info=(type(error), error, error.__traceback__),
-    )
-    return JSONResponse(
-        status_code=500,
-        content={"detail": "An unexpected error occurred. Please try again later."},
-    )
+    try:
+        return await call_next(request)
+    except Exception as error:
+        logger.error(
+            "Unhandled API error for %s %s",
+            request.method,
+            request.url.path,
+            exc_info=(type(error), error, error.__traceback__),
+        )
+        return JSONResponse(
+            status_code=500,
+            content={
+                "detail": "An unexpected error occurred. Please try again later."
+            },
+        )
+
+
+app.middleware("http")(handle_unexpected_error)
 
 
 @app.get("/health")
@@ -64,6 +71,7 @@ def health():
     return {"status": "ok"}
 
 
+# Keep CORS outside the error middleware so even unexpected errors carry CORS headers.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS_LIST.split(","),

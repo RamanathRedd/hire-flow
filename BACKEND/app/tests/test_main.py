@@ -63,7 +63,10 @@ def test_unexpected_errors_return_safe_500_and_are_logged(caplog, monkeypatch):
     )
     error = RuntimeError("internal detail")
 
-    response = asyncio.run(main.handle_unexpected_error(request, error))
+    async def fail_request(_request):
+        raise error
+
+    response = asyncio.run(main.handle_unexpected_error(request, fail_request))
 
     assert response.status_code == 500
     assert json.loads(response.body) == {
