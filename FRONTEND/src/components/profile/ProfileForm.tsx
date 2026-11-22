@@ -16,6 +16,7 @@ interface inputField {
   max?: string;
   step?: string | number;
   error?: string;
+  invalidMessage?: string;
 }
 
 interface UserDetails {
@@ -117,6 +118,9 @@ const ProfileForm = (props: ProfileFormProps) => {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
+    if (e.target instanceof HTMLInputElement) {
+      e.target.setCustomValidity("");
+    }
     const updatedDetails = {
       ...draftUserDetails,
       [name]: value,
@@ -230,22 +234,44 @@ const ProfileForm = (props: ProfileFormProps) => {
                 )}
               </>
             ) : (
-              <input
-                className="profile-form-input"
-                id={fieldId}
-                type={inputField.type}
-                name={inputField.key}
-                minLength={inputField.minLength ?? undefined}
-                maxLength={inputField.maxLength ?? undefined}
-                min={inputField.min ?? undefined}
-                max={inputField.max ?? undefined}
-                step={inputField.step}
-                placeholder={inputField.placeHolder}
-                value={isEditable ? value : value || " — "}
-                onChange={onFieldChange}
-                readOnly={inputField.type !== "email" ? !isEditable : true}
-                required={inputField.required}
-              />
+              <>
+                <input
+                  className="profile-form-input"
+                  id={fieldId}
+                  type={inputField.type}
+                  name={inputField.key}
+                  minLength={inputField.minLength ?? undefined}
+                  maxLength={inputField.maxLength ?? undefined}
+                  min={inputField.min ?? undefined}
+                  max={inputField.max ?? undefined}
+                  step={inputField.step}
+                  placeholder={inputField.placeHolder}
+                  value={isEditable ? value : value || " — "}
+                  onChange={onFieldChange}
+                  onInvalid={(event) => {
+                    if (inputField.invalidMessage) {
+                      event.currentTarget.setCustomValidity(
+                        inputField.invalidMessage,
+                      );
+                    }
+                  }}
+                  aria-invalid={Boolean(inputField.error)}
+                  aria-describedby={
+                    inputField.error ? `${fieldId}-error` : undefined
+                  }
+                  readOnly={inputField.type !== "email" ? !isEditable : true}
+                  required={inputField.required}
+                />
+                {inputField.error && (
+                  <span
+                    className="profile-form-error"
+                    id={`${fieldId}-error`}
+                    role="alert"
+                  >
+                    {inputField.error}
+                  </span>
+                )}
+              </>
             )}
           </div>
         );

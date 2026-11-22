@@ -193,6 +193,12 @@ body {
 	box-shadow: 0 0 0 3px rgba(84, 112, 255, 0.12);
 }
 
+.profile-form-error {
+	color: #f87171;
+	font-size: 0.8rem;
+	line-height: 1.35;
+}
+
 .profile-form-skill-list {
 	display: flex;
 	flex-wrap: wrap;

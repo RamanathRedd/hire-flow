@@ -8,6 +8,7 @@ import {
 } from "../../hooks/useCandidates";
 import type { CandidateUpdate } from "../../types/candidate";
 import { useQueryClient } from "@tanstack/react-query";
+import { getApiErrorMessage } from "../../api/errors";
 
 const inputFieldDetails = [
   {
@@ -69,18 +70,20 @@ const inputFieldDetails = [
     required: false,
   },
   {
-    type: "text",
+    type: "url",
     placeHolder: "Enter your resume link",
     name: "Resume",
     key: "resume_url",
-    required: false,
+    required: true,
+    invalidMessage: "Enter a valid resume URL with http:// or https://.",
   },
   {
-    type: "text",
+    type: "url",
     placeHolder: "Enter your Linkedin link",
     name: "LinkedIn",
     key: "linkedin_url",
     required: false,
+    invalidMessage: "Enter a valid resume URL with http:// or https://.",
   },
 ];
 
@@ -114,6 +117,23 @@ const Profile = () => {
     isError: userDataError,
   } = useGetCandidateDetails();
 
+  const updateErrorMessage = updateCandidateDetailsMutation.error
+    ? getApiErrorMessage(updateCandidateDetailsMutation.error)
+    : "";
+  const resumeUrlError = updateErrorMessage.startsWith("resume_url:")
+    ? updateErrorMessage.slice("resume_url:".length).trim()
+    : undefined;
+  const linkedInUrlError = updateErrorMessage.startsWith("linkedin_url:")
+    ? updateErrorMessage.slice("linkedin_url:".length).trim()
+    : undefined;
+  const profileInputFields = inputFieldDetails.map((field) =>
+    field.key === "resume_url"
+      ? { ...field, error: resumeUrlError }
+      : field.key === "linkedin_url"
+        ? { ...field, error: linkedInUrlError }
+        : field,
+  );
+
   const onConfirm = () => {
     if (
       !profileFormRef.current?.reportValidity() ||
@@ -134,6 +154,7 @@ const Profile = () => {
           setIsEditable(false);
           setIsModalOpen(false);
         },
+        onError: () => setIsModalOpen(false),
       },
     );
   };
@@ -185,11 +206,14 @@ const Profile = () => {
           {userData && (
             <ProfileForm
               profileType="candidate"
-              inputFields={inputFieldDetails}
+              inputFields={profileInputFields}
               userData={userData}
               isEditable={isEditable}
               formRef={profileFormRef}
-              onDetailsChange={setCandidateDraft}
+              onDetailsChange={(details) => {
+                updateCandidateDetailsMutation.reset();
+                setCandidateDraft(details);
+              }}
             />
           )}
 
@@ -199,9 +223,9 @@ const Profile = () => {
             </span>
           )}
 
-          {updateCandidateDetailsMutation.isError && (
+          {updateCandidateDetailsMutation.isError && !resumeUrlError && (
             <span id="profile-update-error" role="alert">
-              {updateCandidateDetailsMutation.error.message}
+              {updateErrorMessage}
             </span>
           )}
         </>
