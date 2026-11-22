@@ -66,8 +66,10 @@ def test_search_candidates_translates_unauthorized(monkeypatch):
 
 
 def test_get_candidate_details_returns_profile(monkeypatch):
-    candidate = {"id": 7, "name": "Casey Candidate"}
-    monkeypatch.setattr(router.service, "get_candidate_details", lambda *args: candidate)
+    candidate = {"id": 7, "name": "Ram"}
+    monkeypatch.setattr(
+        router.service, "get_candidate_details", lambda *args: candidate
+    )
 
     assert router.get_candidate_details(USER, MagicMock()) == candidate
 

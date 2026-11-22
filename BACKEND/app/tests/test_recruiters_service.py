@@ -23,8 +23,8 @@ def admin():
 @pytest.fixture
 def recruiter_data():
     return RecruiterCreate(
-        name="Riley Recruiter",
-        email="riley@example.com",
+        name="Damu",
+        email="damu@example.com",
         phone="1234567890",
         department="Engineering",
         password="password123",
@@ -47,8 +47,8 @@ def test_create_recruiter_hashes_password_and_saves(db, recruiter_data, monkeypa
 
 def test_create_recruiter_rejects_mismatched_confirmation(db):
     recruiter_data = RecruiterCreate(
-        name="Riley Recruiter",
-        email="riley@example.com",
+        name="Damu",
+        email="damu@example.com",
         phone="1234567890",
         department="Engineering",
         password="password123",
@@ -114,9 +114,7 @@ def test_update_recruiter_changes_fields(db, admin):
     recruiter = MagicMock(phone="1111111111")
     db.scalar.return_value = recruiter
 
-    service.update_recruiter(
-        db, 3, RecruiterUpdate(name="Updated Recruiter"), admin
-    )
+    service.update_recruiter(db, 3, RecruiterUpdate(name="Updated Recruiter"), admin)
 
     assert recruiter.name == "Updated Recruiter"
     db.commit.assert_called_once_with()
@@ -126,9 +124,7 @@ def test_update_recruiter_skips_phone_duplicate_check_when_unchanged(db, admin):
     recruiter = MagicMock(phone="1111111111")
     db.scalar.return_value = recruiter
 
-    service.update_recruiter(
-        db, 3, RecruiterUpdate(phone="1111111111"), admin
-    )
+    service.update_recruiter(db, 3, RecruiterUpdate(phone="1111111111"), admin)
 
     db.scalar.assert_called_once()
     db.commit.assert_called_once_with()
@@ -138,9 +134,7 @@ def test_update_recruiter_allows_new_phone_when_not_taken(db, admin):
     recruiter = MagicMock(phone="1111111111")
     db.scalar.side_effect = [recruiter, None]
 
-    service.update_recruiter(
-        db, 3, RecruiterUpdate(phone="2222222222"), admin
-    )
+    service.update_recruiter(db, 3, RecruiterUpdate(phone="2222222222"), admin)
 
     assert recruiter.phone == "2222222222"
     assert db.scalar.call_count == 2
@@ -152,9 +146,7 @@ def test_update_recruiter_rejects_duplicate_phone(db, admin):
     db.scalar.side_effect = [recruiter, MagicMock()]
 
     with pytest.raises(PhoneAlreadyExistsError):
-        service.update_recruiter(
-            db, 3, RecruiterUpdate(phone="2222222222"), admin
-        )
+        service.update_recruiter(db, 3, RecruiterUpdate(phone="2222222222"), admin)
 
     db.commit.assert_not_called()
 
@@ -163,7 +155,9 @@ def test_update_recruiter_rejects_missing_recruiter(db, admin):
     db.scalar.return_value = None
 
     with pytest.raises(RecruiterNotExistsError):
-        service.update_recruiter(db, 3, RecruiterUpdate(name="Updated Recruiter"), admin)
+        service.update_recruiter(
+            db, 3, RecruiterUpdate(name="Updated Recruiter"), admin
+        )
 
 
 def test_update_recruiter_requires_admin(db):

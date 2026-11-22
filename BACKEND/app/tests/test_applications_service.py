@@ -43,9 +43,7 @@ def candidate_user():
 
 def test_rejects_non_candidate_without_database_access(db, application_data):
     with pytest.raises(UnauthorizedError):
-        service.create_application(
-            db, application_data, {"id": 7, "role": "Admin"}
-        )
+        service.create_application(db, application_data, {"id": 7, "role": "Admin"})
 
     db.scalar.assert_not_called()
 
@@ -67,9 +65,7 @@ def test_get_application_details_summarizes_closed_application_duration(db, stag
     application.job = MagicMock()
     db.scalar.return_value = application
 
-    result = service.get_application_details(
-        db, 12, {"id": 7, "role": "User"}
-    )
+    result = service.get_application_details(db, 12, {"id": 7, "role": "User"})
 
     assert result["summary"]["total_days_in_process"] == 3
 
@@ -209,9 +205,7 @@ def test_update_application_stage_advances_and_records_history(db):
     db.scalar.side_effect = [recruiter, application]
     update = UpdateStage(new_stage="Interview_R1", notes="Strong application")
 
-    service.update_application_stage(
-        db, 12, update, {"id": 3, "role": "Admin"}
-    )
+    service.update_application_stage(db, 12, update, {"id": 3, "role": "Admin"})
 
     assert application.stage == "Interview_R1"
     assert application.notes == "Strong application"
@@ -410,13 +404,13 @@ def test_get_candidate_applications_deduplicates_history_and_counts_statuses(db)
         rejection_reason="Position filled",
     )
     common = {
-        "candidate_name": "Casey Candidate",
+        "candidate_name": "Ram",
         "department": "Engineering",
         "location": "Remote",
         "job_type": "Full-time",
         "interview_scheduled_at": created_at + timedelta(days=6),
         "interview_round_type": "Technical",
-        "interviewer_name": "Riley Recruiter",
+        "interviewer_name": "Damu",
     }
     rows = [
         SimpleNamespace(
@@ -460,7 +454,7 @@ def test_get_candidate_applications_deduplicates_history_and_counts_statuses(db)
             interview_scheduled_at=None,
             interview_round_type=None,
             interviewer_name=None,
-            candidate_name="Casey Candidate",
+            candidate_name="Ram",
             department="Design",
             location="Remote",
             job_type="Contract",
@@ -508,7 +502,7 @@ def test_get_candidate_applications_filters_by_status(
         rows.append(
             SimpleNamespace(
                 Application=application,
-                candidate_name="Casey Candidate",
+                candidate_name="Ram",
                 job_title="Backend Engineer",
                 department="Engineering",
                 location="Remote",
@@ -573,7 +567,7 @@ def test_get_candidate_applications_returns_empty_summary(db):
 
 def test_get_live_applications_serializes_candidate_and_job_names(db):
     application = MagicMock(id=12)
-    application.candidate.name = "Casey Candidate"
+    application.candidate.name = "Ram"
     application.job.title = "Backend Engineer"
     db.scalars.return_value.all.return_value = [application]
 
@@ -582,7 +576,7 @@ def test_get_live_applications_serializes_candidate_and_job_names(db):
     assert result == [
         {
             "id": 12,
-            "candidate_name": "Casey Candidate",
+            "candidate_name": "Ram",
             "job_title": "Backend Engineer",
         }
     ]
@@ -657,9 +651,7 @@ def test_get_application_details_summarizes_interviews_and_stage_history(db):
     application.job = MagicMock()
     db.scalar.return_value = application
 
-    result = service.get_application_details(
-        db, 12, {"id": 7, "role": "User"}
-    )
+    result = service.get_application_details(db, 12, {"id": 7, "role": "User"})
 
     assert result["application"]["id"] == 12
     assert result["candidate"] is application.candidate
@@ -696,7 +688,7 @@ def test_get_application_timeline_returns_current_stage_and_empty_history(db):
         applied_at=datetime.now(timezone.utc),
         rejection_reason=None,
     )
-    application.candidate.name = "Casey Candidate"
+    application.candidate.name = "Ram"
     application.job.title = "Backend Engineer"
     db.scalar.return_value = application
     db.scalars.return_value.all.return_value = []
@@ -704,7 +696,7 @@ def test_get_application_timeline_returns_current_stage_and_empty_history(db):
     result = service.get_application_timeline(db, 12, {"id": 7, "role": "User"})
 
     assert result["application_id"] == 12
-    assert result["candidate_name"] == "Casey Candidate"
+    assert result["candidate_name"] == "Ram"
     assert result["job_title"] == "Backend Engineer"
     assert result["current_stage"] == "Screened"
     assert result["timeline"] == []
@@ -720,9 +712,7 @@ def test_get_application_timeline_rejects_missing_application(db):
 
 def test_get_application_timeline_requires_candidate(db):
     with pytest.raises(UnauthorizedError):
-        service.get_application_timeline(
-            db, 12, {"id": 3, "role": "Admin"}
-        )
+        service.get_application_timeline(db, 12, {"id": 3, "role": "Admin"})
 
     db.scalar.assert_not_called()
 
@@ -736,7 +726,7 @@ def test_get_application_timeline_includes_rejection_and_recruiter_details(db):
         stage_updated_at=now - timedelta(days=2),
         rejection_reason="Position filled",
     )
-    application.candidate.name = "Casey Candidate"
+    application.candidate.name = "Ram"
     application.job.title = "Backend Engineer"
     histories = [
         SimpleNamespace(
@@ -758,7 +748,7 @@ def test_get_application_timeline_includes_rejection_and_recruiter_details(db):
     ]
     db.scalar.return_value = application
     db.scalars.return_value.all.return_value = histories
-    db.execute.return_value.all.return_value = [(3, "Riley Recruiter")]
+    db.execute.return_value.all.return_value = [(3, "Damu")]
 
     result = service.get_application_timeline(db, 12, {"id": 7, "role": "User"})
 
@@ -773,11 +763,13 @@ def test_get_application_timeline_includes_rejection_and_recruiter_details(db):
         "rejected_from_stage": "Screened",
         "rejection_reason": "Position filled",
         "rejected_at": histories[1].created_at,
-        "rejected_by": "Riley Recruiter",
+        "rejected_by": "Damu",
     }
 
 
-def test_get_application_timeline_handles_single_ongoing_stage_and_future_apply_date(db):
+def test_get_application_timeline_handles_single_ongoing_stage_and_future_apply_date(
+    db,
+):
     now = datetime.now(timezone.utc).replace(microsecond=0)
     application = MagicMock(
         id=12,
@@ -785,7 +777,7 @@ def test_get_application_timeline_handles_single_ongoing_stage_and_future_apply_
         applied_at=now + timedelta(days=1),
         rejection_reason=None,
     )
-    application.candidate.name = "Casey Candidate"
+    application.candidate.name = "Ram"
     application.job.title = "Backend Engineer"
     history = SimpleNamespace(
         id=1,

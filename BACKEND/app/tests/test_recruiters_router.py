@@ -41,8 +41,8 @@ def test_get_recruiter_details_returns_profile_and_job_stats(monkeypatch):
     created_at = datetime.now(timezone.utc)
     recruiter = MagicMock(
         id=3,
-        name="Riley Recruiter",
-        email="riley@example.com",
+        name="Damu",
+        email="damu@example.com",
         phone="1234567890",
         department="Engineering",
         created_at=created_at,
@@ -65,7 +65,9 @@ def test_get_recruiter_details_returns_profile_and_job_stats(monkeypatch):
     )
     db = MagicMock()
     db.scalars.return_value.all.return_value = [open_job, closed_job]
-    monkeypatch.setattr(router.service, "get_recruiter_details", lambda *args: recruiter)
+    monkeypatch.setattr(
+        router.service, "get_recruiter_details", lambda *args: recruiter
+    )
 
     result = router.get_recruiter_details(ADMIN, db)
 
@@ -106,7 +108,11 @@ def test_update_recruiter_returns_success(monkeypatch):
 
 @pytest.mark.parametrize(
     ("exception", "status_code"),
-    [(UnauthorizedError, 401), (RecruiterNotExistsError, 404), (PhoneAlreadyExistsError, 400)],
+    [
+        (UnauthorizedError, 401),
+        (RecruiterNotExistsError, 404),
+        (PhoneAlreadyExistsError, 400),
+    ],
 )
 def test_update_recruiter_translates_errors(monkeypatch, exception, status_code):
     def reject(*args):

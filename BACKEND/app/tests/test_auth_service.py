@@ -17,7 +17,7 @@ def test_candidate_login_returns_bearer_token(monkeypatch):
     db = MagicMock()
     candidate = MagicMock()
     candidate.id = 7
-    candidate.name = "Candidate Name"
+    candidate.name = "Ram"
     candidate.password = "hashed-password"
     db.scalar.return_value = candidate
     create_token = MagicMock(return_value="signed-token")
@@ -25,7 +25,7 @@ def test_candidate_login_returns_bearer_token(monkeypatch):
     monkeypatch.setattr(service, "create_access_token", create_token)
     monkeypatch.setattr(service, "verify_password", verify_password)
 
-    response = service.login(db, False, "candidate@example.com", "password")
+    response = service.login(db, False, "ram@example.com", "password")
 
     assert response == {
         "access_token": "signed-token",
@@ -34,29 +34,25 @@ def test_candidate_login_returns_bearer_token(monkeypatch):
         "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     }
     verify_password.assert_called_once_with("password", "hashed-password")
-    create_token.assert_called_once_with(
-        {"sub": "Candidate Name", "id": 7, "role": "User"}
-    )
+    create_token.assert_called_once_with({"sub": "Ram", "id": 7, "role": "User"})
 
 
 def test_admin_login_returns_admin_role_and_token(monkeypatch):
     db = MagicMock()
     recruiter = MagicMock()
     recruiter.id = 3
-    recruiter.name = "Riley Recruiter"
+    recruiter.name = "Damu"
     recruiter.password = "hashed-password"
     db.scalar.return_value = recruiter
     monkeypatch.setattr(service, "verify_password", lambda *args: True)
     create_token = MagicMock(return_value="admin-token")
     monkeypatch.setattr(service, "create_access_token", create_token)
 
-    response = service.login(db, True, "riley@example.com", "password")
+    response = service.login(db, True, "damu@example.com", "password")
 
     assert response["access_token"] == "admin-token"
     assert response["role"] == "Admin"
-    create_token.assert_called_once_with(
-        {"sub": "Riley Recruiter", "id": 3, "role": "Admin"}
-    )
+    create_token.assert_called_once_with({"sub": "Damu", "id": 3, "role": "Admin"})
 
 
 def test_login_rejects_incorrect_password(monkeypatch):
@@ -66,7 +62,7 @@ def test_login_rejects_incorrect_password(monkeypatch):
     monkeypatch.setattr(service, "verify_password", verify_password)
 
     with pytest.raises(InvalidCredentials):
-        service.login(db, False, "candidate@example.com", "wrong-password")
+        service.login(db, False, "ram@example.com", "wrong-password")
 
     verify_password.assert_called_once_with("wrong-password", "hashed-password")
 
@@ -147,8 +143,8 @@ def test_register_recruiter_delegates_to_recruiter_service(monkeypatch):
     create_recruiter = MagicMock()
     monkeypatch.setattr(service.recruiter_service, "create_recruiter", create_recruiter)
     data = {
-        "name": "Riley Recruiter",
-        "email": "riley@example.com",
+        "name": "Damu",
+        "email": "damu@example.com",
         "phone": "1234567890",
         "department": "Engineering",
         "password": "password123",
@@ -159,20 +155,20 @@ def test_register_recruiter_delegates_to_recruiter_service(monkeypatch):
 
     assert result == {"message": "Recruiter created successfully"}
     create_recruiter.assert_called_once()
-    assert create_recruiter.call_args.args[1].email == "riley@example.com"
+    assert create_recruiter.call_args.args[1].email == "damu@example.com"
 
 
 def test_register_candidate_delegates_to_candidate_service(monkeypatch):
     create_candidate = MagicMock()
     monkeypatch.setattr(service.candidate_service, "create_candidate", create_candidate)
     data = {
-        "name": "Casey Candidate",
-        "email": "casey@example.com",
+        "name": "Ram",
+        "email": "ram@example.com",
         "phone": "1234567890",
         "resume_url": "https://example.com/resume",
         "experience_years": 2,
         "current_title": "Engineer",
-        "current_company": "Example",
+        "current_company": "TCS",
         "password": "password123",
         "confirm_password": "password123",
     }
@@ -181,7 +177,7 @@ def test_register_candidate_delegates_to_candidate_service(monkeypatch):
 
     assert result == {"message": "Candidate created successfully"}
     create_candidate.assert_called_once()
-    assert create_candidate.call_args.args[1].email == "casey@example.com"
+    assert create_candidate.call_args.args[1].email == "ram@example.com"
 
 
 def test_get_current_user_rejects_invalid_token(monkeypatch):
@@ -215,9 +211,7 @@ def test_get_current_user_loads_candidate(monkeypatch):
     result = service.get_current_user(db, "valid-token")
 
     assert result is candidate
-    get_candidate_details.assert_called_once_with(
-        db, {"id": 7, "role": "User"}
-    )
+    get_candidate_details.assert_called_once_with(db, {"id": 7, "role": "User"})
 
 
 def test_get_current_user_loads_recruiter(monkeypatch):
@@ -232,9 +226,7 @@ def test_get_current_user_loads_recruiter(monkeypatch):
     result = service.get_current_user(db, "valid-token")
 
     assert result is recruiter
-    get_recruiter_details.assert_called_once_with(
-        db, {"id": 3, "role": "Admin"}
-    )
+    get_recruiter_details.assert_called_once_with(db, {"id": 3, "role": "Admin"})
 
 
 def test_get_current_user_rejects_missing_account(monkeypatch):

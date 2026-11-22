@@ -10,7 +10,11 @@ from domains.applications.schemas import (
     UpdateStage,
 )
 from domains.auth.schemas import PasswordUpdate
-from domains.candidates.schemas import CandidateCreate, CandidateFilters, CandidateUpdate
+from domains.candidates.schemas import (
+    CandidateCreate,
+    CandidateFilters,
+    CandidateUpdate,
+)
 from domains.interviews.schemas import (
     CancelInterview,
     InterviewCreate,
@@ -23,11 +27,14 @@ from domains.recruiters.schemas import RecruiterCreate, RecruiterUpdate
 
 
 def test_password_update_accepts_valid_passwords_and_rejects_short_values():
-    assert PasswordUpdate(
-        old_password="old-pass",
-        new_password="new-pass",
-        confirm_password="new-pass",
-    ).new_password == "new-pass"
+    assert (
+        PasswordUpdate(
+            old_password="old-pass",
+            new_password="new-pass",
+            confirm_password="new-pass",
+        ).new_password
+        == "new-pass"
+    )
 
     with pytest.raises(ValidationError):
         PasswordUpdate(
@@ -54,15 +61,15 @@ def test_application_schemas_accept_valid_values_and_reject_invalid_stage():
 
 def test_candidate_create_and_filters_validate_positive_and_negative_values():
     candidate = CandidateCreate(
-        name="Casey Candidate",
+        name="Ram",
         password="password123",
-        email="casey@example.com",
+        email="ram@example.com",
         phone="1234567890",
         resume_url="https://example.com/resume",
         experience_years=0,
         skills=[],
         current_title="Engineer",
-        current_company="Example",
+        current_company="TCS",
         confirm_password="password123",
     )
     assert candidate.experience_years == 0
@@ -71,14 +78,14 @@ def test_candidate_create_and_filters_validate_positive_and_negative_values():
 
     with pytest.raises(ValidationError):
         CandidateCreate(
-            name="Casey Candidate",
+            name="Ram",
             password="password123",
             email="not-an-email",
             phone="1234567890",
             resume_url="https://example.com/resume",
             experience_years=-1,
             current_title="Engineer",
-            current_company="Example",
+            current_company="TCS",
             confirm_password="password123",
         )
 
@@ -112,19 +119,19 @@ def test_job_schemas_accept_valid_values_and_reject_invalid_values():
 
 def test_recruiter_schemas_validate_fields():
     recruiter = RecruiterCreate(
-        name="Riley Recruiter",
-        email="riley@example.com",
+        name="Damu",
+        email="damu@example.com",
         phone="1234567890",
         department="Engineering",
         password="password123",
         confirm_password="password123",
     )
-    assert recruiter.email == "riley@example.com"
+    assert recruiter.email == "damu@example.com"
     assert RecruiterUpdate(department="Product").department == "Product"
 
     with pytest.raises(ValidationError):
         RecruiterCreate(
-            name="Riley Recruiter",
+            name="Damu",
             email="invalid",
             phone="1234567890",
             department="Engineering",
@@ -134,8 +141,8 @@ def test_recruiter_schemas_validate_fields():
 
     with pytest.raises(ValidationError):
         RecruiterCreate(
-            name="Riley Recruiter",
-            email="riley@example.com",
+            name="Damu",
+            email="damu@example.com",
             phone="1234567890",
             department="Engineering",
             password="password123",

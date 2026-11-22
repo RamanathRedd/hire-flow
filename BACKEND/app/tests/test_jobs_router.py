@@ -59,7 +59,9 @@ def test_create_job_translates_errors(monkeypatch, exception, status_code):
 def test_get_jobs_serializes_results(monkeypatch):
     jobs = [MagicMock(), MagicMock()]
     monkeypatch.setattr(router.service, "get_jobs", lambda *args: jobs)
-    monkeypatch.setattr(router, "_serialize_job", lambda job: {"id": len(job._mock_children)})
+    monkeypatch.setattr(
+        router, "_serialize_job", lambda job: {"id": len(job._mock_children)}
+    )
 
     assert router.get_jobs(ADMIN, JobFilters(), MagicMock()) == [
         {"id": 0},
@@ -86,7 +88,7 @@ def test_serialize_job_includes_recruiter_and_applicant_count():
         ),
         id=9,
         title="Backend Engineer",
-        recruiter=SimpleNamespace(name="Riley Recruiter"),
+        recruiter=SimpleNamespace(name="Damu"),
         applications=[MagicMock(), MagicMock()],
     )
 
@@ -95,7 +97,7 @@ def test_serialize_job_includes_recruiter_and_applicant_count():
     assert result == {
         "id": 9,
         "title": "Backend Engineer",
-        "recruiter_name": "Riley Recruiter",
+        "recruiter_name": "Damu",
         "applicant_count": 2,
     }
 
@@ -141,9 +143,9 @@ def test_get_job_by_id_translates_errors(monkeypatch, exception, status_code):
 def test_update_job_returns_success(monkeypatch):
     monkeypatch.setattr(router.service, "update_job", lambda *args: None)
 
-    assert router.update_job(9, ADMIN, JobUpdate(description="Updated posting"), MagicMock()) == {
-        "message": "Job updated successfully"
-    }
+    assert router.update_job(
+        9, ADMIN, JobUpdate(description="Updated posting"), MagicMock()
+    ) == {"message": "Job updated successfully"}
 
 
 @pytest.mark.parametrize(
@@ -243,9 +245,12 @@ def test_get_job_filtered_applications_returns_result(monkeypatch):
         router.service, "get_job_filtered_applications", lambda *args: result
     )
 
-    assert router.get_job_filtered_applications(
-        9, ADMIN, JobApplicationFilters(), MagicMock()
-    ) == result
+    assert (
+        router.get_job_filtered_applications(
+            9, ADMIN, JobApplicationFilters(), MagicMock()
+        )
+        == result
+    )
 
 
 @pytest.mark.parametrize(

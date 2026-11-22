@@ -16,22 +16,26 @@ from core.exceptions import (
 )
 from domains.candidates import service
 from domains.candidates.model import Candidate
-from domains.candidates.schemas import CandidateCreate, CandidateFilters, CandidateUpdate
+from domains.candidates.schemas import (
+    CandidateCreate,
+    CandidateFilters,
+    CandidateUpdate,
+)
 
 
 @pytest.fixture
 def candidate_data():
     return CandidateCreate(
-        name="Casey Candidate",
+        name="Ram",
         password="password123",
-        email="casey@example.com",
+        email="ram@example.com",
         phone="1234567890",
         resume_url="https://example.com/resume",
-        linkedin_url="https://linkedin.com/in/casey",
+        linkedin_url="https://linkedin.com/in/ram",
         experience_years=5,
         skills=["Python"],
         current_title="Engineer",
-        current_company="Example",
+        current_company="TCS",
         confirm_password="password123",
     )
 
@@ -45,21 +49,21 @@ def test_create_candidate_hashes_password_and_saves(db, candidate_data, monkeypa
     added_candidate = db.add.call_args.args[0]
     assert isinstance(added_candidate, Candidate)
     assert added_candidate.password == "hashed-password"
-    assert added_candidate.email == "casey@example.com"
+    assert added_candidate.email == "ram@example.com"
     assert not hasattr(added_candidate, "confirm_password")
     db.commit.assert_called_once_with()
 
 
 def test_create_candidate_rejects_mismatched_confirmation(db):
     candidate = CandidateCreate(
-        name="Casey Candidate",
+        name="Ram",
         password="password123",
-        email="casey@example.com",
+        email="ram@example.com",
         phone="1234567890",
         resume_url="https://example.com/resume",
         experience_years=5,
         current_title="Engineer",
-        current_company="Example",
+        current_company="TCS",
         confirm_password="different123",
     )
 
@@ -143,7 +147,7 @@ def test_search_candidates_returns_database_results(db):
 def test_get_candidate_details_omits_password_and_returns_empty_summary(db):
     candidate = Candidate(
         id=7,
-        name="Casey Candidate",
+        name="Ram",
         password="secret-hash",
         email="casey@example.com",
         phone="1234567890",
@@ -151,7 +155,7 @@ def test_get_candidate_details_omits_password_and_returns_empty_summary(db):
         experience_years=5,
         skills=["Python"],
         current_title="Engineer",
-        current_company="Example",
+        current_company="TCS",
     )
     db.scalar.return_value = candidate
     db.execute.return_value.all.return_value = []
@@ -159,7 +163,7 @@ def test_get_candidate_details_omits_password_and_returns_empty_summary(db):
     result = service.get_candidate_details(db, {"id": 7, "role": "User"})
 
     assert "password" not in result
-    assert result["email"] == "casey@example.com"
+    assert result["email"] == "ram@example.com"
     assert result["summary"] == {
         "total_applications": 0,
         "active_applications": 0,
@@ -172,22 +176,20 @@ def test_get_candidate_details_omits_password_and_returns_empty_summary(db):
 def test_get_candidate_details_counts_active_rejected_and_hired_applications(db):
     candidate = Candidate(
         id=7,
-        name="Casey Candidate",
+        name="Ram",
         password="secret-hash",
-        email="casey@example.com",
+        email="ram@example.com",
         phone="1234567890",
         resume_url="https://example.com/resume",
         experience_years=5,
         skills=["Python"],
         current_title="Engineer",
-        current_company="Example",
+        current_company="TCS",
     )
     db.scalar.return_value = candidate
     applied_at = datetime.now(timezone.utc)
     applications = []
-    for application_id, stage in enumerate(
-        ["Screened", "Rejected", "Hired"], start=1
-    ):
+    for application_id, stage in enumerate(["Screened", "Rejected", "Hired"], start=1):
         application = SimpleNamespace(
             id=application_id,
             job_id=9,
@@ -246,9 +248,7 @@ def test_update_candidate_changes_only_set_fields(db):
 def test_update_candidate_with_empty_patch_is_noop(db):
     db.scalar.return_value = MagicMock()
 
-    service.update_candidate(
-        db, 2, CandidateUpdate(), {"id": 2, "role": "User"}
-    )
+    service.update_candidate(db, 2, CandidateUpdate(), {"id": 2, "role": "User"})
 
     db.commit.assert_not_called()
 
@@ -268,11 +268,15 @@ def test_update_candidate_rejects_duplicate_fields(db, field, exception):
         linkedin_url="https://linkedin.com/in/old",
     )
     db.scalar.side_effect = [candidate, MagicMock()]
-    update = CandidateUpdate(**{field: {
-        "phone": "2222222222",
-        "resume_url": "https://example.com/new",
-        "linkedin_url": "https://linkedin.com/in/new",
-    }[field]})
+    update = CandidateUpdate(
+        **{
+            field: {
+                "phone": "2222222222",
+                "resume_url": "https://example.com/new",
+                "linkedin_url": "https://linkedin.com/in/new",
+            }[field]
+        }
+    )
 
     with pytest.raises(exception):
         service.update_candidate(db, 2, update, {"id": 2, "role": "User"})

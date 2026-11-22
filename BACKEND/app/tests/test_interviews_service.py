@@ -130,7 +130,9 @@ def test_create_interview_rejects_unscreened_application(db, admin):
         ("Hired", service.ClosedApplicationError),
     ],
 )
-def test_create_interview_rejects_terminal_application_stages(db, admin, stage, exception):
+def test_create_interview_rejects_terminal_application_stages(
+    db, admin, stage, exception
+):
     db.scalar.side_effect = [MagicMock(), MagicMock(stage=stage)]
     details = InterviewCreate(
         application_id=8,
@@ -158,7 +160,6 @@ def test_create_interview_rejects_duplicate_round(db, admin):
         service.create_interview(db, details, admin)
 
 
-
 def test_cancel_interview_sets_status_and_reason(db, admin):
     interview = MagicMock(status="Scheduled")
     db.scalar.side_effect = [MagicMock(), interview]
@@ -184,9 +185,7 @@ def test_cancel_interview_rejects_completed_interview(db, admin):
 
 def test_cancel_interview_requires_admin(db):
     with pytest.raises(UnauthorizedError):
-        service.cancel_interview(
-            db, 14, CancelInterview(), {"id": 3, "role": "User"}
-        )
+        service.cancel_interview(db, 14, CancelInterview(), {"id": 3, "role": "User"})
 
     db.scalar.assert_not_called()
 
@@ -280,7 +279,7 @@ def test_get_interview_details_returns_related_records(db, admin):
         round_number=1,
         round_type="Technical",
         scheduled_at=future_time(),
-        interviewer_name="Riley Recruiter",
+        interviewer_name="Damu",
         interviewer_id=3,
         status="Scheduled",
         feedback=None,
@@ -290,11 +289,11 @@ def test_get_interview_details_returns_related_records(db, admin):
     )
     candidate = MagicMock(
         id=5,
-        email="casey@example.com",
+        email="ram@example.com",
         experience_years=5,
         skills=["Python"],
     )
-    candidate.name = "Casey Candidate"
+    candidate.name = "Ram"
     job = MagicMock(
         id=9, title="Backend Engineer", department="Engineering", location="Remote"
     )
@@ -306,7 +305,7 @@ def test_get_interview_details_returns_related_records(db, admin):
     result = service.get_interview_details(db, 14, admin)
 
     assert result["application"] == {"application_id": 8, "stage": "Interview_R1"}
-    assert result["candidate"]["name"] == "Casey Candidate"
+    assert result["candidate"]["name"] == "Ram"
     assert result["job"]["title"] == "Backend Engineer"
 
 
@@ -334,9 +333,9 @@ def test_get_interviews_returns_summary_and_serialized_rows(db, admin):
     db.execute.return_value.all.return_value = [
         SimpleNamespace(
             Interview=interview,
-            candidate_name="Casey Candidate",
+            candidate_name="Ram",
             job_title="Backend Engineer",
-            interviewer_name="Riley Recruiter",
+            interviewer_name="Damu",
         )
     ]
 
@@ -348,7 +347,7 @@ def test_get_interviews_returns_summary_and_serialized_rows(db, admin):
 
     assert result["upcoming_interviews"] == 2
     assert len(result["interviews"]) == 1
-    assert result["interviews"][0]["candidate_name"] == "Casey Candidate"
+    assert result["interviews"][0]["candidate_name"] == "Ram"
     assert result["interviews"][0]["job_title"] == "Backend Engineer"
 
 
@@ -394,9 +393,9 @@ def test_list_upcoming_interviews_serializes_rows(db, admin):
     db.execute.return_value.all.return_value = [
         SimpleNamespace(
             Interview=interview,
-            candidate_name="Casey Candidate",
+            candidate_name="Ram",
             job_title="Backend Engineer",
-            interviewer_name="Riley Recruiter",
+            interviewer_name="Damu",
         )
     ]
 
@@ -414,9 +413,9 @@ def test_list_upcoming_interviews_serializes_rows(db, admin):
             "round_number": 1,
             "round_type": "Technical",
             "scheduled_at": scheduled_at,
-            "interviewer_name": "Riley Recruiter",
+            "interviewer_name": "Damu",
             "status": "Scheduled",
-            "candidate_name": "Casey Candidate",
+            "candidate_name": "Ram",
             "job_title": "Backend Engineer",
         }
     ]

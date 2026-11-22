@@ -18,14 +18,14 @@ from domains.auth.schemas import PasswordUpdate
 
 def candidate_registration_data():
     return {
-        "name": "Casey Candidate",
+        "name": "Ram",
         "password": "password123",
-        "email": "casey@example.com",
+        "email": "ram@example.com",
         "phone": "1234567890",
         "resume_url": "https://example.com/resume",
         "experience_years": 0,
         "current_title": "Engineer",
-        "current_company": "Example",
+        "current_company": "TCS",
         "confirm_password": "password123",
     }
 
@@ -66,7 +66,7 @@ def test_login_returns_service_result(monkeypatch):
     result = {"access_token": "token", "token_type": "bearer"}
     monkeypatch.setattr(router.service, "login", lambda *args: result)
     form = OAuth2PasswordRequestForm(
-        username="casey@example.com", password="password", scope=""
+        username="ram@example.com", password="password", scope=""
     )
 
     assert router.login(False, form, MagicMock()) == result
@@ -78,7 +78,7 @@ def test_login_translates_invalid_credentials(monkeypatch):
 
     monkeypatch.setattr(router.service, "login", reject)
     form = OAuth2PasswordRequestForm(
-        username="casey@example.com", password="wrong", scope=""
+        username="ram@example.com", password="wrong", scope=""
     )
 
     with pytest.raises(HTTPException) as error:
@@ -106,7 +106,7 @@ def test_get_current_user_translates_authentication_errors(monkeypatch, route_er
 
 
 def test_get_current_user_returns_authenticated_profile(monkeypatch):
-    profile = {"id": 7, "name": "Casey Candidate"}
+    profile = {"id": 7, "name": "Ram"}
     monkeypatch.setattr(router.service, "get_current_user", lambda *args: profile)
 
     import asyncio
@@ -143,8 +143,6 @@ def test_update_password_translates_errors(monkeypatch, exception, status_code):
     )
 
     with pytest.raises(HTTPException) as error:
-        router.update_password(
-            password_data, {"id": 7, "role": "User"}, MagicMock()
-        )
+        router.update_password(password_data, {"id": 7, "role": "User"}, MagicMock())
 
     assert error.value.status_code == status_code

@@ -21,7 +21,7 @@ def test_password_hash_verifies_only_matching_password():
 
 
 def test_access_token_round_trips_claims():
-    claims = {"sub": "candidate@example.com", "id": 12, "role": "User"}
+    claims = {"sub": "ram@example.com", "id": 12, "role": "User"}
 
     token = create_access_token(claims)
 
@@ -30,9 +30,7 @@ def test_access_token_round_trips_claims():
 
 
 def test_expired_access_token_is_rejected():
-    token = create_access_token(
-        {"sub": "candidate@example.com"}, timedelta(seconds=-1)
-    )
+    token = create_access_token({"sub": "ram@example.com"}, timedelta(seconds=-1))
 
     assert verify_access_token(token) is None
 

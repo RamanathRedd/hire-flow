@@ -105,9 +105,7 @@ def test_get_jobs_filters_by_multiple_departments(db):
 def test_get_jobs_for_candidate_only_selects_open_unapplied_jobs(db):
     db.scalars.return_value.all.return_value = []
 
-    result = service.get_jobs(
-        db, JobFilters(), {"id": 7, "role": "User"}
-    )
+    result = service.get_jobs(db, JobFilters(), {"id": 7, "role": "User"})
 
     assert result == []
     statement = db.scalars.call_args.args[0]
@@ -158,7 +156,10 @@ def test_update_job_applies_only_provided_fields(db, admin):
 def test_update_job_rejects_non_admin(db):
     with pytest.raises(UnauthorizedError):
         service.update_job(
-            db, 9, JobUpdate(description="Updated description"), {"id": 4, "role": "User"}
+            db,
+            9,
+            JobUpdate(description="Updated description"),
+            {"id": 4, "role": "User"},
         )
 
 
@@ -249,7 +250,7 @@ def test_get_job_applications_groups_and_counts_by_stage(db, admin):
         stage="Interview_R1",
     )
     candidate = MagicMock(experience_years=5)
-    candidate.name = "Casey Candidate"
+    candidate.name = "Ram"
     db.scalar.return_value = target_job
     db.execute.return_value.all.return_value = [(application, candidate)]
 
@@ -261,7 +262,7 @@ def test_get_job_applications_groups_and_counts_by_stage(db, admin):
     assert result["total_hired"] == 0
     bucket = result["pipeline"]["Interview_R1"]
     assert bucket["count"] == 1
-    assert bucket["applications"][0]["candidate_name"] == "Casey Candidate"
+    assert bucket["applications"][0]["candidate_name"] == "Ram"
 
 
 def test_get_job_applications_rejects_missing_job(db, admin):
@@ -322,8 +323,8 @@ def test_get_job_filtered_applications_applies_filters_and_serializes_applicatio
         cover_note="Interested",
     )
     candidate = SimpleNamespace(
-        name="Casey Candidate",
-        email="casey@example.com",
+        name="Ram",
+        email="ram@example.com",
         experience_years=5,
         phone="1234567890",
         resume_url="https://example.com/resume",
@@ -339,14 +340,14 @@ def test_get_job_filtered_applications_applies_filters_and_serializes_applicatio
             needs_attention=True,
             interview_round=True,
             offer_stage=True,
-            name_filter="Casey",
+            name_filter="ram",
             stage_filter="Offer",
             date_applied_filter=14,
         ),
         admin,
     )
 
-    assert result["applications"][0]["candidate_name"] == "Casey Candidate"
+    assert result["applications"][0]["candidate_name"] == "Ram"
     assert result["applications"][0]["job"] == "Backend Engineer"
     assert result["applications"][0]["stage"] == "Offer"
     assert result["total_active"] == 2
@@ -360,9 +361,7 @@ def test_get_job_filtered_applications_rejects_missing_job(db, admin):
     db.scalar.return_value = None
 
     with pytest.raises(JobNotExistsError):
-        service.get_job_filtered_applications(
-            db, 9, JobApplicationFilters(), admin
-        )
+        service.get_job_filtered_applications(db, 9, JobApplicationFilters(), admin)
 
 
 def test_get_job_filtered_applications_rejects_non_admin(db):
