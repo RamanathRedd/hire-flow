@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { CandidateUpdate } from "../types/candidate";
+import { createApiError } from "./errors";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -16,7 +17,9 @@ export const getCandidateDetails = async () => {
       },
     });
     return response.data;
-  } catch (error) {}
+  } catch (error) {
+    throw createApiError(error);
+  }
 };
 
 export const updateCandidateDetails = async (
@@ -39,5 +42,7 @@ export const updateCandidateDetails = async (
       },
     );
     return response.data;
-  } catch (error) {}
+  } catch (error) {
+    throw createApiError(error);
+  }
 };

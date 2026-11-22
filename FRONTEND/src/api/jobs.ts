@@ -1,4 +1,5 @@
 import axios from "axios";
+import { createApiError, createUserFacingError } from "./errors";
 import type {
   JobApplicationFilters,
   JobCreate,
@@ -19,7 +20,7 @@ export const createJob = async (jobDetails: JobCreate) => {
     });
     return response.data;
   } catch (error) {
-    // throw new Error(getErrorMessage(error));
+    throw createApiError(error);
   }
 };
 
@@ -55,7 +56,7 @@ export const deleteJob = async (job_id: number) => {
     });
     return response.data;
   } catch (error) {
-    // throw new Error(getErrorMessage(error));
+    throw createApiError(error);
   }
 };
 
@@ -77,7 +78,7 @@ export const updateJob = async (
     );
     return response.data;
   } catch (error) {
-    // throw new Error(getErrorMessage(error));
+    throw createApiError(error);
   }
 };
 
@@ -97,7 +98,7 @@ export const updateJobStatus = async (job_id: number, status: string) => {
     );
     return response.data;
   } catch (error) {
-    // throw new Error(getErrorMessage(error));
+    throw createApiError(error);
   }
 };
 
@@ -105,7 +106,9 @@ export const getJobApplications = async (
   job_id: number,
   application_filters: JobApplicationFilters,
 ) => {
-  if (!job_id) return;
+  if (!job_id) {
+    throw createUserFacingError("A job must be selected to load applications.");
+  }
   const token = sessionStorage.getItem("access_token");
 
   try {
@@ -121,6 +124,6 @@ export const getJobApplications = async (
     );
     return response.data;
   } catch (error) {
-    // throw new Error(getErrorMessage(error));
+    throw createApiError(error);
   }
 };

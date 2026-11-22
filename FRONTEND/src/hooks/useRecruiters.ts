@@ -27,4 +27,5 @@ export const useUpdateRecruiterDetails = () =>
       recruiter_id: number;
       recruiter_details: RecruiterUpdate;
     }) => updateRecruiterDetails(recruiter_id, recruiter_details),
+    meta: { errorHandled: true },
   });

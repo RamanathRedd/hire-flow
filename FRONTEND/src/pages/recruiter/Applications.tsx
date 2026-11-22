@@ -12,6 +12,7 @@ import {
 } from "../../hooks/useApplications";
 import { useScheduleInterview } from "../../hooks/useInterviews";
 import LoadingPage from "../../components/layout/LoadingPage";
+import { getApiErrorMessage, notifyApiError } from "../../api/errors";
 
 const Applications = () => {
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
@@ -88,7 +89,9 @@ const Applications = () => {
       setIsUpdateApplicationModalOpen(false);
       setSelectedCandidateApplication(null);
       setIsDrawerOpen(false);
-    } catch (error) {}
+    } catch (error) {
+      notifyApiError({ message: getApiErrorMessage(error) });
+    }
   };
 
   useEffect(() => {

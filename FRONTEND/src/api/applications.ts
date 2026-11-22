@@ -1,4 +1,5 @@
 import axios from "axios";
+import { createApiError } from "./errors";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -17,7 +18,7 @@ export const applyJob = async (job_id: number) => {
     );
     return response.data;
   } catch (error) {
-    // throw new Error(getErrorMessage(error));
+    throw createApiError(error);
   }
 };
 
@@ -32,7 +33,7 @@ export const getLiveApplications = async () => {
     });
     return response.data;
   } catch (error) {
-    // throw new Error(getErrorMessage(error));
+    throw createApiError(error);
   }
 };
 
@@ -48,7 +49,7 @@ export const getCandidateApplications = async (status: string | null) => {
     });
     return response.data;
   } catch (error) {
-    // throw new Error(getErrorMessage(error));
+    throw createApiError(error);
   }
 };
 
@@ -63,7 +64,7 @@ export const getApplicationCounts = async () => {
     });
     return response.data;
   } catch (error) {
-    // throw new Error(getErrorMessage(error));
+    throw createApiError(error);
   }
 };
 
@@ -85,7 +86,7 @@ export const rejectApplication = async (
     );
     return response.data;
   } catch (error) {
-    // throw new Error(getErrorMessage(error));
+    throw createApiError(error);
   }
 };
 
@@ -107,6 +108,6 @@ export const updateApplicationStage = async (
     );
     return response.data;
   } catch (error) {
-    // throw new Error(getErrorMessage(error));
+    throw createApiError(error);
   }
 };

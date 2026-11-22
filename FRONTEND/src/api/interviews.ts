@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { interviewFeedback, InterviewFilters } from "../types/interview";
+import { createApiError } from "./errors";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -21,7 +22,7 @@ export const scheduleInterview = async (interview_details: any) => {
     );
     return response.data;
   } catch (error) {
-    // throw new Error(getErrorMessage(error));
+    throw createApiError(error);
   }
 };
 
@@ -41,7 +42,7 @@ export const getInterviews = async (interviewFilter: InterviewFilters) => {
     });
     return response.data;
   } catch (error) {
-    // throw new Error(getErrorMessage(error));
+    throw createApiError(error);
   }
 };
 
@@ -62,7 +63,9 @@ export const getUpcomingInterviews = async (
       paramsSerializer: { indexes: null },
     });
     return response.data;
-  } catch (error) {}
+  } catch (error) {
+    throw createApiError(error);
+  }
 };
 
 export const reScheduleInterview = async (
@@ -86,7 +89,7 @@ export const reScheduleInterview = async (
     );
     return response.data;
   } catch (error) {
-    // throw new Error(getErrorMessage(error));
+    throw createApiError(error);
   }
 };
 
@@ -111,7 +114,7 @@ export const cancelInterview = async (
     );
     return response.data;
   } catch (error) {
-    // throw new Error(getErrorMessage(error));
+    throw createApiError(error);
   }
 };
 
@@ -136,6 +139,6 @@ export const submitInterviewFeedback = async (
     );
     return response.data;
   } catch (error) {
-    // throw new Error(getErrorMessage(error));
+    throw createApiError(error);
   }
 };

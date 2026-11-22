@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { RecruiterUpdate } from "../types/recruiter";
+import { createApiError } from "./errors";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -17,7 +18,7 @@ export const getInterviewers = async () => {
     });
     return response.data;
   } catch (error) {
-    // throw new Error(getErrorMessage(error));
+    throw createApiError(error);
   }
 };
 
@@ -34,7 +35,9 @@ export const getRecruiterDetails = async () => {
       },
     });
     return response.data;
-  } catch (error) {}
+  } catch (error) {
+    throw createApiError(error);
+  }
 };
 
 export const updateRecruiterDetails = async (
@@ -57,5 +60,7 @@ export const updateRecruiterDetails = async (
       },
     );
     return response.data;
-  } catch (error) {}
+  } catch (error) {
+    throw createApiError(error);
+  }
 };

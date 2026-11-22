@@ -1,29 +1,8 @@
 import axios from "axios";
 import type { LoginResponse, RegisterCredentials } from "../types/auth";
+import { createApiError } from "./errors";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-const getErrorMessage = (error: unknown): string => {
-  if (!axios.isAxiosError(error)) {
-    return error instanceof Error
-      ? error.message
-      : "Sign in failed. Please try again.";
-  }
-
-  if (!error.response) {
-    return "Unable to connect to the server. Check that the backend is running and try again.";
-  }
-
-  const data: unknown = error.response.data;
-  if (typeof data === "object" && data !== null) {
-    if ("detail" in data && typeof data.detail === "string") return data.detail;
-    if ("message" in data && typeof data.message === "string")
-      return data.message;
-    if ("error" in data && typeof data.error === "string") return data.error;
-  }
-
-  return "Sign in failed. Please try again.";
-};
 
 export const login = async (
   email: string,
@@ -40,7 +19,7 @@ export const login = async (
     );
     return response.data;
   } catch (error) {
-    throw new Error(getErrorMessage(error));
+    throw createApiError(error, "Sign in failed. Please try again.");
   }
 };
 
@@ -88,6 +67,6 @@ export const register = async (credentails: RegisterCredentials) => {
 
     return response.data;
   } catch (error) {
-    throw new Error(getErrorMessage(error));
+    throw createApiError(error, "Account creation failed. Please try again.");
   }
 };

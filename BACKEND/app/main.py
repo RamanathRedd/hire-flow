@@ -1,5 +1,10 @@
+import logging
+
 from core.config import settings
 from core.database import init_db
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from domains.anlaytics.router import analytics_router
 from domains.application_stage_history import model as stage_history_model  # noqa: F401
 from domains.applications import model as application_model  # noqa: F401
@@ -14,10 +19,44 @@ from domains.jobs.router import jobs_router
 from domains.recruiters import model as recruiter_model  # noqa: F401
 from domains.recruiters.router import recruiters_router
 from domains.auth.router import auth_router
-from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+logger = logging.getLogger("hireflow.api")
 app = FastAPI(title=settings.APP_TITLE)
+
+
+@app.exception_handler(RequestValidationError)
+async def handle_request_validation_error(
+    _request: Request, error: RequestValidationError
+) -> JSONResponse:
+    details = [
+        {
+            "loc": detail.get("loc", ()),
+            "msg": detail.get("msg", "Invalid value"),
+            "type": detail.get("type", "value_error"),
+        }
+        for detail in error.errors()
+    ]
+    return JSONResponse(
+        status_code=422,
+        content={"detail": details},
+    )
+
+
+@app.exception_handler(Exception)
+async def handle_unexpected_error(
+    request: Request, error: Exception
+) -> JSONResponse:
+    logger.error(
+        "Unhandled API error for %s %s",
+        request.method,
+        request.url.path,
+        exc_info=(type(error), error, error.__traceback__),
+    )
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An unexpected error occurred. Please try again later."},
+    )
 
 
 @app.get("/health")

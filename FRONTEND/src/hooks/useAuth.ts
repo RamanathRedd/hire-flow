@@ -6,9 +6,11 @@ export const useLogin = () =>
   useMutation({
     mutationFn: ({ email, password, isAdmin }: LoginCredentials) =>
       login(email, password, isAdmin),
+    meta: { errorHandled: true },
   });
 
 export const useRegister = () =>
   useMutation({
     mutationFn: (credentails: RegisterCredentials) => register(credentails),
+    meta: { errorHandled: true },
   });
