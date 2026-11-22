@@ -7,6 +7,7 @@ import { useApplyJob } from "../../hooks/useApplications";
 import Modal from "../../components/ui/Modal";
 import { useQueryClient } from "@tanstack/react-query";
 import EmptyPage from "../../components/layout/EmptyPage";
+import LoadingPage from "../../components/layout/LoadingPage";
 
 const BrowseJobs = () => {
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
@@ -22,7 +23,7 @@ const BrowseJobs = () => {
   const queryClient = useQueryClient();
   const applyJobMutation = useApplyJob();
 
-  const { data: jobs = [] } = useGetJobs({
+  const { data: jobs = [], isPending: jobsLoading } = useGetJobs({
     departments: selectedDepartments,
     statuses: null,
     locations: selectedLocations,
@@ -83,174 +84,190 @@ const BrowseJobs = () => {
     });
   };
 
+  const showEmptyState =
+    jobs.length === 0 &&
+    selectedDepartments.length === 0 &&
+    selectedLocations.length === 0;
+
   return (
     <section className="candidate-browse-page">
       <Navbar leftTitle="Open roles" rightText="" classString="" />
-      {jobs.length === 0 &&
-      selectedDepartments.length === 0 &&
-      selectedLocations.length === 0 ? (
-        <EmptyPage
-          icon="M8 2v4m8-4v4M3 10h18M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm-2 0 18 18"
-          title="No open roles right now"
-          subTitle="New roles are posted regularly. Check back soon, and keep your profile up to date so you are ready."
-          button={{
-            text: "Update my profile",
-            navigation: "/candidate-profile",
-          }}
-        />
+      {jobsLoading ? (
+        <LoadingPage page="Browse Jobs" />
       ) : (
         <>
-          <div className="filter-toolbar browser-job-toolbar">
-            <details className="department-filter" ref={departmentFilterRef}>
-              <summary
-                className="filter-select filter-trigger"
-                aria-label={
-                  selectedDepartments.length
-                    ? `Departments: ${selectedDepartments.join(", ")}`
-                    : "Filter by department"
-                }
-                onClick={(event) => {
-                  if (departmentsLoading || departmentsError) {
-                    event.preventDefault();
-                  }
-                }}
-              >
-                {selectedDepartments.length === 0
-                  ? "Department"
-                  : `${selectedDepartments.length} selected`}
-              </summary>
-              <div className="department-filter-options">
-                {departments?.map((department) => (
-                  <label key={department.id}>
-                    <input
-                      type="checkbox"
-                      checked={selectedDepartments.includes(department.name)}
-                      onChange={(event) => {
-                        setSelectedDepartments((current) =>
-                          event.target.checked
-                            ? [...current, department.name]
-                            : current.filter(
-                                (name) => name !== department.name,
-                              ),
-                        );
-                      }}
-                      disabled={departmentsLoading || departmentsError}
-                    />
-                    {department.name}
-                  </label>
-                ))}
-              </div>
-            </details>
-            {departmentsError && (
-              <span id="department-load-error" role="alert">
-                Failed to load departments. Please try again.
-              </span>
-            )}
-            <details className="department-filter" ref={locationFilterRef}>
-              <summary
-                className="filter-select filter-trigger"
-                aria-label={
-                  selectedLocations.length
-                    ? `Locations: ${selectedLocations.join(", ")}`
-                    : "Filter by location"
-                }
-                onClick={(event) => {
-                  if (locationsLoading || locationsError) {
-                    event.preventDefault();
-                  }
-                }}
-              >
-                {selectedLocations.length === 0
-                  ? "Location"
-                  : `${selectedLocations.length} selected`}
-              </summary>
-              <div className="department-filter-options">
-                {locations?.map((location) => (
-                  <label key={location.id}>
-                    <input
-                      type="checkbox"
-                      checked={selectedLocations.includes(location.name)}
-                      onChange={(event) => {
-                        setSelectedLocations((current) =>
-                          event.target.checked
-                            ? [...current, location.name]
-                            : current.filter((name) => name !== location.name),
-                        );
-                      }}
-                      disabled={locationsLoading || locationsError}
-                    />
-                    {location.name}
-                  </label>
-                ))}
-              </div>
-            </details>
-            {locationsError && (
-              <span id="location-load-error" role="alert">
-                Failed to load locations. Please try again.
-              </span>
-            )}
-
-            <button
-              type="button"
-              className="filter-button"
-              onClick={clearFilters}
-            >
-              Clear Filters
-            </button>
-          </div>
-          {jobs.length === 0 ? (
+          {showEmptyState ? (
             <EmptyPage
-              icon="M4 5h16l-6.5 7.5v5l-3-1.5v-3.5L4 5zM4 4l16 16"
-              title="No roles match your filters"
-              subTitle="Try a different location or department."
-              button={{ text: "Clear filters", onClick: clearFilters }}
+              icon="M8 2v4m8-4v4M3 10h18M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm-2 0 18 18"
+              title="No open roles right now"
+              subTitle="New roles are posted regularly. Check back soon, and keep your profile up to date so you are ready."
+              button={{
+                text: "Update my profile",
+                navigation: "/candidate-profile",
+              }}
             />
           ) : (
-            <div className="responsive-table-wrap">
-              <table className="jobs-table interviews-table">
-                <thead>
-                  <tr>
-                    <th scope="col">
-                      <button
-                        className="table-sort-button"
-                        type="button"
-                        // onClick={"sortDirection"}
-                      >
-                        Title{" "}
-                        <span aria-hidden="true">
-                          {"ascending" === "ascending" ? "↑" : "↓"}
-                        </span>
-                      </button>
-                    </th>
-                    <th scope="col">Department</th>
-                    <th scope="col">Location</th>
-                    <th scope="col">Type</th>
-                    <th scope="col" aria-label="Actions"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {jobs.length > 0
-                    ? jobs.map((job: Job) => (
-                        <tr key={job.id}>
-                          <td>{job.title}</td>
-                          <td>{job.department}</td>
-                          <td>{job.location}</td>
-                          <td>{job.job_type}</td>
-                          <td>
-                            <button
-                              className="apply-button"
-                              type="button"
-                              onClick={() => applyJob(job.id, job.title)}
-                            >
-                              Apply
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    : "No jobs found"}
-                </tbody>
-              </table>
-            </div>
+            <>
+              <div className="filter-toolbar browser-job-toolbar">
+                <details
+                  className="department-filter"
+                  ref={departmentFilterRef}
+                >
+                  <summary
+                    className="filter-select filter-trigger"
+                    aria-label={
+                      selectedDepartments.length
+                        ? `Departments: ${selectedDepartments.join(", ")}`
+                        : "Filter by department"
+                    }
+                    onClick={(event) => {
+                      if (departmentsLoading || departmentsError) {
+                        event.preventDefault();
+                      }
+                    }}
+                  >
+                    {selectedDepartments.length === 0
+                      ? "Department"
+                      : `${selectedDepartments.length} selected`}
+                  </summary>
+                  <div className="department-filter-options">
+                    {departments?.map((department) => (
+                      <label key={department.id}>
+                        <input
+                          type="checkbox"
+                          checked={selectedDepartments.includes(
+                            department.name,
+                          )}
+                          onChange={(event) => {
+                            setSelectedDepartments((current) =>
+                              event.target.checked
+                                ? [...current, department.name]
+                                : current.filter(
+                                    (name) => name !== department.name,
+                                  ),
+                            );
+                          }}
+                          disabled={departmentsLoading || departmentsError}
+                        />
+                        {department.name}
+                      </label>
+                    ))}
+                  </div>
+                </details>
+                {departmentsError && (
+                  <span id="department-load-error" role="alert">
+                    Failed to load departments. Please try again.
+                  </span>
+                )}
+                <details className="department-filter" ref={locationFilterRef}>
+                  <summary
+                    className="filter-select filter-trigger"
+                    aria-label={
+                      selectedLocations.length
+                        ? `Locations: ${selectedLocations.join(", ")}`
+                        : "Filter by location"
+                    }
+                    onClick={(event) => {
+                      if (locationsLoading || locationsError) {
+                        event.preventDefault();
+                      }
+                    }}
+                  >
+                    {selectedLocations.length === 0
+                      ? "Location"
+                      : `${selectedLocations.length} selected`}
+                  </summary>
+                  <div className="department-filter-options">
+                    {locations?.map((location) => (
+                      <label key={location.id}>
+                        <input
+                          type="checkbox"
+                          checked={selectedLocations.includes(location.name)}
+                          onChange={(event) => {
+                            setSelectedLocations((current) =>
+                              event.target.checked
+                                ? [...current, location.name]
+                                : current.filter(
+                                    (name) => name !== location.name,
+                                  ),
+                            );
+                          }}
+                          disabled={locationsLoading || locationsError}
+                        />
+                        {location.name}
+                      </label>
+                    ))}
+                  </div>
+                </details>
+                {locationsError && (
+                  <span id="location-load-error" role="alert">
+                    Failed to load locations. Please try again.
+                  </span>
+                )}
+
+                <button
+                  type="button"
+                  className="filter-button"
+                  onClick={clearFilters}
+                >
+                  Clear Filters
+                </button>
+              </div>
+              {jobs.length === 0 ? (
+                <EmptyPage
+                  icon="M4 5h16l-6.5 7.5v5l-3-1.5v-3.5L4 5zM4 4l16 16"
+                  title="No roles match your filters"
+                  subTitle="Try a different location or department."
+                  button={{ text: "Clear filters", onClick: clearFilters }}
+                />
+              ) : (
+                <div className="responsive-table-wrap">
+                  <table className="jobs-table interviews-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">
+                          <button
+                            className="table-sort-button"
+                            type="button"
+                            // onClick={"sortDirection"}
+                          >
+                            Title{" "}
+                            <span aria-hidden="true">
+                              {"ascending" === "ascending" ? "↑" : "↓"}
+                            </span>
+                          </button>
+                        </th>
+                        <th scope="col">Department</th>
+                        <th scope="col">Location</th>
+                        <th scope="col">Type</th>
+                        <th scope="col" aria-label="Actions"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {jobs.length > 0
+                        ? jobs.map((job: Job) => (
+                            <tr key={job.id}>
+                              <td>{job.title}</td>
+                              <td>{job.department}</td>
+                              <td>{job.location}</td>
+                              <td>{job.job_type}</td>
+                              <td>
+                                <button
+                                  className="apply-button"
+                                  type="button"
+                                  onClick={() => applyJob(job.id, job.title)}
+                                >
+                                  Apply
+                                </button>
+                              </td>
+                            </tr>
+                          ))
+                        : "No jobs found"}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
           )}
         </>
       )}
